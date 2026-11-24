@@ -137,6 +137,37 @@ export function studentRoutes(): Router {
   r.post("/trip/end", wrap(() => ctl.rental.endTrip(STUDENT)));
   r.post("/fare/pay", wrap(() => ctl.rental.payFare(STUDENT)));
 
+  // UC-04 Reserve parking space
+  r.get("/parking/start", (_req, res) => res.json(ctl.reservation.startReservation(STUDENT)));
+  r.post("/vehicle", wrap((req) => ctl.reservation.registerVehicle(STUDENT, req.body.type, String(req.body.id ?? ""))));
+  r.post("/parking/window", wrap((req) => ctl.reservation.submitTimeWindow(STUDENT, req.body.hubId, req.body.vehicleId, Number(req.body.arrival), Number(req.body.departure))));
+  r.post("/parking/alt", wrap((req) => ctl.reservation.chooseAlternative(STUDENT, Number(req.body.index))));
+  r.post("/parking/confirm", wrap(() => allocationView(ctl.reservation.confirmReservation(STUDENT))));
+  r.post("/parking/discard", wrap(() => ctl.reservation.discardRequest(STUDENT)));
+
+  // UC-05 Schedule charging session
+  r.get("/charging/start", (req, res) => res.json(ctl.charging.startScheduling(STUDENT, req.query.hubId as string | undefined)));
+  r.post("/charging/request", wrap((req) => {
+    const b = req.body as Record<string, unknown>;
+    return ctl.charging.submitRequest(STUDENT, { hubId: String(b.hubId), privateVehicleId: String(b.vehicleId), from: Number(b.from), to: Number(b.to), neededBy: b.neededBy ? Number(b.neededBy) : null, currentSoc: Number(b.currentSoc), targetSoc: Number(b.targetSoc) });
+  }));
+  r.post("/charging/alt", wrap((req) => ctl.charging.chooseAlternative(STUDENT, Number(req.body.index))));
+  r.post("/charging/confirm", wrap(() => allocationView(ctl.charging.confirmProposal(STUDENT))));
+  r.post("/charging/discard", wrap(() => ctl.charging.discardRequest(STUDENT)));
+
+  // UC-06 Report issue
+  r.get("/report/start", (_req, res) => res.json(ctl.issue.startReport(STUDENT)));
+  r.get("/report/resources/:hubId", (req, res) => res.json(ctl.issue.resourcesAt(req.params.hubId)));
+  r.post("/report", wrap((req) => ctl.issue.submitReport(STUDENT, req.body.category, String(req.body.resourceId ?? ""), String(req.body.description ?? ""), (req.body.photos as string[]) ?? [], req.body.key)));
+  r.get("/reports", (_req, res) => res.json(ctl.issue.reportsOf(STUDENT)));
+
+  // S11 My bookings
+  r.get("/bookings", (_req, res) => {
+    const mine = [...db.allocations.values()].filter((a) => a.studentId === STUDENT && (a.kind !== "ChargingSession" || (a as ChargingSession).isCommittedReservation()));
+    const views = mine.sort((a, b) => b.createdAt - a.createdAt).map((a) => ({ ...allocationView(a), active: a.isActive(), createdAt: a.createdAt }));
+    res.json({ active: views.filter((v) => v.active), past: views.filter((v) => !v.active) });
+  });
+
   // S12 notifications
   r.get("/notifications", (_req, res) => res.json(db.notifications.filter((n) => n.studentId === STUDENT).sort((a, b) => b.time - a.time)));
   r.post("/notifications/read", wrap((req) => {

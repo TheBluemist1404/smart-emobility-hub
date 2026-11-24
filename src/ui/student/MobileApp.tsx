@@ -8,6 +8,9 @@ import { getSocket, hm, useClock, useLive } from "../shared/live";
 import { S01HubSearch, S02HubDetail } from "./Discover";
 import { S03Review, VRScreen } from "./Reserve";
 import { TripTab } from "./Ride";
+import { S05Parking, S06Charging, PRScreen, CSScreen } from "./Book";
+import { S07Report } from "./Report";
+import { S11Bookings, S12Notifications } from "./Account";
 import type { Home, Route } from "./types";
 
 interface Toast { id: string; title: string; body: string; tone: string }
@@ -16,9 +19,9 @@ function tabOf(r: Route): Tab {
   switch (r.s) {
     case "S01": case "S02": case "notifications": return "hubs";
     case "S03": case "VR": return "none";
-    case "S09": case "S10": return "trip";
+    case "S09": case "S10": case "S08": return "trip";
     case "bookings": case "PR": case "CS": return "bookings";
-    case "report": case "S07": case "S08": return "report";
+    case "report": case "S07": return "report";
     default: return "none";
   }
 }
@@ -58,7 +61,14 @@ export function MobileApp() {
     case "S03": body = <S03Review go={go} vehicleId={route.vehicleId} />; break;
     case "VR": body = <VRScreen go={go} id={route.id} now={now} />; break;
     case "S09": case "S10": body = home ? <TripTab go={go} home={home} now={now} /> : <span className="spinner" />; break;
-    default: body = <Later what={route.s} go={go} />;
+    case "S05": body = home ? <S05Parking go={go} home={home} now={now} hubId={route.hubId} /> : <span className="spinner" />; break;
+    case "S06": body = home ? <S06Charging go={go} home={home} now={now} hubId={route.hubId} /> : <span className="spinner" />; break;
+    case "PR": body = <PRScreen go={go} id={route.id} now={now} />; break;
+    case "CS": body = <CSScreen go={go} id={route.id} now={now} />; break;
+    case "report": case "S07": body = home ? <S07Report key={`r-${"resourceId" in route ? route.resourceId ?? "" : ""}`} go={go} home={home} resourceId={"resourceId" in route ? route.resourceId : undefined} /> : <span className="spinner" />; break;
+    case "S08": body = home?.trip ? <S07Report key="s08" go={go} home={home} trip /> : home ? <TripTab go={go} home={home} now={now} /> : <span className="spinner" />; break;
+    case "bookings": body = <S11Bookings go={go} home={home} now={now} />; break;
+    case "notifications": body = <S12Notifications go={go} now={now} />; break;
   }
 
   const overlay = toasts.length ? (
@@ -78,15 +88,6 @@ export function MobileApp() {
         <Phone tab={tabOf(route)} dark={dark} time={hm(now)} onTab={onTab} overlay={overlay}>{body}</Phone>
       </div>
       <DemoTools side="student" />
-    </>
-  );
-}
-
-function Later({ what, go }: { what: string; go: (r: Route) => void }) {
-  return (
-    <>
-      <div className="m-appbar"><span className="icon-btn clickable" onClick={() => go({ s: "S01" })}><Icon name="chevron-left" /></span><div className="title"><div className="h4">{what}</div></div><span /></div>
-      <div className="content"><div className="banner neutral"><span className="ic"><Icon name="hammer" /></span><b>Coming in the next phase.</b><p>This screen is built in Phase 3.</p></div></div>
     </>
   );
 }

@@ -6,6 +6,7 @@ import { api, hhmmss, hm, hms, mmss, useLive, vnd } from "../shared/live";
 import { Soc, chipTone } from "./Discover";
 import { BankMeter } from "./Reserve";
 import type { Go, Home, PickupSummary, TripView } from "./types";
+import { BreakdownCard, type ReportResult } from "./Report";
 
 const vehIcon = (t: string) => (t === "electric bicycle" ? "bike" : "motorbike");
 
@@ -14,7 +15,7 @@ export function TripTab({ go, home, now }: { go: Go; home: Home; now: number }) 
   const [doneTrip, setDoneTrip] = useState<string | null>(null);
   const [returning, setReturning] = useState(false);
   if (home.pickup) return <Pickup go={go} home={home} now={now} />;
-  if (home.trip) return returning ? <S10Return home={home} trip={home.trip} now={now} onBack={() => setReturning(false)} /> : <S09Trip trip={home.trip} now={now} onEnd={() => setReturning(true)} />;
+  if (home.trip) return returning ? <S10Return home={home} trip={home.trip} now={now} onBack={() => setReturning(false)} /> : <S09Trip go={go} trip={home.trip} now={now} onEnd={() => setReturning(true)} />;
   const lt = home.lastTrip;
   if (lt && lt.id !== doneTrip && (lt.fareStatus === "Unpaid" || now - (lt.endTime ?? 0) < 30 * 60_000)) return <S10Summary trip={lt} now={now} onDone={() => { setDoneTrip(lt.id); go({ s: "S01" }); }} />;
   return <S09Scan go={go} home={home} />;
@@ -140,7 +141,9 @@ function Pickup({ go, home, now }: { go: Go; home: Home; now: number }) {
   );
 }
 
-function S09Trip({ trip, now, onEnd }: { trip: TripView; now: number; onEnd: () => void }) {
+function S09Trip({ go, trip, now, onEnd }: { go: Go; trip: TripView; now: number; onEnd: () => void }) {
+  const { data: reports } = useLive<ReportResult[]>("/student/reports");
+  const bd = reports?.find((r) => r.resourceId === trip.vehicleId && r.category === "vehicle failure" && r.time >= trip.startTime);
   return (
     <>
       <div className="m-appbar"><span /><div className="title"><div className="h4">Your trip</div><div className="sub">Started {hm(trip.startTime)} at {trip.hubId}</div></div><span className="icon-btn"><Icon name="ellipsis" /></span></div>
@@ -159,9 +162,11 @@ function S09Trip({ trip, now, onEnd }: { trip: TripView; now: number; onEnd: () 
           {trip.reservationId && <div className="li"><div className="lead brand"><Icon name="ticket" /></div><div className="grow"><div className="t mono">{trip.reservationId}</div><div className="s">Reservation used</div></div><span className="chip ok">Fulfilled</span></div>}
           <div className="li"><div className="lead brand"><Icon name="route" /></div><div className="grow"><div className="t mono">{trip.id}</div><div className="s">From {trip.hubId} · dock {trip.startDock}</div></div><span className="chip info">Open</span></div>
         </div></div>
+        {bd && <BreakdownCard r={bd} />}
         <div className="card pad stack tight"><b>How to return</b><p className="small muted">Push the vehicle into any vacant dock at a Hub until it clicks, then tap End Trip. The fare is paid through the Bank System.</p></div>
       </div>
-      <div className="actionbar"><button className="btn primary block lg" onClick={onEnd}><Icon name="flag" />End Trip</button></div>
+      <div className="actionbar"><button className="btn primary block lg" onClick={onEnd}><Icon name="flag" />End Trip</button>
+        {!bd && <button className="btn ghost block" style={{ height: 34, color: "var(--danger)" }} onClick={() => go({ s: "S08" })}><Icon name="triangle-alert" />The vehicle broke down</button>}</div>
     </>
   );
 }

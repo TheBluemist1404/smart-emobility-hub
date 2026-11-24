@@ -78,7 +78,8 @@ export function nextId(prefix: string, style: "code" | "num" = "code", start = 1
   const n = (counters.get(prefix) ?? start - 1) + 1;
   counters.set(prefix, n);
   if (style === "num") return `${prefix}-${String(n).padStart(4, "0")}`;
-  let x = (n * 7919 + 104729) % (ALPH.length ** 4);
+  const salt = [...prefix].reduce((h, c) => h * 31 + c.charCodeAt(0), 0);
+  let x = (n * 7919 + 104729 + salt * 1301) % (ALPH.length ** 4);
   let s = "";
   for (let i = 0; i < 4; i++) { s = ALPH[x % ALPH.length] + s; x = Math.floor(x / ALPH.length); }
   return `${prefix}-${s}`;

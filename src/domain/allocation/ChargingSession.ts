@@ -23,6 +23,8 @@ export class ChargingSession extends Allocation {
   window: TimeWindow | null = null;
   neededBy: number | null = null;
   targetSoc = 80;
+  /** The battery level the student entered (UC-05 step 12). */
+  currentSoc: number | null = null;
   energyKwh = 0;
 
   constructor(

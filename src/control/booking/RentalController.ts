@@ -174,6 +174,20 @@ export class RentalController implements StatusListener {
     this.endSession(p, "cancelled by the student");
   }
 
+  /**
+   * UC-07 6a: after a UC-06 report on the vehicle being picked up, the pickup ends without an
+   * unlock. A walk-up hold is released; a reservation moves to a same-type vehicle (BR-RES-02).
+   */
+  reportedDuringPickup(studentId: string): { outcome: "released" | "moved" | "cancelled" | "awaiting"; vehicleId: string | null } | null {
+    const p = this.sessions.get(studentId);
+    if (!p || p.state === "unlocking") return null;
+    const vr = p.reservationId ? db.allocations.get(p.reservationId) as VehicleReservation : null;
+    this.endSession(p, "issue reported (6a)");
+    if (!vr) return { outcome: "released", vehicleId: null };
+    const outcome = this.reservations.moveOrCancelVehicleReservation(vr, "you reported a problem with it");
+    return { outcome, vehicleId: vr.vehicleId };
+  }
+
   private endSession(p: PickupSession, why: string): void {
     p.timer?.cancel();
     this.sessions.delete(p.studentId);

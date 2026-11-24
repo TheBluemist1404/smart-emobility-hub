@@ -5,7 +5,7 @@
   "description": "MVP of the Smart E-Mobility Hub (HCMUT HK261 Software Engineering, group 4, CC03)",
   "type": "module",
   "scripts": {
-    "dev": "tsx server/main.ts",
+    "dev": "tsx watch --clear-screen=false --exclude \"src/ui/**\" server/main.ts",
     "start": "tsx server/main.ts",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",

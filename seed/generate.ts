@@ -18,7 +18,7 @@ interface HubSpec { id: string; name: string; category: string; open: string; x:
 const HUBS: HubSpec[] = [
   { id: "H01", name: "KTX Khu A", category: "Dormitory", open: "05:00–23:00", x: 66, y: 30, docks: 40, points: ["AC 7 kW", "AC 7 kW", "DC 22 kW", "DC 22 kW"], eb: 20, em: 18, freeEb: 8, freeEm: 6, updated: "14:36:05", mix: { available: 0, waiting: 0, charging: 0 } },
   { id: "H02", name: "KTX Khu B", category: "Dormitory", open: "05:00–23:00", x: 84, y: 56, docks: 30, points: ["AC 7 kW", "AC 7 kW", "AC 7 kW", "AC 7 kW", "DC 22 kW", "DC 22 kW"], eb: 8, em: 6, freeEb: 1, freeEm: 1, updated: "14:36:02", mix: { available: 0, waiting: 0, charging: 5 } },
-  { id: "H03", name: "Ga Metro ĐHQG", category: "Metro", open: "05:00–23:30", x: 22, y: 82, docks: 60, points: ["AC 7 kW", "AC 7 kW", "AC 7 kW", "AC 7 kW", "DC 22 kW", "DC 22 kW", "DC 22 kW", "DC 22 kW"], eb: 16, em: 12, freeEb: 5, freeEm: 4, updated: "14:36:06", mix: { available: 26, waiting: 16, charging: 6 } },
+  { id: "H03", name: "Ga Metro ĐHQG", category: "Metro", open: "05:00–23:30", x: 22, y: 82, docks: 60, points: ["AC 7 kW", "AC 7 kW", "AC 7 kW", "AC 7 kW", "DC 22 kW", "DC 22 kW", "DC 22 kW", "DC 22 kW"], eb: 16, em: 12, freeEb: 5, freeEm: 4, updated: "14:36:06", mix: { available: 29, waiting: 16, charging: 6 } },
   { id: "H04", name: "ĐH Bách khoa (Dĩ An)", category: "School", open: "06:00–22:00", x: 48, y: 12, docks: 36, points: ["AC 7 kW", "AC 7 kW", "AC 7 kW", "AC 7 kW", "AC 7 kW", "DC 22 kW", "DC 22 kW", "DC 22 kW"], eb: 12, em: 10, freeEb: 6, freeEm: 4, updated: "14:36:03", mix: { available: 3, waiting: 11, charging: 2 } },
   { id: "H05", name: "Nhà Văn hóa Sinh viên", category: "Service", open: "06:00–22:00", x: 56, y: 68, docks: 24, points: ["AC 7 kW", "AC 7 kW", "AC 7 kW", "AC 7 kW", "DC 22 kW", "DC 22 kW"], eb: 10, em: 8, freeEb: 7, freeEm: 4, updated: "14:36:04", mix: { available: 8, waiting: 2, charging: 1 } },
   { id: "H06", name: "ĐH KHTN (Linh Trung)", category: "School", open: "06:00–22:00", x: 14, y: 20, docks: 20, points: ["AC 7 kW", "AC 7 kW", "DC 22 kW", "DC 22 kW"], eb: 8, em: 6, freeEb: 4, freeEm: 3, updated: "14:29:40", mix: { available: 6, waiting: 4, charging: 0 } },
@@ -167,6 +167,7 @@ out.incidents.push(
   { id: "INC-0187", resourceId: "CP-H01-04", hubId: "H01", category: "charging point unavailable or faulty", description: "Charging point reports a hardware fault (UC-11 E3).", source: "system", status: "Open", created: T("14:12:00"), blocking: true },
   { id: "INC-0189", resourceId: "H01-P-B12", hubId: "H01", category: "parking space blocked or occupied", description: "Barrier at P-B12 stuck down; space unusable.", source: "operator", status: "In Progress", created: T("13:58:00"), blocking: true, owner: "OP-014",
     actions: [{ note: "Started handling · barrier stuck, technician called", time: T("14:00:00") }, { note: "Blocked P-B12 · PR-4K1C moved to P-B07, PR-3MZ8 cancelled (no replacement) and refund requested", time: T("14:02:00"), block: true }] },
+  { id: "INC-0190", resourceId: "EM-0031", hubId: "H01", category: "vehicle failure", description: "Rear brake squeals and barely grips.", source: "student report", status: "Open", created: T("14:08:00"), blocking: false },
   { id: "INC-0191", resourceId: "H06", hubId: "H06", category: "Hub disconnected", description: "No data from H06 since 14:29:40 (over DATA_STALE_AFTER).", source: "network warning", status: "Open", created: T("14:30:45"), blocking: false },
   { id: "INC-0192", resourceId: "EM-0042", hubId: "H03", category: "vehicle failure", description: "The motor cut out and won't restart. Battery shows 61%.", source: "student report", status: "In Progress", created: T("14:31:00"), blocking: false, owner: "OP-014",
     actions: [{ note: "Started handling · called student, motor dead", time: T("14:33:00") }] },
@@ -175,6 +176,7 @@ out.incidents.push(
   { id: "INC-0186", resourceId: "EB-0221", hubId: "H01", category: "vehicle failure", description: "Bell missing.", source: "student report", status: "Dismissed", created: T("08:40:00"), blocking: false, dismissReason: "Not a failure: bell is optional equipment." },
 );
 out.reports.push(
+  { id: "IR-20261102-029", studentId: "2412088", resourceId: "EM-0031", hubId: "H01", category: "vehicle failure", description: "Rear brake squeals and barely grips.", photos: 0, time: T("14:08:00"), incidentId: "INC-0190", status: "Open" },
   { id: "IR-20261102-034", studentId: "2412077", resourceId: "EM-0042", hubId: "H03", category: "vehicle failure", description: "The motor cut out and won't restart. Battery shows 61%.", photos: 1, time: T("14:31:00"), incidentId: "INC-0192", status: "Open" },
   { id: "IR-20261031-012", studentId: "2412345", resourceId: "CP-H05-02", hubId: "H05", category: "charging point unavailable or faulty", description: "The cable holster is broken, the plug falls out.", photos: 2, time: iso("31/10", "10:15"), incidentId: "INC-0185", status: "Closed" },
 );

@@ -5,6 +5,7 @@ import express from "express";
 import { createServer } from "node:http";
 import { Server } from "socket.io";
 import { createServer as createVite } from "vite";
+import react from "@vitejs/plugin-react";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 import { boot } from "../src/api/boot";
@@ -38,7 +39,7 @@ async function main() {
     }
   });
 
-  const vite = await createVite({ root, server: { middlewareMode: true, hmr: { server: http } }, appType: "spa" });
+  const vite = await createVite({ root, configFile: false, plugins: [react()], server: { middlewareMode: true, hmr: { server: http } }, appType: "spa" });
   app.use(vite.middlewares);
 
   http.listen(PORT, () => {

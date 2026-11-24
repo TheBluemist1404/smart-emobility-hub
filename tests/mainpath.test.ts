@@ -17,20 +17,20 @@ function reserve(vehicleId = "EB-0217"): VehicleReservation {
 }
 
 describe("UC-01 search", () => {
-  it("lists every Hub; a silent Hub is marked stale and its vehicles cannot be reserved (E1)", () => {
+  it("TC-UC01-06 lists every Hub; a silent Hub is marked stale and its vehicles cannot be reserved (E1)", () => {
     const r = ctl.search.search({ text: "", type: "any", minSoc: 0, nearMe: false });
     expect(r.hubs.length).toBe(7);
     expect(r.hubs.find((h) => h.hubId === "H06")!.stale).toBe(true);
     const h06 = ctl.search.hubDetail("H06");
     expect(h06.vehicles.every((v) => !v.reservable)).toBe(true);
   });
-  it("returns an empty list, not an error, when nothing matches (4a)", () => {
+  it("TC-UC01-04 returns an empty list, not an error, when nothing matches (4a)", () => {
     expect(ctl.search.search({ text: "zzz" }).empty).toBe(true);
   });
 });
 
 describe("UC-02 + UC-03 reserve and pay", () => {
-  it("holds, charges and confirms; the vehicle becomes Reserved with a 15 min pickup window", () => {
+  it("TC-UC02-01 holds, charges and confirms; the vehicle becomes Reserved with a 15 min pickup window", () => {
     ctl.reservation.requestReservation("EB-0217", KHOA);
     const vr = ctl.reservation.confirmReservation("EB-0217", KHOA);
     expect(vr.status).toBe("Pending Payment");
@@ -41,17 +41,17 @@ describe("UC-02 + UC-03 reserve and pay", () => {
     expect(db.vehicles.get("EB-0217")!.status).toBe("Reserved");
     expect(vr.expiresAt! - db.payments.get(vr.paymentId!)!.settledAt!).toBe(min(15));
   });
-  it("rejects a second active reservation (E1)", () => {
+  it("TC-UC02-05 rejects a second active reservation (E1)", () => {
     reserve();
     expect(() => ctl.reservation.requestReservation("EB-0221", KHOA)).toThrow(/already have an active/);
   });
-  it("bank declines → Payment Failed, hold released, nothing charged (UC-03 E1)", () => {
+  it("TC-UC02-07 bank declines → Payment Failed, hold released, nothing charged (UC-03 E1)", () => {
     bank().nextMode = "Failed";
     const vr = reserve();
     expect(vr.status).toBe("Payment Failed");
     expect(db.vehicles.get("EB-0217")!.status).toBe("Available");
   });
-  it("no bank answer within PAYMENT_HOLD_VEHICLE → Payment Failed; a late Success is refunded (E2, BR-PAY-03)", () => {
+  it("TC-UC02-08 no bank answer within PAYMENT_HOLD_VEHICLE → Payment Failed; a late Success is refunded (E2, BR-PAY-03)", () => {
     bank().nextMode = "Manual";
     ctl.reservation.requestReservation("EB-0217", KHOA);
     const vr = ctl.reservation.confirmReservation("EB-0217", KHOA);
@@ -63,7 +63,7 @@ describe("UC-02 + UC-03 reserve and pay", () => {
     const refund = ctl.payment.latestFor(vr.id, "Refund");
     expect(refund?.result).toBe("Success");
   });
-  it("a confirmed reservation not picked up expires after 15 min; the fee is kept (NIFR-03, BR-PAY-01)", () => {
+  it("TC-UC02-10 a confirmed reservation not picked up expires after 15 min; the fee is kept (NIFR-03, BR-PAY-01)", () => {
     const vr = reserve();
     advance(min(15) + sec(1));
     expect(vr.status).toBe("Expired");
@@ -73,7 +73,7 @@ describe("UC-02 + UC-03 reserve and pay", () => {
 });
 
 describe("UC-07 pick up", () => {
-  it("unlocks, starts the trip, marks the reservation Fulfilled", () => {
+  it("TC-UC07-01 unlocks, starts the trip, marks the reservation Fulfilled", () => {
     const vr = reserve();
     ctl.rental.requestPickup(KHOA, null, AT_H01);
     expect(vr.status).toBe("Pickup In Progress");
@@ -84,12 +84,12 @@ describe("UC-07 pick up", () => {
     expect(v.status).toBe("In Use");
     expect(db.students.get(KHOA)!.hasOngoingTrip()?.vehicleId).toBe("EB-0217");
   });
-  it("outside the Hub area → rejected, nothing changes (E1)", () => {
+  it("TC-UC07-11 outside the Hub area → rejected, nothing changes (E1)", () => {
     const vr = reserve();
     expect(() => ctl.rental.requestPickup(KHOA, null, { hubId: "H01", insideGeofence: false })).toThrow(/E1/);
     expect(vr.status).toBe("Confirmed");
   });
-  it("unlock failure → incident on the dock, reservation moved to a same-type vehicle (E3, BR-RES-02)", () => {
+  it("TC-UC07-14 unlock failure → incident on the dock, reservation moved to a same-type vehicle (E3, BR-RES-02)", () => {
     const vr = reserve();
     dataSource().nextUnlockMode = "Failure";
     ctl.rental.requestPickup(KHOA, null, AT_H01);
@@ -102,7 +102,7 @@ describe("UC-07 pick up", () => {
     expect(p.state).toBe("failed");
     expect(db.incidents.get(p.incidentId!)!.source).toBe("system");
   });
-  it("no unlock answer within DOCK_UNLOCK_TIMEOUT → E3 too", () => {
+  it("TC-UC07-15 no unlock answer within DOCK_UNLOCK_TIMEOUT → E3 too", () => {
     reserve();
     dataSource().nextUnlockMode = "Timeout";
     ctl.rental.requestPickup(KHOA, null, AT_H01);
@@ -110,14 +110,14 @@ describe("UC-07 pick up", () => {
     advance(sec(16));
     expect(ctl.rental.pickupFor(KHOA)!.state).toBe("failed");
   });
-  it("inspection not confirmed within INSPECTION_TIMEOUT → back to Confirmed (4b)", () => {
+  it("TC-UC07-05 inspection not confirmed within INSPECTION_TIMEOUT → back to Confirmed (4b)", () => {
     const vr = reserve();
     ctl.rental.requestPickup(KHOA, null, AT_H01);
     advance(min(3) + sec(1));
     expect(vr.status).toBe("Confirmed");
     expect(ctl.rental.pickupFor(KHOA)).toBeNull();
   });
-  it("walk-up rental without reservation (4a)", () => {
+  it("TC-UC07-02 walk-up rental without reservation (4a)", () => {
     ctl.rental.requestPickup(KHOA, "EM-0038", AT_H01);
     expect(db.vehicles.get("EM-0038")!.status).toBe("Held");
     ctl.rental.unlockAndStartTrip(KHOA);
@@ -136,7 +136,7 @@ describe("UC-08 return and pay", () => {
     advance(min(minutes) - sec(30));
     return t;
   }
-  it("the latch closes the trip and the fare is charged: 36 min e-bike = 5,600 VND", () => {
+  it("TC-UC08-01 the latch closes the trip and the fare is charged: 36 min e-bike = 5,600 VND", () => {
     const t = ride(36);
     const dock = [...db.docks.values()].find((d) => d.hubId === "H05" && d.status === "Vacant")!;
     dataSource().latch(dock.id, "EB-0217");
@@ -149,7 +149,7 @@ describe("UC-08 return and pay", () => {
     expect(v.hubId).toBe("H05");
     expect(dock.status).toBe("Occupied");
   });
-  it("fare declined → Unpaid and the student is blocked until paid (E2, BR-PAY-04)", () => {
+  it("TC-UC08-07 fare declined → Unpaid and the student is blocked until paid (E2, BR-PAY-04)", () => {
     const t = ride(10);
     bank().nextMode = "Failed";
     const dock = [...db.docks.values()].find((d) => d.hubId === "H01" && d.status === "Vacant")!;
@@ -162,12 +162,12 @@ describe("UC-08 return and pay", () => {
     expect(t.fareStatus).toBe("Paid");
     expect(db.students.get(KHOA)!.isBlocked()).toBe(false);
   });
-  it("End Trip before the latch reports → the trip stays open (E3)", () => {
+  it("TC-UC08-06 End Trip before the latch reports → the trip stays open (E3)", () => {
     const t = ride(5);
     expect(ctl.rental.endTrip(KHOA).status).toBe("Open");
     expect(t.status).toBe("Open");
   });
-  it("a full Hub lists nearby Hubs with vacant docks (1a)", () => {
+  it("TC-UC08-05 a full Hub lists nearby Hubs with vacant docks (1a)", () => {
     for (const d of db.docks.values()) if (d.hubId === "H02" && d.status === "Vacant") { d.latched = true; d.reevaluate(); }
     const r = ctl.rental.getVacantDocks("H02");
     expect(r.vacant).toHaveLength(0);

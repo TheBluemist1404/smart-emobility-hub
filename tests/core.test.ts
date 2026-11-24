@@ -9,7 +9,7 @@ import { dataSource } from "../src/gateway/iot/SimulatedDataSource";
 beforeEach(fresh);
 
 describe("ConfigurationRegistry (Table 2.3-6)", () => {
-  it("holds every parameter of Table 2.3-6 with its default", () => {
+  it("CORE-01 holds every parameter of Table 2.3-6 with its default", () => {
     const want: Record<string, number> = {
       VEHICLE_RESERVATION_HOLD: min(15), PAYMENT_HOLD_VEHICLE: min(2), PAYMENT_HOLD_BOOKING: min(10), PAYMENT_GATEWAY_TIMEOUT: sec(60),
       INSPECTION_TIMEOUT: min(3), DOCK_UNLOCK_TIMEOUT: sec(15), LOW_BATTERY_SOC: 20, REDISTRIBUTION_MIN_SOC: 80,
@@ -22,7 +22,7 @@ describe("ConfigurationRegistry (Table 2.3-6)", () => {
     expect(config().list().filter((p) => p.table236)).toHaveLength(Object.keys(want).length);
   });
 
-  it("refuses an out-of-range value and keeps the old one", () => {
+  it("CORE-02 refuses an out-of-range value and keeps the old one", () => {
     expect(config().set("W_SOC", 1.5)).toMatchObject({ parameter: "W_SOC" });
     expect(config().value("W_SOC")).toBe(0.5);
     expect(config().set("W_SOC", 0.6)).toBeNull();
@@ -31,7 +31,7 @@ describe("ConfigurationRegistry (Table 2.3-6)", () => {
 });
 
 describe("DemoClock", () => {
-  it("fires timers in time order, each at its own time, when skipping ahead", () => {
+  it("CORE-03 fires timers in time order, each at its own time, when skipping ahead", () => {
     const c = new DemoClock(0, () => 0);
     const seen: Array<[string, number]> = [];
     c.after(3000, "b", () => seen.push(["b", c.now()]));
@@ -43,7 +43,7 @@ describe("DemoClock", () => {
 });
 
 describe("Seed state and the state charts", () => {
-  it("derives the Table 2.3-1 vehicle status in BR-RES-01 order (mockup S02)", () => {
+  it("CORE-04 derives the Table 2.3-1 vehicle status in BR-RES-01 order (mockup S02)", () => {
     const s = (id: string) => db.vehicles.get(id)!.status;
     expect(s("EB-0217")).toBe("Available");
     expect(s("EB-0226")).toBe("Reserved");
@@ -53,7 +53,7 @@ describe("Seed state and the state charts", () => {
     expect(s("EB-0215")).toBe("In Redistribution");
   });
 
-  it("classifies the Hubs by BR-HUB-01 (mockup O01)", () => {
+  it("TC-UC09-03 classifies the Hubs by BR-HUB-01 (mockup O01)", () => {
     const h = (id: string) => db.hubs.get(id)!;
     expect(h("H02").status).toBe("Overloaded");
     expect(h("H02").getFlags()).toContain("Vehicle Shortage");
@@ -65,7 +65,7 @@ describe("Seed state and the state charts", () => {
     expect(h("H06").status).toBe("Disconnected");
   });
 
-  it("keeps dock, point and space states apart from their windows (Table 2.3-5)", () => {
+  it("CORE-05 keeps dock, point and space states apart from their windows (Table 2.3-5)", () => {
     expect(db.docks.get("H01-D07")!.status).toBe("Occupied");
     expect(db.docks.get("H01-D04")!.status).toBe("Allocated");
     expect(db.points.get("CP-H01-04")!.status).toBe("Out of Service");
@@ -75,7 +75,7 @@ describe("Seed state and the state charts", () => {
 });
 
 describe("IoT / Simulated Data Source", () => {
-  it("keeps reporting Hubs fresh and turns a silent Hub Disconnected after DATA_STALE_AFTER", () => {
+  it("TC-UC09-11 keeps reporting Hubs fresh and turns a silent Hub Disconnected after DATA_STALE_AFTER", () => {
     advance(min(2));
     expect(db.hubs.get("H01")!.isStale()).toBe(false);
     dataSource().disconnectHub("H03");
@@ -90,7 +90,7 @@ describe("IoT / Simulated Data Source", () => {
 });
 
 describe("BankGateway mock", () => {
-  it("answers Success after its delay, and never answers in Timeout mode", () => {
+  it("TC-UC03-04 answers Success after its delay, and never answers in Timeout mode", () => {
     const got: string[] = [];
     bank().submit("Charge", "X1", 5000, (a) => got.push(a.result));
     advance(sec(5));

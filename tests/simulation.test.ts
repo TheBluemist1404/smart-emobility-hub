@@ -27,11 +27,11 @@ describe("UC-13 what-if simulation", () => {
     expect(snapshotLive()).toBe(before);
   });
 
-  it("TC-UC13-E1 a Disconnected Hub cannot be simulated", () => {
+  it("TC-UC13-10 a Disconnected Hub cannot be simulated", () => {
     expect(() => ctl.simulation.startSimulation("H06")).toThrow(/E1/);
   });
 
-  it("TC-UC13-E2 out-of-range input is refused with its field", () => {
+  it("TC-UC13-11 out-of-range input is refused with its field", () => {
     ctl.simulation.startSimulation();
     try { ctl.simulation.defineScenario("A demand surge", ["H02"], period(), [{ name: "extraDemandPct", value: 500 }]); expect.fail(); }
     catch (e) { expect((e as { code: string }).code).toBe("E2:extraDemandPct"); }
@@ -46,7 +46,7 @@ describe("UC-13 what-if simulation", () => {
     expect(s.recommendations.some((r) => r.kind === "charging plan")).toBe(true);
   });
 
-  it("TC-UC13-12 discard releases the result; nothing was applied", () => {
+  it("TC-UC13-09 discard releases the result; nothing was applied", () => {
     const n = db.orders.size;
     runA();
     ctl.simulation.discard();
@@ -69,7 +69,7 @@ describe("UC-14 apply recommendations", () => {
     expect(o.toHub).toBe("H02");
   });
 
-  it("TC-UC14-5a cancel goes back to the result and applies nothing", () => {
+  it("TC-UC14-06 cancel goes back to the result and applies nothing", () => {
     const s = runA();
     const n = db.orders.size;
     ctl.simulation.apply([s.recommendations[0].id]);
@@ -78,7 +78,7 @@ describe("UC-14 apply recommendations", () => {
     expect(db.orders.size).toBe(n);
   });
 
-  it("TC-UC14-E1 a recommendation the live state no longer supports is recorded Not Applied", () => {
+  it("TC-UC14-04 a recommendation the live state no longer supports is recorded Not Applied", () => {
     const s = runA();
     const t = s.recommendations.find((r) => r.kind === "transfer")!;
     // Live state drifts: every eligible vehicle at the source leaves.

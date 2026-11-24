@@ -39,13 +39,13 @@ describe("UC-10 redistribution", () => {
       expect(db.docks.get(t.destDockId!)!.status).toBe("Allocated");
     }
   });
-  it("TC-UC10-E2 destination without enough net free docks is refused with alternatives", () => {
+  it("TC-UC10-05 destination without enough net free docks is refused with alternatives", () => {
     const free = db.hubs.get("H07")!.netFreeDocks();
     const v = ctl.redistribution.validateOrder({ fromHub: "H05", toHub: "H07", model: "e-bike", quantity: free + 1, deadline: now() + min(60) });
     expect(v.ok).toBe(false);
     expect(v.message).toMatch(/net free docks|eligible/);
   });
-  it("TC-UC10-2a departures and arrivals aggregate to Completed (BR-RED-01)", () => {
+  it("TC-UC10-09 departures and arrivals aggregate to Completed (BR-RED-01)", () => {
     const id = ctl.redistribution.submitOrder({ fromHub: "H05", toHub: "H07", model: "e-bike", quantity: 2, deadline: now() + min(60) }, "commit");
     const o = db.orders.get(id)!;
     for (const t of o.transfers) dataSource().departed(t.vehicleId);
@@ -66,7 +66,7 @@ describe("UC-10 redistribution", () => {
     dataSource().arrived(b.vehicleId, b.destDockId!);
     expect(o.status).toBe("Partially Completed");
   });
-  it("TC-UC10-2c cancel releases Assigned transfers and their docks", () => {
+  it("TC-UC10-13 cancel releases Assigned transfers and their docks", () => {
     const id = ctl.redistribution.submitOrder({ fromHub: "H05", toHub: "H07", model: "e-bike", quantity: 2, deadline: now() + min(60) }, "commit");
     const o = db.orders.get(id)!;
     ctl.redistribution.cancelOrder(id, "Team unavailable");
@@ -100,19 +100,19 @@ describe("UC-11 smart charging", () => {
     const shared = p.blocks.find((b) => !b.committed && !b.locked);
     if (shared) expect((db.allocations.get(shared.sessionId) as ChargingSession).status).toBe("Scheduled");
   });
-  it("TC-UC11-E2 a committed session cannot move earlier or beyond CHARGING_SHIFT_TOLERANCE", () => {
+  it("TC-UC11-10 a committed session cannot move earlier or beyond CHARGING_SHIFT_TOLERANCE", () => {
     ctl.charging.generateSchedule("H01");
     const cs = db.allocations.get("CS-5HDP") as ChargingSession;
     const orig = cs.originalStart!;
     expect(ctl.charging.moveBlock("H01", cs.id, cs.slot!.pointId, orig - min(15)).violation).toMatch(/earlier/);
     expect(ctl.charging.moveBlock("H01", cs.id, cs.slot!.pointId, orig + config().value("CHARGING_SHIFT_TOLERANCE") + min(15)).violation).toMatch(/later/);
   });
-  it("TC-UC11-E4 apply is refused when the schedule changed after generation", () => {
+  it("TC-UC11-14 apply is refused when the schedule changed after generation", () => {
     ctl.charging.generateSchedule("H01");
     db.points.get("CP-H01-02")!.scheduleVersion++;
     expect(() => ctl.charging.applySchedule("H01")).toThrow(/E4/);
   });
-  it("TC-UC11-15 point fault moves the paid session within tolerance or cancels with a refund", () => {
+  it("TC-UC11-16 point fault moves the paid session within tolerance or cancels with a refund", () => {
     const cs = db.allocations.get("CS-5HDP") as ChargingSession;
     dataSource().pointFault(cs.slot!.pointId);
     expect(db.points.get("CP-H01-03")!.status).toBe("Out of Service");
@@ -133,7 +133,7 @@ describe("UC-12 incidents and the cross-actor push", () => {
     expect(db.vehicles.get("EB-0217")!.status).toBe("Under Maintenance");
     expect(db.notifications.at(-1)).toMatchObject({ studentId: KHOA, title: "Vehicle replaced", ref: vr.id });
   });
-  it("TC-UC12-E2 a stale version is rejected wholesale", () => {
+  it("TC-UC12-18 a stale version is rejected wholesale", () => {
     const incId = ctl.incident.createIncident("EB-0221", "vehicle failure", "Light broken");
     const v = db.incidents.get(incId)!.version;
     ctl.incident.startHandling(incId, "Looking", v);
@@ -156,7 +156,7 @@ describe("UC-12 incidents and the cross-actor push", () => {
     expect(trip.fareStatus).toBe("Waived");
     expect(db.notifications.at(-1)).toMatchObject({ studentId: KHOA, title: "Trip closed · fare waived" });
   });
-  it("TC-UC12-10 resolve re-evaluates the resource and tells the reporters", () => {
+  it("TC-UC12-01 resolve re-evaluates the resource and tells the reporters", () => {
     const r = ctl.issue.submitReport(KHOA, "vehicle failure", "EB-0221", "Front light is broken", []);
     const inc = db.incidents.get(r.incidentId!)!;
     expect(db.vehicles.get("EB-0221")!.isReservable()).toBe(false);

@@ -1,0 +1,5980 @@
+{
+ "meta": {
+  "generatedBy": "seed/generate.ts",
+  "clock": "2026-11-02T07:36:00.000Z",
+  "student": "2412345",
+  "operator": "OP-014"
+ },
+ "hubs": [
+  {
+   "id": "H01",
+   "name": "KTX Khu A",
+   "category": "Dormitory",
+   "openHours": "05:00–23:00",
+   "x": 66,
+   "y": 30,
+   "lastUpdate": "2026-11-02T07:36:05.000Z"
+  },
+  {
+   "id": "H02",
+   "name": "KTX Khu B",
+   "category": "Dormitory",
+   "openHours": "05:00–23:00",
+   "x": 84,
+   "y": 56,
+   "lastUpdate": "2026-11-02T07:36:02.000Z"
+  },
+  {
+   "id": "H03",
+   "name": "Ga Metro ĐHQG",
+   "category": "Metro",
+   "openHours": "05:00–23:30",
+   "x": 22,
+   "y": 82,
+   "lastUpdate": "2026-11-02T07:36:06.000Z"
+  },
+  {
+   "id": "H04",
+   "name": "ĐH Bách khoa (Dĩ An)",
+   "category": "School",
+   "openHours": "06:00–22:00",
+   "x": 48,
+   "y": 12,
+   "lastUpdate": "2026-11-02T07:36:03.000Z"
+  },
+  {
+   "id": "H05",
+   "name": "Nhà Văn hóa Sinh viên",
+   "category": "Service",
+   "openHours": "06:00–22:00",
+   "x": 56,
+   "y": 68,
+   "lastUpdate": "2026-11-02T07:36:04.000Z"
+  },
+  {
+   "id": "H06",
+   "name": "ĐH KHTN (Linh Trung)",
+   "category": "School",
+   "openHours": "06:00–22:00",
+   "x": 14,
+   "y": 20,
+   "lastUpdate": "2026-11-02T07:29:40.000Z"
+  },
+  {
+   "id": "H07",
+   "name": "Thư viện Trung tâm",
+   "category": "Service",
+   "openHours": "06:30–22:00",
+   "x": 30,
+   "y": 44,
+   "lastUpdate": "2026-11-02T07:36:06.000Z"
+  }
+ ],
+ "docks": [
+  {
+   "id": "H01-D01",
+   "hubId": "H01",
+   "label": "D-01"
+  },
+  {
+   "id": "H01-D02",
+   "hubId": "H01",
+   "label": "D-02"
+  },
+  {
+   "id": "H01-D03",
+   "hubId": "H01",
+   "label": "D-03"
+  },
+  {
+   "id": "H01-D04",
+   "hubId": "H01",
+   "label": "D-04"
+  },
+  {
+   "id": "H01-D05",
+   "hubId": "H01",
+   "label": "D-05"
+  },
+  {
+   "id": "H01-D06",
+   "hubId": "H01",
+   "label": "D-06"
+  },
+  {
+   "id": "H01-D07",
+   "hubId": "H01",
+   "label": "D-07"
+  },
+  {
+   "id": "H01-D08",
+   "hubId": "H01",
+   "label": "D-08"
+  },
+  {
+   "id": "H01-D09",
+   "hubId": "H01",
+   "label": "D-09"
+  },
+  {
+   "id": "H01-D10",
+   "hubId": "H01",
+   "label": "D-10"
+  },
+  {
+   "id": "H01-D11",
+   "hubId": "H01",
+   "label": "D-11"
+  },
+  {
+   "id": "H01-D12",
+   "hubId": "H01",
+   "label": "D-12"
+  },
+  {
+   "id": "H01-D13",
+   "hubId": "H01",
+   "label": "D-13"
+  },
+  {
+   "id": "H01-D14",
+   "hubId": "H01",
+   "label": "D-14"
+  },
+  {
+   "id": "H01-D15",
+   "hubId": "H01",
+   "label": "D-15"
+  },
+  {
+   "id": "H01-D16",
+   "hubId": "H01",
+   "label": "D-16"
+  },
+  {
+   "id": "H01-D17",
+   "hubId": "H01",
+   "label": "D-17"
+  },
+  {
+   "id": "H01-D18",
+   "hubId": "H01",
+   "label": "D-18"
+  },
+  {
+   "id": "H01-D19",
+   "hubId": "H01",
+   "label": "D-19"
+  },
+  {
+   "id": "H01-D20",
+   "hubId": "H01",
+   "label": "D-20"
+  },
+  {
+   "id": "H01-D21",
+   "hubId": "H01",
+   "label": "D-21"
+  },
+  {
+   "id": "H01-D22",
+   "hubId": "H01",
+   "label": "D-22"
+  },
+  {
+   "id": "H01-D23",
+   "hubId": "H01",
+   "label": "D-23"
+  },
+  {
+   "id": "H01-D24",
+   "hubId": "H01",
+   "label": "D-24"
+  },
+  {
+   "id": "H01-D25",
+   "hubId": "H01",
+   "label": "D-25"
+  },
+  {
+   "id": "H01-D26",
+   "hubId": "H01",
+   "label": "D-26"
+  },
+  {
+   "id": "H01-D27",
+   "hubId": "H01",
+   "label": "D-27"
+  },
+  {
+   "id": "H01-D28",
+   "hubId": "H01",
+   "label": "D-28"
+  },
+  {
+   "id": "H01-D29",
+   "hubId": "H01",
+   "label": "D-29"
+  },
+  {
+   "id": "H01-D30",
+   "hubId": "H01",
+   "label": "D-30"
+  },
+  {
+   "id": "H01-D31",
+   "hubId": "H01",
+   "label": "D-31"
+  },
+  {
+   "id": "H01-D32",
+   "hubId": "H01",
+   "label": "D-32"
+  },
+  {
+   "id": "H01-D33",
+   "hubId": "H01",
+   "label": "D-33"
+  },
+  {
+   "id": "H01-D34",
+   "hubId": "H01",
+   "label": "D-34"
+  },
+  {
+   "id": "H01-D35",
+   "hubId": "H01",
+   "label": "D-35"
+  },
+  {
+   "id": "H01-D36",
+   "hubId": "H01",
+   "label": "D-36"
+  },
+  {
+   "id": "H01-D37",
+   "hubId": "H01",
+   "label": "D-37"
+  },
+  {
+   "id": "H01-D38",
+   "hubId": "H01",
+   "label": "D-38"
+  },
+  {
+   "id": "H01-D39",
+   "hubId": "H01",
+   "label": "D-39"
+  },
+  {
+   "id": "H01-D40",
+   "hubId": "H01",
+   "label": "D-40"
+  },
+  {
+   "id": "H02-D01",
+   "hubId": "H02",
+   "label": "D-01"
+  },
+  {
+   "id": "H02-D02",
+   "hubId": "H02",
+   "label": "D-02"
+  },
+  {
+   "id": "H02-D03",
+   "hubId": "H02",
+   "label": "D-03"
+  },
+  {
+   "id": "H02-D04",
+   "hubId": "H02",
+   "label": "D-04"
+  },
+  {
+   "id": "H02-D05",
+   "hubId": "H02",
+   "label": "D-05"
+  },
+  {
+   "id": "H02-D06",
+   "hubId": "H02",
+   "label": "D-06"
+  },
+  {
+   "id": "H02-D07",
+   "hubId": "H02",
+   "label": "D-07"
+  },
+  {
+   "id": "H02-D08",
+   "hubId": "H02",
+   "label": "D-08"
+  },
+  {
+   "id": "H02-D09",
+   "hubId": "H02",
+   "label": "D-09"
+  },
+  {
+   "id": "H02-D10",
+   "hubId": "H02",
+   "label": "D-10"
+  },
+  {
+   "id": "H02-D11",
+   "hubId": "H02",
+   "label": "D-11"
+  },
+  {
+   "id": "H02-D12",
+   "hubId": "H02",
+   "label": "D-12"
+  },
+  {
+   "id": "H02-D13",
+   "hubId": "H02",
+   "label": "D-13"
+  },
+  {
+   "id": "H02-D14",
+   "hubId": "H02",
+   "label": "D-14"
+  },
+  {
+   "id": "H02-D15",
+   "hubId": "H02",
+   "label": "D-15"
+  },
+  {
+   "id": "H02-D16",
+   "hubId": "H02",
+   "label": "D-16"
+  },
+  {
+   "id": "H02-D17",
+   "hubId": "H02",
+   "label": "D-17"
+  },
+  {
+   "id": "H02-D18",
+   "hubId": "H02",
+   "label": "D-18"
+  },
+  {
+   "id": "H02-D19",
+   "hubId": "H02",
+   "label": "D-19"
+  },
+  {
+   "id": "H02-D20",
+   "hubId": "H02",
+   "label": "D-20"
+  },
+  {
+   "id": "H02-D21",
+   "hubId": "H02",
+   "label": "D-21"
+  },
+  {
+   "id": "H02-D22",
+   "hubId": "H02",
+   "label": "D-22"
+  },
+  {
+   "id": "H02-D23",
+   "hubId": "H02",
+   "label": "D-23"
+  },
+  {
+   "id": "H02-D24",
+   "hubId": "H02",
+   "label": "D-24"
+  },
+  {
+   "id": "H02-D25",
+   "hubId": "H02",
+   "label": "D-25"
+  },
+  {
+   "id": "H02-D26",
+   "hubId": "H02",
+   "label": "D-26"
+  },
+  {
+   "id": "H02-D27",
+   "hubId": "H02",
+   "label": "D-27"
+  },
+  {
+   "id": "H02-D28",
+   "hubId": "H02",
+   "label": "D-28"
+  },
+  {
+   "id": "H02-D29",
+   "hubId": "H02",
+   "label": "D-29"
+  },
+  {
+   "id": "H02-D30",
+   "hubId": "H02",
+   "label": "D-30"
+  },
+  {
+   "id": "H03-D01",
+   "hubId": "H03",
+   "label": "D-01"
+  },
+  {
+   "id": "H03-D02",
+   "hubId": "H03",
+   "label": "D-02"
+  },
+  {
+   "id": "H03-D03",
+   "hubId": "H03",
+   "label": "D-03"
+  },
+  {
+   "id": "H03-D04",
+   "hubId": "H03",
+   "label": "D-04"
+  },
+  {
+   "id": "H03-D05",
+   "hubId": "H03",
+   "label": "D-05"
+  },
+  {
+   "id": "H03-D06",
+   "hubId": "H03",
+   "label": "D-06"
+  },
+  {
+   "id": "H03-D07",
+   "hubId": "H03",
+   "label": "D-07"
+  },
+  {
+   "id": "H03-D08",
+   "hubId": "H03",
+   "label": "D-08"
+  },
+  {
+   "id": "H03-D09",
+   "hubId": "H03",
+   "label": "D-09"
+  },
+  {
+   "id": "H03-D10",
+   "hubId": "H03",
+   "label": "D-10"
+  },
+  {
+   "id": "H03-D11",
+   "hubId": "H03",
+   "label": "D-11"
+  },
+  {
+   "id": "H03-D12",
+   "hubId": "H03",
+   "label": "D-12"
+  },
+  {
+   "id": "H03-D13",
+   "hubId": "H03",
+   "label": "D-13"
+  },
+  {
+   "id": "H03-D14",
+   "hubId": "H03",
+   "label": "D-14"
+  },
+  {
+   "id": "H03-D15",
+   "hubId": "H03",
+   "label": "D-15"
+  },
+  {
+   "id": "H03-D16",
+   "hubId": "H03",
+   "label": "D-16"
+  },
+  {
+   "id": "H03-D17",
+   "hubId": "H03",
+   "label": "D-17"
+  },
+  {
+   "id": "H03-D18",
+   "hubId": "H03",
+   "label": "D-18"
+  },
+  {
+   "id": "H03-D19",
+   "hubId": "H03",
+   "label": "D-19"
+  },
+  {
+   "id": "H03-D20",
+   "hubId": "H03",
+   "label": "D-20"
+  },
+  {
+   "id": "H03-D21",
+   "hubId": "H03",
+   "label": "D-21"
+  },
+  {
+   "id": "H03-D22",
+   "hubId": "H03",
+   "label": "D-22"
+  },
+  {
+   "id": "H03-D23",
+   "hubId": "H03",
+   "label": "D-23"
+  },
+  {
+   "id": "H03-D24",
+   "hubId": "H03",
+   "label": "D-24"
+  },
+  {
+   "id": "H03-D25",
+   "hubId": "H03",
+   "label": "D-25"
+  },
+  {
+   "id": "H03-D26",
+   "hubId": "H03",
+   "label": "D-26"
+  },
+  {
+   "id": "H03-D27",
+   "hubId": "H03",
+   "label": "D-27"
+  },
+  {
+   "id": "H03-D28",
+   "hubId": "H03",
+   "label": "D-28"
+  },
+  {
+   "id": "H03-D29",
+   "hubId": "H03",
+   "label": "D-29"
+  },
+  {
+   "id": "H03-D30",
+   "hubId": "H03",
+   "label": "D-30"
+  },
+  {
+   "id": "H03-D31",
+   "hubId": "H03",
+   "label": "D-31"
+  },
+  {
+   "id": "H03-D32",
+   "hubId": "H03",
+   "label": "D-32"
+  },
+  {
+   "id": "H03-D33",
+   "hubId": "H03",
+   "label": "D-33"
+  },
+  {
+   "id": "H03-D34",
+   "hubId": "H03",
+   "label": "D-34"
+  },
+  {
+   "id": "H03-D35",
+   "hubId": "H03",
+   "label": "D-35"
+  },
+  {
+   "id": "H03-D36",
+   "hubId": "H03",
+   "label": "D-36"
+  },
+  {
+   "id": "H03-D37",
+   "hubId": "H03",
+   "label": "D-37"
+  },
+  {
+   "id": "H03-D38",
+   "hubId": "H03",
+   "label": "D-38"
+  },
+  {
+   "id": "H03-D39",
+   "hubId": "H03",
+   "label": "D-39"
+  },
+  {
+   "id": "H03-D40",
+   "hubId": "H03",
+   "label": "D-40"
+  },
+  {
+   "id": "H03-D41",
+   "hubId": "H03",
+   "label": "D-41"
+  },
+  {
+   "id": "H03-D42",
+   "hubId": "H03",
+   "label": "D-42"
+  },
+  {
+   "id": "H03-D43",
+   "hubId": "H03",
+   "label": "D-43"
+  },
+  {
+   "id": "H03-D44",
+   "hubId": "H03",
+   "label": "D-44"
+  },
+  {
+   "id": "H03-D45",
+   "hubId": "H03",
+   "label": "D-45"
+  },
+  {
+   "id": "H03-D46",
+   "hubId": "H03",
+   "label": "D-46"
+  },
+  {
+   "id": "H03-D47",
+   "hubId": "H03",
+   "label": "D-47"
+  },
+  {
+   "id": "H03-D48",
+   "hubId": "H03",
+   "label": "D-48"
+  },
+  {
+   "id": "H03-D49",
+   "hubId": "H03",
+   "label": "D-49"
+  },
+  {
+   "id": "H03-D50",
+   "hubId": "H03",
+   "label": "D-50"
+  },
+  {
+   "id": "H03-D51",
+   "hubId": "H03",
+   "label": "D-51"
+  },
+  {
+   "id": "H03-D52",
+   "hubId": "H03",
+   "label": "D-52"
+  },
+  {
+   "id": "H03-D53",
+   "hubId": "H03",
+   "label": "D-53"
+  },
+  {
+   "id": "H03-D54",
+   "hubId": "H03",
+   "label": "D-54"
+  },
+  {
+   "id": "H03-D55",
+   "hubId": "H03",
+   "label": "D-55"
+  },
+  {
+   "id": "H03-D56",
+   "hubId": "H03",
+   "label": "D-56"
+  },
+  {
+   "id": "H03-D57",
+   "hubId": "H03",
+   "label": "D-57"
+  },
+  {
+   "id": "H03-D58",
+   "hubId": "H03",
+   "label": "D-58"
+  },
+  {
+   "id": "H03-D59",
+   "hubId": "H03",
+   "label": "D-59"
+  },
+  {
+   "id": "H03-D60",
+   "hubId": "H03",
+   "label": "D-60"
+  },
+  {
+   "id": "H04-D01",
+   "hubId": "H04",
+   "label": "D-01"
+  },
+  {
+   "id": "H04-D02",
+   "hubId": "H04",
+   "label": "D-02"
+  },
+  {
+   "id": "H04-D03",
+   "hubId": "H04",
+   "label": "D-03"
+  },
+  {
+   "id": "H04-D04",
+   "hubId": "H04",
+   "label": "D-04"
+  },
+  {
+   "id": "H04-D05",
+   "hubId": "H04",
+   "label": "D-05"
+  },
+  {
+   "id": "H04-D06",
+   "hubId": "H04",
+   "label": "D-06"
+  },
+  {
+   "id": "H04-D07",
+   "hubId": "H04",
+   "label": "D-07"
+  },
+  {
+   "id": "H04-D08",
+   "hubId": "H04",
+   "label": "D-08"
+  },
+  {
+   "id": "H04-D09",
+   "hubId": "H04",
+   "label": "D-09"
+  },
+  {
+   "id": "H04-D10",
+   "hubId": "H04",
+   "label": "D-10"
+  },
+  {
+   "id": "H04-D11",
+   "hubId": "H04",
+   "label": "D-11"
+  },
+  {
+   "id": "H04-D12",
+   "hubId": "H04",
+   "label": "D-12"
+  },
+  {
+   "id": "H04-D13",
+   "hubId": "H04",
+   "label": "D-13"
+  },
+  {
+   "id": "H04-D14",
+   "hubId": "H04",
+   "label": "D-14"
+  },
+  {
+   "id": "H04-D15",
+   "hubId": "H04",
+   "label": "D-15"
+  },
+  {
+   "id": "H04-D16",
+   "hubId": "H04",
+   "label": "D-16"
+  },
+  {
+   "id": "H04-D17",
+   "hubId": "H04",
+   "label": "D-17"
+  },
+  {
+   "id": "H04-D18",
+   "hubId": "H04",
+   "label": "D-18"
+  },
+  {
+   "id": "H04-D19",
+   "hubId": "H04",
+   "label": "D-19"
+  },
+  {
+   "id": "H04-D20",
+   "hubId": "H04",
+   "label": "D-20"
+  },
+  {
+   "id": "H04-D21",
+   "hubId": "H04",
+   "label": "D-21"
+  },
+  {
+   "id": "H04-D22",
+   "hubId": "H04",
+   "label": "D-22"
+  },
+  {
+   "id": "H04-D23",
+   "hubId": "H04",
+   "label": "D-23"
+  },
+  {
+   "id": "H04-D24",
+   "hubId": "H04",
+   "label": "D-24"
+  },
+  {
+   "id": "H04-D25",
+   "hubId": "H04",
+   "label": "D-25"
+  },
+  {
+   "id": "H04-D26",
+   "hubId": "H04",
+   "label": "D-26"
+  },
+  {
+   "id": "H04-D27",
+   "hubId": "H04",
+   "label": "D-27"
+  },
+  {
+   "id": "H04-D28",
+   "hubId": "H04",
+   "label": "D-28"
+  },
+  {
+   "id": "H04-D29",
+   "hubId": "H04",
+   "label": "D-29"
+  },
+  {
+   "id": "H04-D30",
+   "hubId": "H04",
+   "label": "D-30"
+  },
+  {
+   "id": "H04-D31",
+   "hubId": "H04",
+   "label": "D-31"
+  },
+  {
+   "id": "H04-D32",
+   "hubId": "H04",
+   "label": "D-32"
+  },
+  {
+   "id": "H04-D33",
+   "hubId": "H04",
+   "label": "D-33"
+  },
+  {
+   "id": "H04-D34",
+   "hubId": "H04",
+   "label": "D-34"
+  },
+  {
+   "id": "H04-D35",
+   "hubId": "H04",
+   "label": "D-35"
+  },
+  {
+   "id": "H04-D36",
+   "hubId": "H04",
+   "label": "D-36"
+  },
+  {
+   "id": "H05-D01",
+   "hubId": "H05",
+   "label": "D-01"
+  },
+  {
+   "id": "H05-D02",
+   "hubId": "H05",
+   "label": "D-02"
+  },
+  {
+   "id": "H05-D03",
+   "hubId": "H05",
+   "label": "D-03"
+  },
+  {
+   "id": "H05-D04",
+   "hubId": "H05",
+   "label": "D-04"
+  },
+  {
+   "id": "H05-D05",
+   "hubId": "H05",
+   "label": "D-05"
+  },
+  {
+   "id": "H05-D06",
+   "hubId": "H05",
+   "label": "D-06"
+  },
+  {
+   "id": "H05-D07",
+   "hubId": "H05",
+   "label": "D-07"
+  },
+  {
+   "id": "H05-D08",
+   "hubId": "H05",
+   "label": "D-08"
+  },
+  {
+   "id": "H05-D09",
+   "hubId": "H05",
+   "label": "D-09"
+  },
+  {
+   "id": "H05-D10",
+   "hubId": "H05",
+   "label": "D-10"
+  },
+  {
+   "id": "H05-D11",
+   "hubId": "H05",
+   "label": "D-11"
+  },
+  {
+   "id": "H05-D12",
+   "hubId": "H05",
+   "label": "D-12"
+  },
+  {
+   "id": "H05-D13",
+   "hubId": "H05",
+   "label": "D-13"
+  },
+  {
+   "id": "H05-D14",
+   "hubId": "H05",
+   "label": "D-14"
+  },
+  {
+   "id": "H05-D15",
+   "hubId": "H05",
+   "label": "D-15"
+  },
+  {
+   "id": "H05-D16",
+   "hubId": "H05",
+   "label": "D-16"
+  },
+  {
+   "id": "H05-D17",
+   "hubId": "H05",
+   "label": "D-17"
+  },
+  {
+   "id": "H05-D18",
+   "hubId": "H05",
+   "label": "D-18"
+  },
+  {
+   "id": "H05-D19",
+   "hubId": "H05",
+   "label": "D-19"
+  },
+  {
+   "id": "H05-D20",
+   "hubId": "H05",
+   "label": "D-20"
+  },
+  {
+   "id": "H05-D21",
+   "hubId": "H05",
+   "label": "D-21"
+  },
+  {
+   "id": "H05-D22",
+   "hubId": "H05",
+   "label": "D-22"
+  },
+  {
+   "id": "H05-D23",
+   "hubId": "H05",
+   "label": "D-23"
+  },
+  {
+   "id": "H05-D24",
+   "hubId": "H05",
+   "label": "D-24"
+  },
+  {
+   "id": "H06-D01",
+   "hubId": "H06",
+   "label": "D-01"
+  },
+  {
+   "id": "H06-D02",
+   "hubId": "H06",
+   "label": "D-02"
+  },
+  {
+   "id": "H06-D03",
+   "hubId": "H06",
+   "label": "D-03"
+  },
+  {
+   "id": "H06-D04",
+   "hubId": "H06",
+   "label": "D-04"
+  },
+  {
+   "id": "H06-D05",
+   "hubId": "H06",
+   "label": "D-05"
+  },
+  {
+   "id": "H06-D06",
+   "hubId": "H06",
+   "label": "D-06"
+  },
+  {
+   "id": "H06-D07",
+   "hubId": "H06",
+   "label": "D-07"
+  },
+  {
+   "id": "H06-D08",
+   "hubId": "H06",
+   "label": "D-08"
+  },
+  {
+   "id": "H06-D09",
+   "hubId": "H06",
+   "label": "D-09"
+  },
+  {
+   "id": "H06-D10",
+   "hubId": "H06",
+   "label": "D-10"
+  },
+  {
+   "id": "H06-D11",
+   "hubId": "H06",
+   "label": "D-11"
+  },
+  {
+   "id": "H06-D12",
+   "hubId": "H06",
+   "label": "D-12"
+  },
+  {
+   "id": "H06-D13",
+   "hubId": "H06",
+   "label": "D-13"
+  },
+  {
+   "id": "H06-D14",
+   "hubId": "H06",
+   "label": "D-14"
+  },
+  {
+   "id": "H06-D15",
+   "hubId": "H06",
+   "label": "D-15"
+  },
+  {
+   "id": "H06-D16",
+   "hubId": "H06",
+   "label": "D-16"
+  },
+  {
+   "id": "H06-D17",
+   "hubId": "H06",
+   "label": "D-17"
+  },
+  {
+   "id": "H06-D18",
+   "hubId": "H06",
+   "label": "D-18"
+  },
+  {
+   "id": "H06-D19",
+   "hubId": "H06",
+   "label": "D-19"
+  },
+  {
+   "id": "H06-D20",
+   "hubId": "H06",
+   "label": "D-20"
+  },
+  {
+   "id": "H07-D01",
+   "hubId": "H07",
+   "label": "D-01"
+  },
+  {
+   "id": "H07-D02",
+   "hubId": "H07",
+   "label": "D-02"
+  },
+  {
+   "id": "H07-D03",
+   "hubId": "H07",
+   "label": "D-03"
+  },
+  {
+   "id": "H07-D04",
+   "hubId": "H07",
+   "label": "D-04"
+  },
+  {
+   "id": "H07-D05",
+   "hubId": "H07",
+   "label": "D-05"
+  },
+  {
+   "id": "H07-D06",
+   "hubId": "H07",
+   "label": "D-06"
+  },
+  {
+   "id": "H07-D07",
+   "hubId": "H07",
+   "label": "D-07"
+  },
+  {
+   "id": "H07-D08",
+   "hubId": "H07",
+   "label": "D-08"
+  },
+  {
+   "id": "H07-D09",
+   "hubId": "H07",
+   "label": "D-09"
+  },
+  {
+   "id": "H07-D10",
+   "hubId": "H07",
+   "label": "D-10"
+  },
+  {
+   "id": "H07-D11",
+   "hubId": "H07",
+   "label": "D-11"
+  },
+  {
+   "id": "H07-D12",
+   "hubId": "H07",
+   "label": "D-12"
+  },
+  {
+   "id": "H07-D13",
+   "hubId": "H07",
+   "label": "D-13"
+  },
+  {
+   "id": "H07-D14",
+   "hubId": "H07",
+   "label": "D-14"
+  },
+  {
+   "id": "H07-D15",
+   "hubId": "H07",
+   "label": "D-15"
+  },
+  {
+   "id": "H07-D16",
+   "hubId": "H07",
+   "label": "D-16"
+  },
+  {
+   "id": "H07-D17",
+   "hubId": "H07",
+   "label": "D-17"
+  },
+  {
+   "id": "H07-D18",
+   "hubId": "H07",
+   "label": "D-18"
+  },
+  {
+   "id": "H07-D19",
+   "hubId": "H07",
+   "label": "D-19"
+  },
+  {
+   "id": "H07-D20",
+   "hubId": "H07",
+   "label": "D-20"
+  }
+ ],
+ "vehicles": [
+  {
+   "odometerKm": 1477,
+   "updated": "2026-11-02T07:36:05.000Z",
+   "id": "EB-0217",
+   "hubId": "H01",
+   "type": "electric bicycle",
+   "soc": 78,
+   "dock": "H01-D07"
+  },
+  {
+   "odometerKm": 1575,
+   "updated": "2026-11-02T07:36:05.000Z",
+   "id": "EB-0221",
+   "hubId": "H01",
+   "type": "electric bicycle",
+   "soc": 91,
+   "dock": "H01-D11"
+  },
+  {
+   "odometerKm": 536,
+   "updated": "2026-11-02T07:36:05.000Z",
+   "id": "EM-0038",
+   "hubId": "H01",
+   "type": "electric motorcycle",
+   "soc": 64,
+   "dock": "H01-D14"
+  },
+  {
+   "odometerKm": 1084,
+   "updated": "2026-11-02T07:36:05.000Z",
+   "id": "EB-0226",
+   "hubId": "H01",
+   "type": "electric bicycle",
+   "soc": 55,
+   "dock": "H01-D18",
+   "usage": "Reserved",
+   "heldBy": "2412088"
+  },
+  {
+   "odometerKm": 752,
+   "updated": "2026-11-02T07:36:05.000Z",
+   "id": "EB-0230",
+   "hubId": "H01",
+   "type": "electric bicycle",
+   "soc": 14,
+   "dock": "H01-D21"
+  },
+  {
+   "odometerKm": 123,
+   "updated": "2026-11-02T07:36:05.000Z",
+   "id": "EM-0031",
+   "hubId": "H01",
+   "type": "electric motorcycle",
+   "soc": 47,
+   "dock": "H01-D25"
+  },
+  {
+   "odometerKm": 953,
+   "updated": "2026-11-02T07:31:00.000Z",
+   "id": "EB-0212",
+   "hubId": "H01",
+   "type": "electric bicycle",
+   "soc": 86,
+   "dock": "H01-D03"
+  },
+  {
+   "odometerKm": 1242,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EB-0244",
+   "hubId": "H02",
+   "type": "electric bicycle",
+   "soc": 92,
+   "dock": "H02-D01"
+  },
+  {
+   "odometerKm": 1029,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EB-0251",
+   "hubId": "H02",
+   "type": "electric bicycle",
+   "soc": 88,
+   "dock": "H02-D02"
+  },
+  {
+   "odometerKm": 2014,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EB-0300",
+   "hubId": "H02",
+   "type": "electric bicycle",
+   "soc": 70,
+   "dock": "H02-D03",
+   "usage": "Reserved",
+   "heldBy": "2412090"
+  },
+  {
+   "odometerKm": 2226,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EM-0100",
+   "hubId": "H02",
+   "type": "electric motorcycle",
+   "soc": 66,
+   "dock": "H02-D04",
+   "usage": "Reserved",
+   "heldBy": "2412091"
+  },
+  {
+   "odometerKm": 1051,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EB-0239",
+   "hubId": "H02",
+   "type": "electric bicycle",
+   "soc": 84,
+   "dock": "H02-D05"
+  },
+  {
+   "odometerKm": 380,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EB-0260",
+   "hubId": "H02",
+   "type": "electric bicycle",
+   "soc": 81,
+   "dock": "H02-D06"
+  },
+  {
+   "odometerKm": 2384,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EB-0262",
+   "hubId": "H02",
+   "type": "electric bicycle",
+   "soc": 63,
+   "dock": "H02-D07"
+  },
+  {
+   "odometerKm": 909,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EB-0301",
+   "hubId": "H02",
+   "type": "electric bicycle",
+   "soc": 50,
+   "dock": "H02-D08"
+  },
+  {
+   "odometerKm": 1006,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EB-0302",
+   "hubId": "H02",
+   "type": "electric bicycle",
+   "soc": 38,
+   "dock": "H02-D09"
+  },
+  {
+   "odometerKm": 206,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EB-0303",
+   "hubId": "H02",
+   "type": "electric bicycle",
+   "soc": 8,
+   "dock": "H02-D10"
+  },
+  {
+   "odometerKm": 1020,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EB-0304",
+   "hubId": "H02",
+   "type": "electric bicycle",
+   "soc": 10,
+   "dock": "H02-D11"
+  },
+  {
+   "odometerKm": 681,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EB-0305",
+   "hubId": "H02",
+   "type": "electric bicycle",
+   "soc": 10,
+   "dock": "H02-D12"
+  },
+  {
+   "odometerKm": 184,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EB-0306",
+   "hubId": "H02",
+   "type": "electric bicycle",
+   "soc": 9,
+   "dock": "H02-D13"
+  },
+  {
+   "odometerKm": 2198,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EB-0307",
+   "hubId": "H02",
+   "type": "electric bicycle",
+   "soc": 14,
+   "dock": "H02-D14"
+  },
+  {
+   "odometerKm": 733,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EM-0101",
+   "hubId": "H02",
+   "type": "electric motorcycle",
+   "soc": 14,
+   "dock": "H02-D15"
+  },
+  {
+   "odometerKm": 410,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EB-0308",
+   "hubId": "H02",
+   "type": "electric bicycle",
+   "soc": 6,
+   "dock": "H02-D16"
+  },
+  {
+   "odometerKm": 695,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EB-0309",
+   "hubId": "H02",
+   "type": "electric bicycle",
+   "soc": 16,
+   "dock": "H02-D17"
+  },
+  {
+   "odometerKm": 1851,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EM-0102",
+   "hubId": "H02",
+   "type": "electric motorcycle",
+   "soc": 19,
+   "dock": "H02-D18"
+  },
+  {
+   "odometerKm": 1607,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EB-0310",
+   "hubId": "H02",
+   "type": "electric bicycle",
+   "soc": 18,
+   "dock": "H02-D19"
+  },
+  {
+   "odometerKm": 674,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EM-0103",
+   "hubId": "H02",
+   "type": "electric motorcycle",
+   "soc": 15,
+   "dock": "H02-D20"
+  },
+  {
+   "odometerKm": 1333,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EB-0311",
+   "hubId": "H02",
+   "type": "electric bicycle",
+   "soc": 19,
+   "dock": "H02-D21"
+  },
+  {
+   "odometerKm": 1409,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EB-0312",
+   "hubId": "H02",
+   "type": "electric bicycle",
+   "soc": 11,
+   "dock": "H02-D22"
+  },
+  {
+   "odometerKm": 843,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EM-0104",
+   "hubId": "H02",
+   "type": "electric motorcycle",
+   "soc": 6,
+   "dock": "H02-D23"
+  },
+  {
+   "odometerKm": 1680,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EB-0313",
+   "hubId": "H02",
+   "type": "electric bicycle",
+   "soc": 11,
+   "dock": "H02-D24"
+  },
+  {
+   "odometerKm": 1707,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EB-0314",
+   "hubId": "H02",
+   "type": "electric bicycle",
+   "soc": 13,
+   "dock": "H02-D25"
+  },
+  {
+   "odometerKm": 294,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EM-0105",
+   "hubId": "H02",
+   "type": "electric motorcycle",
+   "soc": 12,
+   "dock": "H02-D26"
+  },
+  {
+   "odometerKm": 543,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EB-0315",
+   "hubId": "H02",
+   "type": "electric bicycle",
+   "soc": 14,
+   "dock": "H02-D27"
+  },
+  {
+   "odometerKm": 1422,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EB-0316",
+   "hubId": "H02",
+   "type": "electric bicycle",
+   "soc": 18,
+   "dock": "H02-D28"
+  },
+  {
+   "odometerKm": 526,
+   "updated": "2026-11-02T07:36:02.000Z",
+   "id": "EB-0317",
+   "hubId": "H02",
+   "type": "electric bicycle",
+   "soc": 10,
+   "dock": "H02-D29"
+  },
+  {
+   "odometerKm": 738,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0318",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 71,
+   "dock": "H03-D01"
+  },
+  {
+   "odometerKm": 528,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EM-0106",
+   "hubId": "H03",
+   "type": "electric motorcycle",
+   "soc": 48,
+   "dock": "H03-D02"
+  },
+  {
+   "odometerKm": 493,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0319",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 74,
+   "dock": "H03-D03"
+  },
+  {
+   "odometerKm": 2252,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0320",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 88,
+   "dock": "H03-D04"
+  },
+  {
+   "odometerKm": 230,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EM-0107",
+   "hubId": "H03",
+   "type": "electric motorcycle",
+   "soc": 63,
+   "dock": "H03-D05"
+  },
+  {
+   "odometerKm": 2179,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0321",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 96,
+   "dock": "H03-D06"
+  },
+  {
+   "odometerKm": 1468,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0322",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 61,
+   "dock": "H03-D07"
+  },
+  {
+   "odometerKm": 1866,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0323",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 97,
+   "dock": "H03-D08"
+  },
+  {
+   "odometerKm": 618,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0324",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 60,
+   "dock": "H03-D09"
+  },
+  {
+   "odometerKm": 968,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0325",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 74,
+   "dock": "H03-D10"
+  },
+  {
+   "odometerKm": 1622,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0326",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 78,
+   "dock": "H03-D11"
+  },
+  {
+   "odometerKm": 735,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EM-0108",
+   "hubId": "H03",
+   "type": "electric motorcycle",
+   "soc": 61,
+   "dock": "H03-D12"
+  },
+  {
+   "odometerKm": 1826,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0327",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 67,
+   "dock": "H03-D13"
+  },
+  {
+   "odometerKm": 1700,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EM-0109",
+   "hubId": "H03",
+   "type": "electric motorcycle",
+   "soc": 96,
+   "dock": "H03-D14"
+  },
+  {
+   "odometerKm": 380,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EM-0110",
+   "hubId": "H03",
+   "type": "electric motorcycle",
+   "soc": 89,
+   "dock": "H03-D15"
+  },
+  {
+   "odometerKm": 1014,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EM-0111",
+   "hubId": "H03",
+   "type": "electric motorcycle",
+   "soc": 56,
+   "dock": "H03-D16"
+  },
+  {
+   "odometerKm": 921,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EM-0112",
+   "hubId": "H03",
+   "type": "electric motorcycle",
+   "soc": 69,
+   "dock": "H03-D17"
+  },
+  {
+   "odometerKm": 2170,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0328",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 72,
+   "dock": "H03-D18"
+  },
+  {
+   "odometerKm": 1038,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0329",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 66,
+   "dock": "H03-D19"
+  },
+  {
+   "odometerKm": 1593,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EM-0113",
+   "hubId": "H03",
+   "type": "electric motorcycle",
+   "soc": 57,
+   "dock": "H03-D20"
+  },
+  {
+   "odometerKm": 233,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0330",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 91,
+   "dock": "H03-D21"
+  },
+  {
+   "odometerKm": 1552,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0331",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 92,
+   "dock": "H03-D22"
+  },
+  {
+   "odometerKm": 1959,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EM-0114",
+   "hubId": "H03",
+   "type": "electric motorcycle",
+   "soc": 76,
+   "dock": "H03-D23"
+  },
+  {
+   "odometerKm": 1444,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0332",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 52,
+   "dock": "H03-D24"
+  },
+  {
+   "odometerKm": 297,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0333",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 64,
+   "dock": "H03-D25"
+  },
+  {
+   "odometerKm": 1910,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0334",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 68,
+   "dock": "H03-D26"
+  },
+  {
+   "odometerKm": 1734,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0335",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 9,
+   "dock": "H03-D27"
+  },
+  {
+   "odometerKm": 2160,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0336",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 15,
+   "dock": "H03-D28"
+  },
+  {
+   "odometerKm": 1834,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0337",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 12,
+   "dock": "H03-D29"
+  },
+  {
+   "odometerKm": 2150,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0338",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 9,
+   "dock": "H03-D30"
+  },
+  {
+   "odometerKm": 1136,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0339",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 11,
+   "dock": "H03-D31"
+  },
+  {
+   "odometerKm": 2093,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EM-0115",
+   "hubId": "H03",
+   "type": "electric motorcycle",
+   "soc": 19,
+   "dock": "H03-D32"
+  },
+  {
+   "odometerKm": 1869,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0340",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 17,
+   "dock": "H03-D33"
+  },
+  {
+   "odometerKm": 1312,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EM-0116",
+   "hubId": "H03",
+   "type": "electric motorcycle",
+   "soc": 13,
+   "dock": "H03-D34"
+  },
+  {
+   "odometerKm": 144,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EM-0117",
+   "hubId": "H03",
+   "type": "electric motorcycle",
+   "soc": 15,
+   "dock": "H03-D35"
+  },
+  {
+   "odometerKm": 960,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0341",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 12,
+   "dock": "H03-D36"
+  },
+  {
+   "odometerKm": 377,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0342",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 18,
+   "dock": "H03-D37"
+  },
+  {
+   "odometerKm": 456,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0343",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 17,
+   "dock": "H03-D38"
+  },
+  {
+   "odometerKm": 319,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0344",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 5,
+   "dock": "H03-D39"
+  },
+  {
+   "odometerKm": 190,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EM-0118",
+   "hubId": "H03",
+   "type": "electric motorcycle",
+   "soc": 7,
+   "dock": "H03-D40"
+  },
+  {
+   "odometerKm": 1749,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0345",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 17,
+   "dock": "H03-D41"
+  },
+  {
+   "odometerKm": 1614,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EM-0119",
+   "hubId": "H03",
+   "type": "electric motorcycle",
+   "soc": 16,
+   "dock": "H03-D42"
+  },
+  {
+   "odometerKm": 853,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EM-0120",
+   "hubId": "H03",
+   "type": "electric motorcycle",
+   "soc": 44,
+   "dock": "H03-D43"
+  },
+  {
+   "odometerKm": 417,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0346",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 71,
+   "dock": "H03-D44"
+  },
+  {
+   "odometerKm": 2073,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EM-0121",
+   "hubId": "H03",
+   "type": "electric motorcycle",
+   "soc": 26,
+   "dock": "H03-D45"
+  },
+  {
+   "odometerKm": 907,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0347",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 68,
+   "dock": "H03-D46"
+  },
+  {
+   "odometerKm": 1087,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EM-0122",
+   "hubId": "H03",
+   "type": "electric motorcycle",
+   "soc": 65,
+   "dock": "H03-D47"
+  },
+  {
+   "odometerKm": 1681,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0348",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 53,
+   "dock": "H03-D48"
+  },
+  {
+   "odometerKm": 2089,
+   "updated": "2026-11-02T07:36:03.000Z",
+   "id": "EB-0349",
+   "hubId": "H04",
+   "type": "electric bicycle",
+   "soc": 53,
+   "dock": "H04-D01"
+  },
+  {
+   "odometerKm": 1867,
+   "updated": "2026-11-02T07:36:03.000Z",
+   "id": "EB-0350",
+   "hubId": "H04",
+   "type": "electric bicycle",
+   "soc": 86,
+   "dock": "H04-D02"
+  },
+  {
+   "odometerKm": 324,
+   "updated": "2026-11-02T07:36:03.000Z",
+   "id": "EB-0351",
+   "hubId": "H04",
+   "type": "electric bicycle",
+   "soc": 73,
+   "dock": "H04-D03"
+  },
+  {
+   "odometerKm": 1533,
+   "updated": "2026-11-02T07:36:03.000Z",
+   "id": "EB-0352",
+   "hubId": "H04",
+   "type": "electric bicycle",
+   "soc": 93,
+   "dock": "H04-D04",
+   "usage": "In Redistribution",
+   "orderId": "RO-0314"
+  },
+  {
+   "odometerKm": 979,
+   "updated": "2026-11-02T07:36:03.000Z",
+   "id": "EB-0353",
+   "hubId": "H04",
+   "type": "electric bicycle",
+   "soc": 88,
+   "dock": "H04-D05",
+   "usage": "In Redistribution",
+   "orderId": "RO-0314"
+  },
+  {
+   "odometerKm": 190,
+   "updated": "2026-11-02T07:36:03.000Z",
+   "id": "EB-0354",
+   "hubId": "H04",
+   "type": "electric bicycle",
+   "soc": 88,
+   "dock": "H04-D06",
+   "usage": "In Redistribution",
+   "orderId": "RO-0314"
+  },
+  {
+   "odometerKm": 561,
+   "updated": "2026-11-02T07:36:03.000Z",
+   "id": "EM-0123",
+   "hubId": "H04",
+   "type": "electric motorcycle",
+   "soc": 12,
+   "dock": "H04-D07"
+  },
+  {
+   "odometerKm": 1136,
+   "updated": "2026-11-02T07:36:03.000Z",
+   "id": "EM-0124",
+   "hubId": "H04",
+   "type": "electric motorcycle",
+   "soc": 13,
+   "dock": "H04-D08"
+  },
+  {
+   "odometerKm": 2095,
+   "updated": "2026-11-02T07:36:03.000Z",
+   "id": "EM-0125",
+   "hubId": "H04",
+   "type": "electric motorcycle",
+   "soc": 14,
+   "dock": "H04-D09"
+  },
+  {
+   "odometerKm": 1421,
+   "updated": "2026-11-02T07:36:03.000Z",
+   "id": "EB-0355",
+   "hubId": "H04",
+   "type": "electric bicycle",
+   "soc": 17,
+   "dock": "H04-D10"
+  },
+  {
+   "odometerKm": 1145,
+   "updated": "2026-11-02T07:36:03.000Z",
+   "id": "EB-0356",
+   "hubId": "H04",
+   "type": "electric bicycle",
+   "soc": 18,
+   "dock": "H04-D11"
+  },
+  {
+   "odometerKm": 1066,
+   "updated": "2026-11-02T07:36:03.000Z",
+   "id": "EB-0357",
+   "hubId": "H04",
+   "type": "electric bicycle",
+   "soc": 7,
+   "dock": "H04-D12"
+  },
+  {
+   "odometerKm": 2343,
+   "updated": "2026-11-02T07:36:03.000Z",
+   "id": "EB-0358",
+   "hubId": "H04",
+   "type": "electric bicycle",
+   "soc": 8,
+   "dock": "H04-D13"
+  },
+  {
+   "odometerKm": 924,
+   "updated": "2026-11-02T07:36:03.000Z",
+   "id": "EB-0359",
+   "hubId": "H04",
+   "type": "electric bicycle",
+   "soc": 14,
+   "dock": "H04-D14"
+  },
+  {
+   "odometerKm": 1021,
+   "updated": "2026-11-02T07:36:03.000Z",
+   "id": "EB-0360",
+   "hubId": "H04",
+   "type": "electric bicycle",
+   "soc": 16,
+   "dock": "H04-D15"
+  },
+  {
+   "odometerKm": 2029,
+   "updated": "2026-11-02T07:36:03.000Z",
+   "id": "EB-0361",
+   "hubId": "H04",
+   "type": "electric bicycle",
+   "soc": 12,
+   "dock": "H04-D16"
+  },
+  {
+   "odometerKm": 438,
+   "updated": "2026-11-02T07:36:03.000Z",
+   "id": "EB-0362",
+   "hubId": "H04",
+   "type": "electric bicycle",
+   "soc": 15,
+   "dock": "H04-D17"
+  },
+  {
+   "odometerKm": 2305,
+   "updated": "2026-11-02T07:36:03.000Z",
+   "id": "EM-0126",
+   "hubId": "H04",
+   "type": "electric motorcycle",
+   "soc": 45,
+   "dock": "H04-D18"
+  },
+  {
+   "odometerKm": 933,
+   "updated": "2026-11-02T07:36:03.000Z",
+   "id": "EB-0363",
+   "hubId": "H04",
+   "type": "electric bicycle",
+   "soc": 71,
+   "dock": "H04-D19"
+  },
+  {
+   "odometerKm": 1670,
+   "updated": "2026-11-02T07:36:04.000Z",
+   "id": "EB-0364",
+   "hubId": "H05",
+   "type": "electric bicycle",
+   "soc": 67,
+   "dock": "H05-D01"
+  },
+  {
+   "odometerKm": 2225,
+   "updated": "2026-11-02T07:36:04.000Z",
+   "id": "EB-0365",
+   "hubId": "H05",
+   "type": "electric bicycle",
+   "soc": 68,
+   "dock": "H05-D02"
+  },
+  {
+   "odometerKm": 2142,
+   "updated": "2026-11-02T07:36:04.000Z",
+   "id": "EB-0366",
+   "hubId": "H05",
+   "type": "electric bicycle",
+   "soc": 94,
+   "dock": "H05-D03"
+  },
+  {
+   "odometerKm": 257,
+   "updated": "2026-11-02T07:36:04.000Z",
+   "id": "EB-0367",
+   "hubId": "H05",
+   "type": "electric bicycle",
+   "soc": 62,
+   "dock": "H05-D04"
+  },
+  {
+   "odometerKm": 1688,
+   "updated": "2026-11-02T07:36:04.000Z",
+   "id": "EM-0127",
+   "hubId": "H05",
+   "type": "electric motorcycle",
+   "soc": 65,
+   "dock": "H05-D05"
+  },
+  {
+   "odometerKm": 2183,
+   "updated": "2026-11-02T07:36:04.000Z",
+   "id": "EM-0128",
+   "hubId": "H05",
+   "type": "electric motorcycle",
+   "soc": 94,
+   "dock": "H05-D06"
+  },
+  {
+   "odometerKm": 1615,
+   "updated": "2026-11-02T07:36:04.000Z",
+   "id": "EB-0368",
+   "hubId": "H05",
+   "type": "electric bicycle",
+   "soc": 83,
+   "dock": "H05-D07"
+  },
+  {
+   "odometerKm": 2098,
+   "updated": "2026-11-02T07:36:04.000Z",
+   "id": "EB-0369",
+   "hubId": "H05",
+   "type": "electric bicycle",
+   "soc": 76,
+   "dock": "H05-D08"
+  },
+  {
+   "odometerKm": 2150,
+   "updated": "2026-11-02T07:36:04.000Z",
+   "id": "EB-0370",
+   "hubId": "H05",
+   "type": "electric bicycle",
+   "soc": 10,
+   "dock": "H05-D09"
+  },
+  {
+   "odometerKm": 502,
+   "updated": "2026-11-02T07:36:04.000Z",
+   "id": "EB-0371",
+   "hubId": "H05",
+   "type": "electric bicycle",
+   "soc": 16,
+   "dock": "H05-D10"
+  },
+  {
+   "odometerKm": 1973,
+   "updated": "2026-11-02T07:36:04.000Z",
+   "id": "EB-0372",
+   "hubId": "H05",
+   "type": "electric bicycle",
+   "soc": 51,
+   "dock": "H05-D11"
+  },
+  {
+   "odometerKm": 1464,
+   "updated": "2026-11-02T07:29:40.000Z",
+   "id": "EM-0129",
+   "hubId": "H06",
+   "type": "electric motorcycle",
+   "soc": 53,
+   "dock": "H06-D01"
+  },
+  {
+   "odometerKm": 1474,
+   "updated": "2026-11-02T07:29:40.000Z",
+   "id": "EM-0130",
+   "hubId": "H06",
+   "type": "electric motorcycle",
+   "soc": 66,
+   "dock": "H06-D02"
+  },
+  {
+   "odometerKm": 184,
+   "updated": "2026-11-02T07:29:40.000Z",
+   "id": "EM-0131",
+   "hubId": "H06",
+   "type": "electric motorcycle",
+   "soc": 54,
+   "dock": "H06-D03"
+  },
+  {
+   "odometerKm": 1952,
+   "updated": "2026-11-02T07:29:40.000Z",
+   "id": "EB-0373",
+   "hubId": "H06",
+   "type": "electric bicycle",
+   "soc": 57,
+   "dock": "H06-D04"
+  },
+  {
+   "odometerKm": 795,
+   "updated": "2026-11-02T07:29:40.000Z",
+   "id": "EB-0374",
+   "hubId": "H06",
+   "type": "electric bicycle",
+   "soc": 72,
+   "dock": "H06-D05"
+  },
+  {
+   "odometerKm": 969,
+   "updated": "2026-11-02T07:29:40.000Z",
+   "id": "EB-0375",
+   "hubId": "H06",
+   "type": "electric bicycle",
+   "soc": 93,
+   "dock": "H06-D06"
+  },
+  {
+   "odometerKm": 804,
+   "updated": "2026-11-02T07:29:40.000Z",
+   "id": "EM-0132",
+   "hubId": "H06",
+   "type": "electric motorcycle",
+   "soc": 16,
+   "dock": "H06-D07"
+  },
+  {
+   "odometerKm": 1679,
+   "updated": "2026-11-02T07:29:40.000Z",
+   "id": "EB-0376",
+   "hubId": "H06",
+   "type": "electric bicycle",
+   "soc": 10,
+   "dock": "H06-D08"
+  },
+  {
+   "odometerKm": 495,
+   "updated": "2026-11-02T07:29:40.000Z",
+   "id": "EM-0133",
+   "hubId": "H06",
+   "type": "electric motorcycle",
+   "soc": 17,
+   "dock": "H06-D09"
+  },
+  {
+   "odometerKm": 1241,
+   "updated": "2026-11-02T07:29:40.000Z",
+   "id": "EB-0377",
+   "hubId": "H06",
+   "type": "electric bicycle",
+   "soc": 19,
+   "dock": "H06-D10"
+  },
+  {
+   "odometerKm": 1643,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0378",
+   "hubId": "H07",
+   "type": "electric bicycle",
+   "soc": 68,
+   "dock": "H07-D01"
+  },
+  {
+   "odometerKm": 2058,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EM-0134",
+   "hubId": "H07",
+   "type": "electric motorcycle",
+   "soc": 64,
+   "dock": "H07-D02"
+  },
+  {
+   "odometerKm": 1399,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0379",
+   "hubId": "H07",
+   "type": "electric bicycle",
+   "soc": 78,
+   "dock": "H07-D03"
+  },
+  {
+   "odometerKm": 1007,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0380",
+   "hubId": "H07",
+   "type": "electric bicycle",
+   "soc": 70,
+   "dock": "H07-D04"
+  },
+  {
+   "odometerKm": 1930,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0381",
+   "hubId": "H07",
+   "type": "electric bicycle",
+   "soc": 55,
+   "dock": "H07-D05"
+  },
+  {
+   "odometerKm": 608,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0382",
+   "hubId": "H07",
+   "type": "electric bicycle",
+   "soc": 95,
+   "dock": "H07-D06"
+  },
+  {
+   "odometerKm": 844,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0383",
+   "hubId": "H07",
+   "type": "electric bicycle",
+   "soc": 74,
+   "dock": "H07-D07"
+  },
+  {
+   "odometerKm": 492,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0384",
+   "hubId": "H07",
+   "type": "electric bicycle",
+   "soc": 62,
+   "dock": "H07-D08"
+  },
+  {
+   "odometerKm": 2111,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0385",
+   "hubId": "H07",
+   "type": "electric bicycle",
+   "soc": 85,
+   "dock": "H07-D09"
+  },
+  {
+   "odometerKm": 1071,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0386",
+   "hubId": "H07",
+   "type": "electric bicycle",
+   "soc": 14,
+   "dock": "H07-D10"
+  },
+  {
+   "odometerKm": 514,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EM-0135",
+   "hubId": "H07",
+   "type": "electric motorcycle",
+   "soc": 12,
+   "dock": "H07-D11"
+  },
+  {
+   "odometerKm": 1331,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0387",
+   "hubId": "H07",
+   "type": "electric bicycle",
+   "soc": 7,
+   "dock": "H07-D12"
+  },
+  {
+   "odometerKm": 559,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0388",
+   "hubId": "H07",
+   "type": "electric bicycle",
+   "soc": 8,
+   "dock": "H07-D13"
+  },
+  {
+   "odometerKm": 2123,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EB-0389",
+   "hubId": "H07",
+   "type": "electric bicycle",
+   "soc": 54,
+   "dock": "H07-D14"
+  },
+  {
+   "odometerKm": 436,
+   "updated": "2026-11-02T07:36:06.000Z",
+   "id": "EM-0136",
+   "hubId": "H07",
+   "type": "electric motorcycle",
+   "soc": 73,
+   "dock": "H07-D15"
+  },
+  {
+   "odometerKm": 927,
+   "updated": "2026-11-02T07:36:01.000Z",
+   "id": "EB-0215",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 83,
+   "dock": null,
+   "usage": "In Redistribution",
+   "orderId": "RO-0312"
+  },
+  {
+   "odometerKm": 1662,
+   "updated": "2026-11-02T07:36:01.000Z",
+   "id": "EB-0218",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 85,
+   "dock": null,
+   "usage": "In Redistribution",
+   "orderId": "RO-0312"
+  },
+  {
+   "odometerKm": 2051,
+   "updated": "2026-11-02T07:36:01.000Z",
+   "id": "EB-0223",
+   "hubId": "H03",
+   "type": "electric bicycle",
+   "soc": 52,
+   "dock": null
+  },
+  {
+   "odometerKm": 2391,
+   "updated": "2026-11-02T07:34:02.000Z",
+   "id": "EM-0042",
+   "hubId": "H03",
+   "type": "electric motorcycle",
+   "soc": 61,
+   "dock": null,
+   "usage": "In Use",
+   "heldBy": "2412077"
+  }
+ ],
+ "points": [
+  {
+   "id": "CP-H01-01",
+   "hubId": "H01",
+   "power": "AC 7 kW"
+  },
+  {
+   "id": "CP-H01-02",
+   "hubId": "H01",
+   "power": "AC 7 kW"
+  },
+  {
+   "id": "CP-H01-03",
+   "hubId": "H01",
+   "power": "DC 22 kW"
+  },
+  {
+   "id": "CP-H01-04",
+   "hubId": "H01",
+   "power": "DC 22 kW"
+  },
+  {
+   "id": "CP-H02-01",
+   "hubId": "H02",
+   "power": "AC 7 kW"
+  },
+  {
+   "id": "CP-H02-02",
+   "hubId": "H02",
+   "power": "AC 7 kW"
+  },
+  {
+   "id": "CP-H02-03",
+   "hubId": "H02",
+   "power": "AC 7 kW"
+  },
+  {
+   "id": "CP-H02-04",
+   "hubId": "H02",
+   "power": "AC 7 kW"
+  },
+  {
+   "id": "CP-H02-05",
+   "hubId": "H02",
+   "power": "DC 22 kW"
+  },
+  {
+   "id": "CP-H02-06",
+   "hubId": "H02",
+   "power": "DC 22 kW"
+  },
+  {
+   "id": "CP-H03-01",
+   "hubId": "H03",
+   "power": "AC 7 kW"
+  },
+  {
+   "id": "CP-H03-02",
+   "hubId": "H03",
+   "power": "AC 7 kW"
+  },
+  {
+   "id": "CP-H03-03",
+   "hubId": "H03",
+   "power": "AC 7 kW"
+  },
+  {
+   "id": "CP-H03-04",
+   "hubId": "H03",
+   "power": "AC 7 kW"
+  },
+  {
+   "id": "CP-H03-05",
+   "hubId": "H03",
+   "power": "DC 22 kW"
+  },
+  {
+   "id": "CP-H03-06",
+   "hubId": "H03",
+   "power": "DC 22 kW"
+  },
+  {
+   "id": "CP-H03-07",
+   "hubId": "H03",
+   "power": "DC 22 kW"
+  },
+  {
+   "id": "CP-H03-08",
+   "hubId": "H03",
+   "power": "DC 22 kW"
+  },
+  {
+   "id": "CP-H04-01",
+   "hubId": "H04",
+   "power": "AC 7 kW"
+  },
+  {
+   "id": "CP-H04-02",
+   "hubId": "H04",
+   "power": "AC 7 kW"
+  },
+  {
+   "id": "CP-H04-03",
+   "hubId": "H04",
+   "power": "AC 7 kW"
+  },
+  {
+   "id": "CP-H04-04",
+   "hubId": "H04",
+   "power": "AC 7 kW"
+  },
+  {
+   "id": "CP-H04-05",
+   "hubId": "H04",
+   "power": "AC 7 kW"
+  },
+  {
+   "id": "CP-H04-06",
+   "hubId": "H04",
+   "power": "DC 22 kW"
+  },
+  {
+   "id": "CP-H04-07",
+   "hubId": "H04",
+   "power": "DC 22 kW"
+  },
+  {
+   "id": "CP-H04-08",
+   "hubId": "H04",
+   "power": "DC 22 kW"
+  },
+  {
+   "id": "CP-H05-01",
+   "hubId": "H05",
+   "power": "AC 7 kW"
+  },
+  {
+   "id": "CP-H05-02",
+   "hubId": "H05",
+   "power": "AC 7 kW"
+  },
+  {
+   "id": "CP-H05-03",
+   "hubId": "H05",
+   "power": "AC 7 kW"
+  },
+  {
+   "id": "CP-H05-04",
+   "hubId": "H05",
+   "power": "AC 7 kW"
+  },
+  {
+   "id": "CP-H05-05",
+   "hubId": "H05",
+   "power": "DC 22 kW"
+  },
+  {
+   "id": "CP-H05-06",
+   "hubId": "H05",
+   "power": "DC 22 kW"
+  },
+  {
+   "id": "CP-H06-01",
+   "hubId": "H06",
+   "power": "AC 7 kW"
+  },
+  {
+   "id": "CP-H06-02",
+   "hubId": "H06",
+   "power": "AC 7 kW"
+  },
+  {
+   "id": "CP-H06-03",
+   "hubId": "H06",
+   "power": "DC 22 kW"
+  },
+  {
+   "id": "CP-H06-04",
+   "hubId": "H06",
+   "power": "DC 22 kW"
+  },
+  {
+   "id": "CP-H07-01",
+   "hubId": "H07",
+   "power": "AC 7 kW"
+  },
+  {
+   "id": "CP-H07-02",
+   "hubId": "H07",
+   "power": "AC 7 kW"
+  },
+  {
+   "id": "CP-H07-03",
+   "hubId": "H07",
+   "power": "AC 7 kW"
+  },
+  {
+   "id": "CP-H07-04",
+   "hubId": "H07",
+   "power": "DC 22 kW"
+  },
+  {
+   "id": "CP-H07-05",
+   "hubId": "H07",
+   "power": "DC 22 kW"
+  }
+ ],
+ "spaces": [
+  {
+   "id": "H01-P-A01",
+   "hubId": "H01",
+   "label": "P-A01",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H01-P-A02",
+   "hubId": "H01",
+   "label": "P-A02",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H01-P-A03",
+   "hubId": "H01",
+   "label": "P-A03",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H01-P-A04",
+   "hubId": "H01",
+   "label": "P-A04",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H01-P-A05",
+   "hubId": "H01",
+   "label": "P-A05",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H01-P-A06",
+   "hubId": "H01",
+   "label": "P-A06",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H01-P-A07",
+   "hubId": "H01",
+   "label": "P-A07",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H01-P-A08",
+   "hubId": "H01",
+   "label": "P-A08",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H01-P-A09",
+   "hubId": "H01",
+   "label": "P-A09",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H01-P-A10",
+   "hubId": "H01",
+   "label": "P-A10",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H01-P-A11",
+   "hubId": "H01",
+   "label": "P-A11",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H01-P-A12",
+   "hubId": "H01",
+   "label": "P-A12",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H01-P-A13",
+   "hubId": "H01",
+   "label": "P-A13",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H01-P-A14",
+   "hubId": "H01",
+   "label": "P-A14",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H01-P-A15",
+   "hubId": "H01",
+   "label": "P-A15",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H01-P-A16",
+   "hubId": "H01",
+   "label": "P-A16",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H01-P-A17",
+   "hubId": "H01",
+   "label": "P-A17",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H01-P-A18",
+   "hubId": "H01",
+   "label": "P-A18",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H01-P-A19",
+   "hubId": "H01",
+   "label": "P-A19",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H01-P-A20",
+   "hubId": "H01",
+   "label": "P-A20",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H01-P-B01",
+   "hubId": "H01",
+   "label": "P-B01",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H01-P-B02",
+   "hubId": "H01",
+   "label": "P-B02",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H01-P-B03",
+   "hubId": "H01",
+   "label": "P-B03",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H01-P-B04",
+   "hubId": "H01",
+   "label": "P-B04",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H01-P-B05",
+   "hubId": "H01",
+   "label": "P-B05",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H01-P-B06",
+   "hubId": "H01",
+   "label": "P-B06",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H01-P-B07",
+   "hubId": "H01",
+   "label": "P-B07",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H01-P-B08",
+   "hubId": "H01",
+   "label": "P-B08",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H01-P-B09",
+   "hubId": "H01",
+   "label": "P-B09",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H01-P-B10",
+   "hubId": "H01",
+   "label": "P-B10",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H01-P-B11",
+   "hubId": "H01",
+   "label": "P-B11",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H01-P-B12",
+   "hubId": "H01",
+   "label": "P-B12",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H01-P-B13",
+   "hubId": "H01",
+   "label": "P-B13",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H01-P-B14",
+   "hubId": "H01",
+   "label": "P-B14",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H01-P-B15",
+   "hubId": "H01",
+   "label": "P-B15",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H01-P-B16",
+   "hubId": "H01",
+   "label": "P-B16",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H01-P-B17",
+   "hubId": "H01",
+   "label": "P-B17",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H01-P-B18",
+   "hubId": "H01",
+   "label": "P-B18",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H02-P-A01",
+   "hubId": "H02",
+   "label": "P-A01",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H02-P-A02",
+   "hubId": "H02",
+   "label": "P-A02",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H02-P-A03",
+   "hubId": "H02",
+   "label": "P-A03",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H02-P-A04",
+   "hubId": "H02",
+   "label": "P-A04",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H02-P-A05",
+   "hubId": "H02",
+   "label": "P-A05",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H02-P-A06",
+   "hubId": "H02",
+   "label": "P-A06",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H02-P-A07",
+   "hubId": "H02",
+   "label": "P-A07",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H02-P-A08",
+   "hubId": "H02",
+   "label": "P-A08",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H02-P-B01",
+   "hubId": "H02",
+   "label": "P-B01",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H02-P-B02",
+   "hubId": "H02",
+   "label": "P-B02",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H02-P-B03",
+   "hubId": "H02",
+   "label": "P-B03",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H02-P-B04",
+   "hubId": "H02",
+   "label": "P-B04",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H02-P-B05",
+   "hubId": "H02",
+   "label": "P-B05",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H02-P-B06",
+   "hubId": "H02",
+   "label": "P-B06",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H03-P-A01",
+   "hubId": "H03",
+   "label": "P-A01",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H03-P-A02",
+   "hubId": "H03",
+   "label": "P-A02",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H03-P-A03",
+   "hubId": "H03",
+   "label": "P-A03",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H03-P-A04",
+   "hubId": "H03",
+   "label": "P-A04",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H03-P-A05",
+   "hubId": "H03",
+   "label": "P-A05",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H03-P-A06",
+   "hubId": "H03",
+   "label": "P-A06",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H03-P-A07",
+   "hubId": "H03",
+   "label": "P-A07",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H03-P-A08",
+   "hubId": "H03",
+   "label": "P-A08",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H03-P-A09",
+   "hubId": "H03",
+   "label": "P-A09",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H03-P-A10",
+   "hubId": "H03",
+   "label": "P-A10",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H03-P-A11",
+   "hubId": "H03",
+   "label": "P-A11",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H03-P-A12",
+   "hubId": "H03",
+   "label": "P-A12",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H03-P-A13",
+   "hubId": "H03",
+   "label": "P-A13",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H03-P-A14",
+   "hubId": "H03",
+   "label": "P-A14",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H03-P-A15",
+   "hubId": "H03",
+   "label": "P-A15",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H03-P-A16",
+   "hubId": "H03",
+   "label": "P-A16",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H03-P-B01",
+   "hubId": "H03",
+   "label": "P-B01",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H03-P-B02",
+   "hubId": "H03",
+   "label": "P-B02",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H03-P-B03",
+   "hubId": "H03",
+   "label": "P-B03",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H03-P-B04",
+   "hubId": "H03",
+   "label": "P-B04",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H03-P-B05",
+   "hubId": "H03",
+   "label": "P-B05",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H03-P-B06",
+   "hubId": "H03",
+   "label": "P-B06",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H03-P-B07",
+   "hubId": "H03",
+   "label": "P-B07",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H03-P-B08",
+   "hubId": "H03",
+   "label": "P-B08",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H03-P-B09",
+   "hubId": "H03",
+   "label": "P-B09",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H03-P-B10",
+   "hubId": "H03",
+   "label": "P-B10",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H03-P-B11",
+   "hubId": "H03",
+   "label": "P-B11",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H03-P-B12",
+   "hubId": "H03",
+   "label": "P-B12",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H04-P-A01",
+   "hubId": "H04",
+   "label": "P-A01",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H04-P-A02",
+   "hubId": "H04",
+   "label": "P-A02",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H04-P-A03",
+   "hubId": "H04",
+   "label": "P-A03",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H04-P-A04",
+   "hubId": "H04",
+   "label": "P-A04",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H04-P-A05",
+   "hubId": "H04",
+   "label": "P-A05",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H04-P-A06",
+   "hubId": "H04",
+   "label": "P-A06",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H04-P-A07",
+   "hubId": "H04",
+   "label": "P-A07",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H04-P-A08",
+   "hubId": "H04",
+   "label": "P-A08",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H04-P-A09",
+   "hubId": "H04",
+   "label": "P-A09",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H04-P-A10",
+   "hubId": "H04",
+   "label": "P-A10",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H04-P-A11",
+   "hubId": "H04",
+   "label": "P-A11",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H04-P-A12",
+   "hubId": "H04",
+   "label": "P-A12",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H04-P-B01",
+   "hubId": "H04",
+   "label": "P-B01",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H04-P-B02",
+   "hubId": "H04",
+   "label": "P-B02",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H04-P-B03",
+   "hubId": "H04",
+   "label": "P-B03",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H04-P-B04",
+   "hubId": "H04",
+   "label": "P-B04",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H04-P-B05",
+   "hubId": "H04",
+   "label": "P-B05",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H04-P-B06",
+   "hubId": "H04",
+   "label": "P-B06",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H04-P-B07",
+   "hubId": "H04",
+   "label": "P-B07",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H04-P-B08",
+   "hubId": "H04",
+   "label": "P-B08",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H04-P-B09",
+   "hubId": "H04",
+   "label": "P-B09",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H04-P-B10",
+   "hubId": "H04",
+   "label": "P-B10",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H05-P-A01",
+   "hubId": "H05",
+   "label": "P-A01",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H05-P-A02",
+   "hubId": "H05",
+   "label": "P-A02",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H05-P-A03",
+   "hubId": "H05",
+   "label": "P-A03",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H05-P-A04",
+   "hubId": "H05",
+   "label": "P-A04",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H05-P-A05",
+   "hubId": "H05",
+   "label": "P-A05",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H05-P-A06",
+   "hubId": "H05",
+   "label": "P-A06",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H05-P-A07",
+   "hubId": "H05",
+   "label": "P-A07",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H05-P-A08",
+   "hubId": "H05",
+   "label": "P-A08",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H05-P-A09",
+   "hubId": "H05",
+   "label": "P-A09",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H05-P-A10",
+   "hubId": "H05",
+   "label": "P-A10",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H05-P-B01",
+   "hubId": "H05",
+   "label": "P-B01",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H05-P-B02",
+   "hubId": "H05",
+   "label": "P-B02",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H05-P-B03",
+   "hubId": "H05",
+   "label": "P-B03",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H05-P-B04",
+   "hubId": "H05",
+   "label": "P-B04",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H05-P-B05",
+   "hubId": "H05",
+   "label": "P-B05",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H05-P-B06",
+   "hubId": "H05",
+   "label": "P-B06",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H05-P-B07",
+   "hubId": "H05",
+   "label": "P-B07",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H05-P-B08",
+   "hubId": "H05",
+   "label": "P-B08",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H06-P-A01",
+   "hubId": "H06",
+   "label": "P-A01",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H06-P-A02",
+   "hubId": "H06",
+   "label": "P-A02",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H06-P-A03",
+   "hubId": "H06",
+   "label": "P-A03",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H06-P-A04",
+   "hubId": "H06",
+   "label": "P-A04",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H06-P-A05",
+   "hubId": "H06",
+   "label": "P-A05",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H06-P-A06",
+   "hubId": "H06",
+   "label": "P-A06",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H06-P-A07",
+   "hubId": "H06",
+   "label": "P-A07",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H06-P-A08",
+   "hubId": "H06",
+   "label": "P-A08",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H06-P-B01",
+   "hubId": "H06",
+   "label": "P-B01",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H06-P-B02",
+   "hubId": "H06",
+   "label": "P-B02",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H06-P-B03",
+   "hubId": "H06",
+   "label": "P-B03",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H06-P-B04",
+   "hubId": "H06",
+   "label": "P-B04",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H06-P-B05",
+   "hubId": "H06",
+   "label": "P-B05",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H06-P-B06",
+   "hubId": "H06",
+   "label": "P-B06",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H07-P-A01",
+   "hubId": "H07",
+   "label": "P-A01",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H07-P-A02",
+   "hubId": "H07",
+   "label": "P-A02",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H07-P-A03",
+   "hubId": "H07",
+   "label": "P-A03",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H07-P-A04",
+   "hubId": "H07",
+   "label": "P-A04",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H07-P-A05",
+   "hubId": "H07",
+   "label": "P-A05",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H07-P-A06",
+   "hubId": "H07",
+   "label": "P-A06",
+   "type": "electric bicycle"
+  },
+  {
+   "id": "H07-P-B01",
+   "hubId": "H07",
+   "label": "P-B01",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H07-P-B02",
+   "hubId": "H07",
+   "label": "P-B02",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H07-P-B03",
+   "hubId": "H07",
+   "label": "P-B03",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H07-P-B04",
+   "hubId": "H07",
+   "label": "P-B04",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H07-P-B05",
+   "hubId": "H07",
+   "label": "P-B05",
+   "type": "electric motorcycle"
+  },
+  {
+   "id": "H07-P-B06",
+   "hubId": "H07",
+   "label": "P-B06",
+   "type": "electric motorcycle"
+  }
+ ],
+ "students": [
+  {
+   "id": "2412345",
+   "name": "Nguyen Minh Khoa",
+   "email": "khoa.nm@student.example",
+   "vehicles": [
+    {
+     "id": "59-X3 123.45",
+     "type": "electric motorcycle",
+     "batteryKwh": 2.4
+    }
+   ]
+  },
+  {
+   "id": "2412088",
+   "name": "Pham Gia Huy",
+   "email": "huy@student.example",
+   "vehicles": []
+  },
+  {
+   "id": "2412090",
+   "name": "Vo Thanh Tam",
+   "email": "tam@student.example",
+   "vehicles": []
+  },
+  {
+   "id": "2412091",
+   "name": "Do Bao Ngoc",
+   "email": "ngoc@student.example",
+   "vehicles": []
+  },
+  {
+   "id": "2412077",
+   "name": "Le Thi Mai",
+   "email": "mai@student.example",
+   "vehicles": []
+  },
+  {
+   "id": "2412102",
+   "name": "Tran Quoc Bao",
+   "email": "bao@student.example",
+   "vehicles": [
+    {
+     "id": "51-K2 678.90",
+     "type": "electric motorcycle",
+     "batteryKwh": 2.4
+    }
+   ]
+  },
+  {
+   "id": "2412001",
+   "name": "Student 2412001",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412002",
+   "name": "Student 2412002",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412003",
+   "name": "Student 2412003",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412004",
+   "name": "Student 2412004",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412005",
+   "name": "Student 2412005",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412006",
+   "name": "Student 2412006",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412007",
+   "name": "Student 2412007",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412008",
+   "name": "Student 2412008",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412009",
+   "name": "Student 2412009",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412010",
+   "name": "Student 2412010",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412011",
+   "name": "Student 2412011",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412012",
+   "name": "Student 2412012",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412013",
+   "name": "Student 2412013",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412014",
+   "name": "Student 2412014",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412015",
+   "name": "Student 2412015",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412016",
+   "name": "Student 2412016",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412017",
+   "name": "Student 2412017",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412018",
+   "name": "Student 2412018",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412019",
+   "name": "Student 2412019",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412020",
+   "name": "Student 2412020",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412021",
+   "name": "Student 2412021",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412022",
+   "name": "Student 2412022",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412023",
+   "name": "Student 2412023",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412024",
+   "name": "Student 2412024",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412025",
+   "name": "Student 2412025",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412026",
+   "name": "Student 2412026",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412027",
+   "name": "Student 2412027",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412028",
+   "name": "Student 2412028",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412029",
+   "name": "Student 2412029",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412030",
+   "name": "Student 2412030",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412031",
+   "name": "Student 2412031",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412032",
+   "name": "Student 2412032",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412033",
+   "name": "Student 2412033",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412034",
+   "name": "Student 2412034",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412035",
+   "name": "Student 2412035",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412036",
+   "name": "Student 2412036",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412037",
+   "name": "Student 2412037",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412038",
+   "name": "Student 2412038",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412039",
+   "name": "Student 2412039",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412040",
+   "name": "Student 2412040",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412041",
+   "name": "Student 2412041",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412042",
+   "name": "Student 2412042",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412043",
+   "name": "Student 2412043",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412044",
+   "name": "Student 2412044",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412045",
+   "name": "Student 2412045",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412046",
+   "name": "Student 2412046",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412047",
+   "name": "Student 2412047",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412048",
+   "name": "Student 2412048",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412049",
+   "name": "Student 2412049",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412050",
+   "name": "Student 2412050",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412051",
+   "name": "Student 2412051",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412052",
+   "name": "Student 2412052",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412053",
+   "name": "Student 2412053",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412054",
+   "name": "Student 2412054",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412055",
+   "name": "Student 2412055",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412056",
+   "name": "Student 2412056",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412057",
+   "name": "Student 2412057",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412058",
+   "name": "Student 2412058",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412059",
+   "name": "Student 2412059",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412060",
+   "name": "Student 2412060",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412061",
+   "name": "Student 2412061",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412062",
+   "name": "Student 2412062",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412063",
+   "name": "Student 2412063",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412064",
+   "name": "Student 2412064",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412065",
+   "name": "Student 2412065",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412066",
+   "name": "Student 2412066",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412067",
+   "name": "Student 2412067",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412068",
+   "name": "Student 2412068",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412069",
+   "name": "Student 2412069",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412070",
+   "name": "Student 2412070",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412071",
+   "name": "Student 2412071",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412072",
+   "name": "Student 2412072",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412073",
+   "name": "Student 2412073",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412074",
+   "name": "Student 2412074",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412075",
+   "name": "Student 2412075",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412076",
+   "name": "Student 2412076",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412077",
+   "name": "Student 2412077",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412078",
+   "name": "Student 2412078",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412079",
+   "name": "Student 2412079",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412080",
+   "name": "Student 2412080",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412081",
+   "name": "Student 2412081",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412082",
+   "name": "Student 2412082",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412083",
+   "name": "Student 2412083",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412084",
+   "name": "Student 2412084",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412085",
+   "name": "Student 2412085",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412086",
+   "name": "Student 2412086",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412087",
+   "name": "Student 2412087",
+   "email": "",
+   "vehicles": []
+  },
+  {
+   "id": "2412088",
+   "name": "Student 2412088",
+   "email": "",
+   "vehicles": []
+  }
+ ],
+ "vehicleReservations": [
+  {
+   "id": "VR-8H2D",
+   "studentId": "2412090",
+   "vehicleId": "EB-0300",
+   "hubId": "H02",
+   "status": "Confirmed",
+   "fee": 5000,
+   "tx": "TX-20261102-88390",
+   "created": "2026-11-02T07:26:10.000Z",
+   "expires": "2026-11-02T07:41:10.000Z"
+  },
+  {
+   "id": "VR-9K3E",
+   "studentId": "2412091",
+   "vehicleId": "EM-0100",
+   "hubId": "H02",
+   "status": "Confirmed",
+   "fee": 5000,
+   "tx": "TX-20261102-88401",
+   "created": "2026-11-02T07:33:40.000Z",
+   "expires": "2026-11-02T07:48:40.000Z"
+  },
+  {
+   "id": "VR-6P1A",
+   "studentId": "2412088",
+   "vehicleId": "EB-0226",
+   "hubId": "H01",
+   "status": "Confirmed",
+   "fee": 5000,
+   "tx": "TX-20261102-88405",
+   "created": "2026-11-02T07:32:00.000Z",
+   "expires": "2026-11-02T07:47:00.000Z"
+  },
+  {
+   "id": "VR-5T2C",
+   "studentId": "2412345",
+   "vehicleId": "EB-0204",
+   "hubId": "H02",
+   "status": "Cancelled by System",
+   "fee": 5000,
+   "tx": "TX-20261027-71230",
+   "created": "2026-10-27T02:10:00.000Z",
+   "expires": "2026-10-27T02:25:00.000Z",
+   "refund": "Success"
+  }
+ ],
+ "parkingReservations": [
+  {
+   "id": "PR-2KQ1",
+   "studentId": "2412345",
+   "spaceId": "H05-P-B03",
+   "hubId": "H05",
+   "status": "Expired",
+   "fee": 15000,
+   "tx": "TX-20261028-72010",
+   "start": "2026-10-28T00:30:00.000Z",
+   "end": "2026-10-28T05:00:00.000Z",
+   "plate": "59-X3 123.45",
+   "created": "2026-10-27T14:00:00.000Z"
+  },
+  {
+   "id": "PR-3MZ8",
+   "studentId": "2412345",
+   "spaceId": "H01-P-B12",
+   "hubId": "H01",
+   "status": "Cancelled by System",
+   "fee": 15000,
+   "tx": "TX-20261102-88350",
+   "start": "2026-11-02T09:00:00.000Z",
+   "end": "2026-11-02T14:30:00.000Z",
+   "plate": "59-X3 123.45",
+   "created": "2026-11-02T03:20:00.000Z",
+   "refund": "pending"
+  },
+  {
+   "id": "PR-4K1C",
+   "studentId": "2412102",
+   "spaceId": "H01-P-B07",
+   "hubId": "H01",
+   "status": "Confirmed",
+   "fee": 9000,
+   "tx": "TX-20261102-88341",
+   "start": "2026-11-02T10:00:00.000Z",
+   "end": "2026-11-02T13:00:00.000Z",
+   "plate": "51-K2 678.90",
+   "created": "2026-11-02T02:30:00.000Z",
+   "movedFrom": "P-B12"
+  },
+  {
+   "id": "PR-S0120A",
+   "studentId": "2412001",
+   "spaceId": "H01-P-A20",
+   "hubId": "H01",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-701020",
+   "start": "2026-11-02T02:00:00.000Z",
+   "end": "2026-11-02T09:30:00.000Z",
+   "plate": "EB 001",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0119A",
+   "studentId": "2412002",
+   "spaceId": "H01-P-A19",
+   "hubId": "H01",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-701019",
+   "start": "2026-11-02T03:00:00.000Z",
+   "end": "2026-11-02T11:30:00.000Z",
+   "plate": "EB 002",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0118A",
+   "studentId": "2412003",
+   "spaceId": "H01-P-A18",
+   "hubId": "H01",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-701018",
+   "start": "2026-11-02T04:00:00.000Z",
+   "end": "2026-11-02T11:30:00.000Z",
+   "plate": "EB 003",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0117A",
+   "studentId": "2412004",
+   "spaceId": "H01-P-A17",
+   "hubId": "H01",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-701017",
+   "start": "2026-11-02T04:00:00.000Z",
+   "end": "2026-11-02T12:30:00.000Z",
+   "plate": "EB 004",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0116A",
+   "studentId": "2412005",
+   "spaceId": "H01-P-A16",
+   "hubId": "H01",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-701016",
+   "start": "2026-11-02T06:00:00.000Z",
+   "end": "2026-11-02T13:30:00.000Z",
+   "plate": "EB 005",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0115A",
+   "studentId": "2412006",
+   "spaceId": "H01-P-A15",
+   "hubId": "H01",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-701015",
+   "start": "2026-11-02T03:00:00.000Z",
+   "end": "2026-11-02T13:30:00.000Z",
+   "plate": "EB 006",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0114A",
+   "studentId": "2412007",
+   "spaceId": "H01-P-A14",
+   "hubId": "H01",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-701014",
+   "start": "2026-11-02T06:00:00.000Z",
+   "end": "2026-11-02T10:30:00.000Z",
+   "plate": "EB 007",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0113A",
+   "studentId": "2412008",
+   "spaceId": "H01-P-A13",
+   "hubId": "H01",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-701013",
+   "start": "2026-11-02T03:00:00.000Z",
+   "end": "2026-11-02T09:30:00.000Z",
+   "plate": "EB 008",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0112A",
+   "studentId": "2412009",
+   "spaceId": "H01-P-A12",
+   "hubId": "H01",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-701012",
+   "start": "2026-11-02T05:00:00.000Z",
+   "end": "2026-11-02T09:30:00.000Z",
+   "plate": "EB 009",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0111A",
+   "studentId": "2412010",
+   "spaceId": "H01-P-A11",
+   "hubId": "H01",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-701011",
+   "start": "2026-11-02T04:00:00.000Z",
+   "end": "2026-11-02T11:30:00.000Z",
+   "plate": "EB 010",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0110A",
+   "studentId": "2412011",
+   "spaceId": "H01-P-A10",
+   "hubId": "H01",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-701010",
+   "start": "2026-11-02T02:00:00.000Z",
+   "end": "2026-11-02T11:30:00.000Z",
+   "plate": "EB 011",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0109A",
+   "studentId": "2412012",
+   "spaceId": "H01-P-A09",
+   "hubId": "H01",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-701009",
+   "start": "2026-11-02T03:00:00.000Z",
+   "end": "2026-11-02T12:30:00.000Z",
+   "plate": "EB 012",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0118B",
+   "studentId": "2412013",
+   "spaceId": "H01-P-B18",
+   "hubId": "H01",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-701018",
+   "start": "2026-11-02T05:00:00.000Z",
+   "end": "2026-11-02T10:30:00.000Z",
+   "plate": "59-Z 013",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0117B",
+   "studentId": "2412014",
+   "spaceId": "H01-P-B17",
+   "hubId": "H01",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-701017",
+   "start": "2026-11-02T03:00:00.000Z",
+   "end": "2026-11-02T10:30:00.000Z",
+   "plate": "59-Z 014",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0116B",
+   "studentId": "2412015",
+   "spaceId": "H01-P-B16",
+   "hubId": "H01",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-701016",
+   "start": "2026-11-02T05:00:00.000Z",
+   "end": "2026-11-02T10:30:00.000Z",
+   "plate": "59-Z 015",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0115B",
+   "studentId": "2412016",
+   "spaceId": "H01-P-B15",
+   "hubId": "H01",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-701015",
+   "start": "2026-11-02T06:00:00.000Z",
+   "end": "2026-11-02T10:30:00.000Z",
+   "plate": "59-Z 016",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0114B",
+   "studentId": "2412017",
+   "spaceId": "H01-P-B14",
+   "hubId": "H01",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-701014",
+   "start": "2026-11-02T02:00:00.000Z",
+   "end": "2026-11-02T12:30:00.000Z",
+   "plate": "59-Z 017",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0113B",
+   "studentId": "2412018",
+   "spaceId": "H01-P-B13",
+   "hubId": "H01",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-701013",
+   "start": "2026-11-02T04:00:00.000Z",
+   "end": "2026-11-02T09:30:00.000Z",
+   "plate": "59-Z 018",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0111B",
+   "studentId": "2412019",
+   "spaceId": "H01-P-B11",
+   "hubId": "H01",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-701011",
+   "start": "2026-11-02T04:00:00.000Z",
+   "end": "2026-11-02T08:30:00.000Z",
+   "plate": "59-Z 019",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0110B",
+   "studentId": "2412020",
+   "spaceId": "H01-P-B10",
+   "hubId": "H01",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-701010",
+   "start": "2026-11-02T03:00:00.000Z",
+   "end": "2026-11-02T10:30:00.000Z",
+   "plate": "59-Z 020",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0109B",
+   "studentId": "2412021",
+   "spaceId": "H01-P-B09",
+   "hubId": "H01",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-701009",
+   "start": "2026-11-02T06:00:00.000Z",
+   "end": "2026-11-02T09:30:00.000Z",
+   "plate": "59-Z 021",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0108B",
+   "studentId": "2412022",
+   "spaceId": "H01-P-B08",
+   "hubId": "H01",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-701008",
+   "start": "2026-11-02T03:00:00.000Z",
+   "end": "2026-11-02T11:30:00.000Z",
+   "plate": "59-Z 022",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0107B",
+   "studentId": "2412023",
+   "spaceId": "H01-P-B07",
+   "hubId": "H01",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-701007",
+   "start": "2026-11-02T06:00:00.000Z",
+   "end": "2026-11-02T08:30:00.000Z",
+   "plate": "59-Z 023",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0106B",
+   "studentId": "2412024",
+   "spaceId": "H01-P-B06",
+   "hubId": "H01",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-701006",
+   "start": "2026-11-02T03:00:00.000Z",
+   "end": "2026-11-02T11:30:00.000Z",
+   "plate": "59-Z 024",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0208A",
+   "studentId": "2412025",
+   "spaceId": "H02-P-A08",
+   "hubId": "H02",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-702008",
+   "start": "2026-11-02T06:00:00.000Z",
+   "end": "2026-11-02T10:30:00.000Z",
+   "plate": "EB 025",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0207A",
+   "studentId": "2412026",
+   "spaceId": "H02-P-A07",
+   "hubId": "H02",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-702007",
+   "start": "2026-11-02T05:00:00.000Z",
+   "end": "2026-11-02T10:30:00.000Z",
+   "plate": "EB 026",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0206A",
+   "studentId": "2412027",
+   "spaceId": "H02-P-A06",
+   "hubId": "H02",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-702006",
+   "start": "2026-11-02T03:00:00.000Z",
+   "end": "2026-11-02T12:30:00.000Z",
+   "plate": "EB 027",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0205A",
+   "studentId": "2412028",
+   "spaceId": "H02-P-A05",
+   "hubId": "H02",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-702005",
+   "start": "2026-11-02T04:00:00.000Z",
+   "end": "2026-11-02T08:30:00.000Z",
+   "plate": "EB 028",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0204A",
+   "studentId": "2412029",
+   "spaceId": "H02-P-A04",
+   "hubId": "H02",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-702004",
+   "start": "2026-11-02T03:00:00.000Z",
+   "end": "2026-11-02T09:30:00.000Z",
+   "plate": "EB 029",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0203A",
+   "studentId": "2412030",
+   "spaceId": "H02-P-A03",
+   "hubId": "H02",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-702003",
+   "start": "2026-11-02T06:00:00.000Z",
+   "end": "2026-11-02T10:30:00.000Z",
+   "plate": "EB 030",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0202A",
+   "studentId": "2412031",
+   "spaceId": "H02-P-A02",
+   "hubId": "H02",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-702002",
+   "start": "2026-11-02T05:00:00.000Z",
+   "end": "2026-11-02T09:30:00.000Z",
+   "plate": "EB 031",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0206B",
+   "studentId": "2412032",
+   "spaceId": "H02-P-B06",
+   "hubId": "H02",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-702006",
+   "start": "2026-11-02T03:00:00.000Z",
+   "end": "2026-11-02T08:30:00.000Z",
+   "plate": "59-Z 032",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0205B",
+   "studentId": "2412033",
+   "spaceId": "H02-P-B05",
+   "hubId": "H02",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-702005",
+   "start": "2026-11-02T05:00:00.000Z",
+   "end": "2026-11-02T11:30:00.000Z",
+   "plate": "59-Z 033",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0204B",
+   "studentId": "2412034",
+   "spaceId": "H02-P-B04",
+   "hubId": "H02",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-702004",
+   "start": "2026-11-02T04:00:00.000Z",
+   "end": "2026-11-02T12:30:00.000Z",
+   "plate": "59-Z 034",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0203B",
+   "studentId": "2412035",
+   "spaceId": "H02-P-B03",
+   "hubId": "H02",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-702003",
+   "start": "2026-11-02T05:00:00.000Z",
+   "end": "2026-11-02T09:30:00.000Z",
+   "plate": "59-Z 035",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0202B",
+   "studentId": "2412036",
+   "spaceId": "H02-P-B02",
+   "hubId": "H02",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-702002",
+   "start": "2026-11-02T04:00:00.000Z",
+   "end": "2026-11-02T09:30:00.000Z",
+   "plate": "59-Z 036",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0316A",
+   "studentId": "2412037",
+   "spaceId": "H03-P-A16",
+   "hubId": "H03",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-703016",
+   "start": "2026-11-02T04:00:00.000Z",
+   "end": "2026-11-02T11:30:00.000Z",
+   "plate": "EB 037",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0315A",
+   "studentId": "2412038",
+   "spaceId": "H03-P-A15",
+   "hubId": "H03",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-703015",
+   "start": "2026-11-02T03:00:00.000Z",
+   "end": "2026-11-02T10:30:00.000Z",
+   "plate": "EB 038",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0314A",
+   "studentId": "2412039",
+   "spaceId": "H03-P-A14",
+   "hubId": "H03",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-703014",
+   "start": "2026-11-02T03:00:00.000Z",
+   "end": "2026-11-02T13:30:00.000Z",
+   "plate": "EB 039",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0313A",
+   "studentId": "2412040",
+   "spaceId": "H03-P-A13",
+   "hubId": "H03",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-703013",
+   "start": "2026-11-02T04:00:00.000Z",
+   "end": "2026-11-02T10:30:00.000Z",
+   "plate": "EB 040",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0312A",
+   "studentId": "2412041",
+   "spaceId": "H03-P-A12",
+   "hubId": "H03",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-703012",
+   "start": "2026-11-02T05:00:00.000Z",
+   "end": "2026-11-02T13:30:00.000Z",
+   "plate": "EB 041",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0311A",
+   "studentId": "2412042",
+   "spaceId": "H03-P-A11",
+   "hubId": "H03",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-703011",
+   "start": "2026-11-02T02:00:00.000Z",
+   "end": "2026-11-02T10:30:00.000Z",
+   "plate": "EB 042",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0310A",
+   "studentId": "2412043",
+   "spaceId": "H03-P-A10",
+   "hubId": "H03",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-703010",
+   "start": "2026-11-02T03:00:00.000Z",
+   "end": "2026-11-02T09:30:00.000Z",
+   "plate": "EB 043",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0309A",
+   "studentId": "2412044",
+   "spaceId": "H03-P-A09",
+   "hubId": "H03",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-703009",
+   "start": "2026-11-02T03:00:00.000Z",
+   "end": "2026-11-02T10:30:00.000Z",
+   "plate": "EB 044",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0308A",
+   "studentId": "2412045",
+   "spaceId": "H03-P-A08",
+   "hubId": "H03",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-703008",
+   "start": "2026-11-02T05:00:00.000Z",
+   "end": "2026-11-02T11:30:00.000Z",
+   "plate": "EB 045",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0307A",
+   "studentId": "2412046",
+   "spaceId": "H03-P-A07",
+   "hubId": "H03",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-703007",
+   "start": "2026-11-02T06:00:00.000Z",
+   "end": "2026-11-02T12:30:00.000Z",
+   "plate": "EB 046",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0306A",
+   "studentId": "2412047",
+   "spaceId": "H03-P-A06",
+   "hubId": "H03",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-703006",
+   "start": "2026-11-02T05:00:00.000Z",
+   "end": "2026-11-02T11:30:00.000Z",
+   "plate": "EB 047",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0312B",
+   "studentId": "2412048",
+   "spaceId": "H03-P-B12",
+   "hubId": "H03",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-703012",
+   "start": "2026-11-02T04:00:00.000Z",
+   "end": "2026-11-02T10:30:00.000Z",
+   "plate": "59-Z 048",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0311B",
+   "studentId": "2412049",
+   "spaceId": "H03-P-B11",
+   "hubId": "H03",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-703011",
+   "start": "2026-11-02T03:00:00.000Z",
+   "end": "2026-11-02T10:30:00.000Z",
+   "plate": "59-Z 049",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0310B",
+   "studentId": "2412050",
+   "spaceId": "H03-P-B10",
+   "hubId": "H03",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-703010",
+   "start": "2026-11-02T02:00:00.000Z",
+   "end": "2026-11-02T10:30:00.000Z",
+   "plate": "59-Z 050",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0309B",
+   "studentId": "2412051",
+   "spaceId": "H03-P-B09",
+   "hubId": "H03",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-703009",
+   "start": "2026-11-02T04:00:00.000Z",
+   "end": "2026-11-02T09:30:00.000Z",
+   "plate": "59-Z 051",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0308B",
+   "studentId": "2412052",
+   "spaceId": "H03-P-B08",
+   "hubId": "H03",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-703008",
+   "start": "2026-11-02T03:00:00.000Z",
+   "end": "2026-11-02T12:30:00.000Z",
+   "plate": "59-Z 052",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0307B",
+   "studentId": "2412053",
+   "spaceId": "H03-P-B07",
+   "hubId": "H03",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-703007",
+   "start": "2026-11-02T06:00:00.000Z",
+   "end": "2026-11-02T12:30:00.000Z",
+   "plate": "59-Z 053",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0306B",
+   "studentId": "2412054",
+   "spaceId": "H03-P-B06",
+   "hubId": "H03",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-703006",
+   "start": "2026-11-02T02:00:00.000Z",
+   "end": "2026-11-02T12:30:00.000Z",
+   "plate": "59-Z 054",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0305B",
+   "studentId": "2412055",
+   "spaceId": "H03-P-B05",
+   "hubId": "H03",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-703005",
+   "start": "2026-11-02T05:00:00.000Z",
+   "end": "2026-11-02T11:30:00.000Z",
+   "plate": "59-Z 055",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0412A",
+   "studentId": "2412056",
+   "spaceId": "H04-P-A12",
+   "hubId": "H04",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-704012",
+   "start": "2026-11-02T04:00:00.000Z",
+   "end": "2026-11-02T09:30:00.000Z",
+   "plate": "EB 056",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0411A",
+   "studentId": "2412057",
+   "spaceId": "H04-P-A11",
+   "hubId": "H04",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-704011",
+   "start": "2026-11-02T05:00:00.000Z",
+   "end": "2026-11-02T12:30:00.000Z",
+   "plate": "EB 057",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0410A",
+   "studentId": "2412058",
+   "spaceId": "H04-P-A10",
+   "hubId": "H04",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-704010",
+   "start": "2026-11-02T04:00:00.000Z",
+   "end": "2026-11-02T08:30:00.000Z",
+   "plate": "EB 058",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0409A",
+   "studentId": "2412059",
+   "spaceId": "H04-P-A09",
+   "hubId": "H04",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-704009",
+   "start": "2026-11-02T05:00:00.000Z",
+   "end": "2026-11-02T12:30:00.000Z",
+   "plate": "EB 059",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0408A",
+   "studentId": "2412060",
+   "spaceId": "H04-P-A08",
+   "hubId": "H04",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-704008",
+   "start": "2026-11-02T04:00:00.000Z",
+   "end": "2026-11-02T12:30:00.000Z",
+   "plate": "EB 060",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0407A",
+   "studentId": "2412061",
+   "spaceId": "H04-P-A07",
+   "hubId": "H04",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-704007",
+   "start": "2026-11-02T03:00:00.000Z",
+   "end": "2026-11-02T08:30:00.000Z",
+   "plate": "EB 061",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0410B",
+   "studentId": "2412062",
+   "spaceId": "H04-P-B10",
+   "hubId": "H04",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-704010",
+   "start": "2026-11-02T05:00:00.000Z",
+   "end": "2026-11-02T11:30:00.000Z",
+   "plate": "59-Z 062",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0409B",
+   "studentId": "2412063",
+   "spaceId": "H04-P-B09",
+   "hubId": "H04",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-704009",
+   "start": "2026-11-02T05:00:00.000Z",
+   "end": "2026-11-02T12:30:00.000Z",
+   "plate": "59-Z 063",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0408B",
+   "studentId": "2412064",
+   "spaceId": "H04-P-B08",
+   "hubId": "H04",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-704008",
+   "start": "2026-11-02T06:00:00.000Z",
+   "end": "2026-11-02T11:30:00.000Z",
+   "plate": "59-Z 064",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0407B",
+   "studentId": "2412065",
+   "spaceId": "H04-P-B07",
+   "hubId": "H04",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-704007",
+   "start": "2026-11-02T03:00:00.000Z",
+   "end": "2026-11-02T09:30:00.000Z",
+   "plate": "59-Z 065",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0406B",
+   "studentId": "2412066",
+   "spaceId": "H04-P-B06",
+   "hubId": "H04",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-704006",
+   "start": "2026-11-02T03:00:00.000Z",
+   "end": "2026-11-02T12:30:00.000Z",
+   "plate": "59-Z 066",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0405B",
+   "studentId": "2412067",
+   "spaceId": "H04-P-B05",
+   "hubId": "H04",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-704005",
+   "start": "2026-11-02T05:00:00.000Z",
+   "end": "2026-11-02T09:30:00.000Z",
+   "plate": "59-Z 067",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0510A",
+   "studentId": "2412068",
+   "spaceId": "H05-P-A10",
+   "hubId": "H05",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-705010",
+   "start": "2026-11-02T05:00:00.000Z",
+   "end": "2026-11-02T12:30:00.000Z",
+   "plate": "EB 068",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0509A",
+   "studentId": "2412069",
+   "spaceId": "H05-P-A09",
+   "hubId": "H05",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-705009",
+   "start": "2026-11-02T04:00:00.000Z",
+   "end": "2026-11-02T11:30:00.000Z",
+   "plate": "EB 069",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0508A",
+   "studentId": "2412070",
+   "spaceId": "H05-P-A08",
+   "hubId": "H05",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-705008",
+   "start": "2026-11-02T05:00:00.000Z",
+   "end": "2026-11-02T12:30:00.000Z",
+   "plate": "EB 070",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0508B",
+   "studentId": "2412071",
+   "spaceId": "H05-P-B08",
+   "hubId": "H05",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-705008",
+   "start": "2026-11-02T06:00:00.000Z",
+   "end": "2026-11-02T08:30:00.000Z",
+   "plate": "59-Z 071",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0507B",
+   "studentId": "2412072",
+   "spaceId": "H05-P-B07",
+   "hubId": "H05",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-705007",
+   "start": "2026-11-02T05:00:00.000Z",
+   "end": "2026-11-02T13:30:00.000Z",
+   "plate": "59-Z 072",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0506B",
+   "studentId": "2412073",
+   "spaceId": "H05-P-B06",
+   "hubId": "H05",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-705006",
+   "start": "2026-11-02T03:00:00.000Z",
+   "end": "2026-11-02T13:30:00.000Z",
+   "plate": "59-Z 073",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0505B",
+   "studentId": "2412074",
+   "spaceId": "H05-P-B05",
+   "hubId": "H05",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-705005",
+   "start": "2026-11-02T04:00:00.000Z",
+   "end": "2026-11-02T09:30:00.000Z",
+   "plate": "59-Z 074",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0608A",
+   "studentId": "2412075",
+   "spaceId": "H06-P-A08",
+   "hubId": "H06",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-706008",
+   "start": "2026-11-02T06:00:00.000Z",
+   "end": "2026-11-02T13:30:00.000Z",
+   "plate": "EB 075",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0607A",
+   "studentId": "2412076",
+   "spaceId": "H06-P-A07",
+   "hubId": "H06",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-706007",
+   "start": "2026-11-02T05:00:00.000Z",
+   "end": "2026-11-02T08:30:00.000Z",
+   "plate": "EB 076",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0606A",
+   "studentId": "2412077",
+   "spaceId": "H06-P-A06",
+   "hubId": "H06",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-706006",
+   "start": "2026-11-02T04:00:00.000Z",
+   "end": "2026-11-02T12:30:00.000Z",
+   "plate": "EB 077",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0605A",
+   "studentId": "2412078",
+   "spaceId": "H06-P-A05",
+   "hubId": "H06",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-706005",
+   "start": "2026-11-02T02:00:00.000Z",
+   "end": "2026-11-02T12:30:00.000Z",
+   "plate": "EB 078",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0606B",
+   "studentId": "2412079",
+   "spaceId": "H06-P-B06",
+   "hubId": "H06",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-706006",
+   "start": "2026-11-02T04:00:00.000Z",
+   "end": "2026-11-02T09:30:00.000Z",
+   "plate": "59-Z 079",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0605B",
+   "studentId": "2412080",
+   "spaceId": "H06-P-B05",
+   "hubId": "H06",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-706005",
+   "start": "2026-11-02T04:00:00.000Z",
+   "end": "2026-11-02T11:30:00.000Z",
+   "plate": "59-Z 080",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0604B",
+   "studentId": "2412081",
+   "spaceId": "H06-P-B04",
+   "hubId": "H06",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-706004",
+   "start": "2026-11-02T06:00:00.000Z",
+   "end": "2026-11-02T11:30:00.000Z",
+   "plate": "59-Z 081",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0706A",
+   "studentId": "2412082",
+   "spaceId": "H07-P-A06",
+   "hubId": "H07",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-707006",
+   "start": "2026-11-02T02:00:00.000Z",
+   "end": "2026-11-02T09:30:00.000Z",
+   "plate": "EB 082",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0705A",
+   "studentId": "2412083",
+   "spaceId": "H07-P-A05",
+   "hubId": "H07",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-707005",
+   "start": "2026-11-02T06:00:00.000Z",
+   "end": "2026-11-02T11:30:00.000Z",
+   "plate": "EB 083",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0704A",
+   "studentId": "2412084",
+   "spaceId": "H07-P-A04",
+   "hubId": "H07",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-707004",
+   "start": "2026-11-02T02:00:00.000Z",
+   "end": "2026-11-02T10:30:00.000Z",
+   "plate": "EB 084",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0706B",
+   "studentId": "2412085",
+   "spaceId": "H07-P-B06",
+   "hubId": "H07",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-707006",
+   "start": "2026-11-02T04:00:00.000Z",
+   "end": "2026-11-02T11:30:00.000Z",
+   "plate": "59-Z 085",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0705B",
+   "studentId": "2412086",
+   "spaceId": "H07-P-B05",
+   "hubId": "H07",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-707005",
+   "start": "2026-11-02T06:00:00.000Z",
+   "end": "2026-11-02T10:30:00.000Z",
+   "plate": "59-Z 086",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0704B",
+   "studentId": "2412087",
+   "spaceId": "H07-P-B04",
+   "hubId": "H07",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-707004",
+   "start": "2026-11-02T03:00:00.000Z",
+   "end": "2026-11-02T12:30:00.000Z",
+   "plate": "59-Z 087",
+   "created": "2026-11-02T01:00:00.000Z"
+  },
+  {
+   "id": "PR-S0703B",
+   "studentId": "2412088",
+   "spaceId": "H07-P-B03",
+   "hubId": "H07",
+   "status": "Checked-in",
+   "fee": 9000,
+   "tx": "TX-20261102-707003",
+   "start": "2026-11-02T05:00:00.000Z",
+   "end": "2026-11-02T11:30:00.000Z",
+   "plate": "59-Z 088",
+   "created": "2026-11-02T01:00:00.000Z"
+  }
+ ],
+ "chargingSessions": [
+  {
+   "id": "CQ-S001",
+   "kind": "Charging Queue request",
+   "studentId": "system",
+   "vehicleRef": "EB-0239",
+   "hubId": "H02",
+   "pointId": "CP-H02-01",
+   "status": "Charging",
+   "start": "2026-11-02T07:15:00.000Z",
+   "end": "2026-11-02T08:15:00.000Z",
+   "waitingSince": "2026-11-02T06:40:00.000Z",
+   "targetSoc": 90
+  },
+  {
+   "id": "CQ-S002",
+   "kind": "Charging Queue request",
+   "studentId": "system",
+   "vehicleRef": "EB-0260",
+   "hubId": "H02",
+   "pointId": "CP-H02-02",
+   "status": "Charging",
+   "start": "2026-11-02T07:15:00.000Z",
+   "end": "2026-11-02T08:15:00.000Z",
+   "waitingSince": "2026-11-02T06:40:00.000Z",
+   "targetSoc": 90
+  },
+  {
+   "id": "CQ-S003",
+   "kind": "Charging Queue request",
+   "studentId": "system",
+   "vehicleRef": "EB-0262",
+   "hubId": "H02",
+   "pointId": "CP-H02-03",
+   "status": "Charging",
+   "start": "2026-11-02T07:15:00.000Z",
+   "end": "2026-11-02T08:15:00.000Z",
+   "waitingSince": "2026-11-02T06:40:00.000Z",
+   "targetSoc": 90
+  },
+  {
+   "id": "CQ-S004",
+   "kind": "Charging Queue request",
+   "studentId": "system",
+   "vehicleRef": "EB-0301",
+   "hubId": "H02",
+   "pointId": "CP-H02-04",
+   "status": "Charging",
+   "start": "2026-11-02T07:15:00.000Z",
+   "end": "2026-11-02T08:15:00.000Z",
+   "waitingSince": "2026-11-02T06:40:00.000Z",
+   "targetSoc": 90
+  },
+  {
+   "id": "CQ-S005",
+   "kind": "Charging Queue request",
+   "studentId": "system",
+   "vehicleRef": "EB-0302",
+   "hubId": "H02",
+   "pointId": "CP-H02-05",
+   "status": "Charging",
+   "start": "2026-11-02T07:15:00.000Z",
+   "end": "2026-11-02T08:15:00.000Z",
+   "waitingSince": "2026-11-02T06:40:00.000Z",
+   "targetSoc": 90
+  },
+  {
+   "id": "CQ-S006",
+   "kind": "Charging Queue request",
+   "studentId": "system",
+   "vehicleRef": "EM-0120",
+   "hubId": "H03",
+   "pointId": "CP-H03-01",
+   "status": "Charging",
+   "start": "2026-11-02T07:15:00.000Z",
+   "end": "2026-11-02T08:15:00.000Z",
+   "waitingSince": "2026-11-02T06:40:00.000Z",
+   "targetSoc": 90
+  },
+  {
+   "id": "CQ-S007",
+   "kind": "Charging Queue request",
+   "studentId": "system",
+   "vehicleRef": "EB-0346",
+   "hubId": "H03",
+   "pointId": "CP-H03-02",
+   "status": "Charging",
+   "start": "2026-11-02T07:15:00.000Z",
+   "end": "2026-11-02T08:15:00.000Z",
+   "waitingSince": "2026-11-02T06:40:00.000Z",
+   "targetSoc": 90
+  },
+  {
+   "id": "CQ-S008",
+   "kind": "Charging Queue request",
+   "studentId": "system",
+   "vehicleRef": "EM-0121",
+   "hubId": "H03",
+   "pointId": "CP-H03-03",
+   "status": "Charging",
+   "start": "2026-11-02T07:15:00.000Z",
+   "end": "2026-11-02T08:15:00.000Z",
+   "waitingSince": "2026-11-02T06:40:00.000Z",
+   "targetSoc": 90
+  },
+  {
+   "id": "CQ-S009",
+   "kind": "Charging Queue request",
+   "studentId": "system",
+   "vehicleRef": "EB-0347",
+   "hubId": "H03",
+   "pointId": "CP-H03-04",
+   "status": "Charging",
+   "start": "2026-11-02T07:15:00.000Z",
+   "end": "2026-11-02T08:15:00.000Z",
+   "waitingSince": "2026-11-02T06:40:00.000Z",
+   "targetSoc": 90
+  },
+  {
+   "id": "CQ-S010",
+   "kind": "Charging Queue request",
+   "studentId": "system",
+   "vehicleRef": "EM-0122",
+   "hubId": "H03",
+   "pointId": "CP-H03-05",
+   "status": "Charging",
+   "start": "2026-11-02T07:15:00.000Z",
+   "end": "2026-11-02T08:15:00.000Z",
+   "waitingSince": "2026-11-02T06:40:00.000Z",
+   "targetSoc": 90
+  },
+  {
+   "id": "CQ-S011",
+   "kind": "Charging Queue request",
+   "studentId": "system",
+   "vehicleRef": "EB-0348",
+   "hubId": "H03",
+   "pointId": "CP-H03-06",
+   "status": "Charging",
+   "start": "2026-11-02T07:15:00.000Z",
+   "end": "2026-11-02T08:15:00.000Z",
+   "waitingSince": "2026-11-02T06:40:00.000Z",
+   "targetSoc": 90
+  },
+  {
+   "id": "CQ-S012",
+   "kind": "Charging Queue request",
+   "studentId": "system",
+   "vehicleRef": "EM-0126",
+   "hubId": "H04",
+   "pointId": "CP-H04-01",
+   "status": "Charging",
+   "start": "2026-11-02T07:15:00.000Z",
+   "end": "2026-11-02T08:15:00.000Z",
+   "waitingSince": "2026-11-02T06:40:00.000Z",
+   "targetSoc": 90
+  },
+  {
+   "id": "CQ-S013",
+   "kind": "Charging Queue request",
+   "studentId": "system",
+   "vehicleRef": "EB-0363",
+   "hubId": "H04",
+   "pointId": "CP-H04-02",
+   "status": "Charging",
+   "start": "2026-11-02T07:15:00.000Z",
+   "end": "2026-11-02T08:15:00.000Z",
+   "waitingSince": "2026-11-02T06:40:00.000Z",
+   "targetSoc": 90
+  },
+  {
+   "id": "CQ-S014",
+   "kind": "Charging Queue request",
+   "studentId": "system",
+   "vehicleRef": "EB-0372",
+   "hubId": "H05",
+   "pointId": "CP-H05-01",
+   "status": "Charging",
+   "start": "2026-11-02T07:15:00.000Z",
+   "end": "2026-11-02T08:15:00.000Z",
+   "waitingSince": "2026-11-02T06:40:00.000Z",
+   "targetSoc": 90
+  },
+  {
+   "id": "CQ-S015",
+   "kind": "Charging Queue request",
+   "studentId": "system",
+   "vehicleRef": "EB-0389",
+   "hubId": "H07",
+   "pointId": "CP-H07-01",
+   "status": "Charging",
+   "start": "2026-11-02T07:15:00.000Z",
+   "end": "2026-11-02T08:15:00.000Z",
+   "waitingSince": "2026-11-02T06:40:00.000Z",
+   "targetSoc": 90
+  },
+  {
+   "id": "CQ-S016",
+   "kind": "Charging Queue request",
+   "studentId": "system",
+   "vehicleRef": "EM-0136",
+   "hubId": "H07",
+   "pointId": "CP-H07-02",
+   "status": "Charging",
+   "start": "2026-11-02T07:15:00.000Z",
+   "end": "2026-11-02T08:15:00.000Z",
+   "waitingSince": "2026-11-02T06:40:00.000Z",
+   "targetSoc": 90
+  },
+  {
+   "id": "CS-3WQA",
+   "kind": "committed reservation",
+   "studentId": "2412345",
+   "vehicleRef": "59-X3 123.45",
+   "hubId": "H01",
+   "pointId": "CP-H01-02",
+   "status": "Payment Failed",
+   "start": "2026-10-26T11:00:00.000Z",
+   "end": "2026-10-26T12:00:00.000Z",
+   "fee": 12000,
+   "created": "2026-10-26T10:20:00.000Z"
+  },
+  {
+   "id": "CS-5HDP",
+   "kind": "committed reservation",
+   "studentId": "2412345",
+   "vehicleRef": "59-X3 123.45",
+   "hubId": "H01",
+   "pointId": "CP-H01-03",
+   "status": "Scheduled",
+   "start": "2026-11-02T08:30:00.000Z",
+   "end": "2026-11-02T09:45:00.000Z",
+   "originalStart": "2026-11-02T08:15:00.000Z",
+   "neededBy": "2026-11-02T10:00:00.000Z",
+   "fee": 18500,
+   "tx": "TX-20261102-88371",
+   "created": "2026-11-02T04:40:00.000Z",
+   "currentSoc": 32,
+   "targetSoc": 80
+  },
+  {
+   "id": "CS-7RNB",
+   "kind": "committed reservation",
+   "studentId": "2412102",
+   "vehicleRef": "51-K2 678.90",
+   "hubId": "H01",
+   "pointId": "CP-H01-01",
+   "status": "Charging",
+   "start": "2026-11-02T07:10:00.000Z",
+   "end": "2026-11-02T08:10:00.000Z",
+   "originalStart": "2026-11-02T07:10:00.000Z",
+   "fee": 14000,
+   "tx": "TX-20261102-88310",
+   "created": "2026-11-02T06:50:00.000Z",
+   "currentSoc": 40,
+   "targetSoc": 90
+  }
+ ],
+ "trips": [
+  {
+   "id": "TR-0941",
+   "studentId": "2412077",
+   "vehicleId": "EM-0042",
+   "hubId": "H03",
+   "reservationId": null,
+   "start": "2026-11-02T07:00:00.000Z",
+   "startSoc": 72,
+   "startDock": "D-09",
+   "status": "Open"
+  }
+ ],
+ "payments": [],
+ "reports": [
+  {
+   "id": "IR-20261102-034",
+   "studentId": "2412077",
+   "resourceId": "EM-0042",
+   "hubId": "H03",
+   "category": "vehicle failure",
+   "description": "The motor cut out and won't restart. Battery shows 61%.",
+   "photos": 1,
+   "time": "2026-11-02T07:31:00.000Z",
+   "incidentId": "INC-0192",
+   "status": "Open"
+  },
+  {
+   "id": "IR-20261031-012",
+   "studentId": "2412345",
+   "resourceId": "CP-H05-02",
+   "hubId": "H05",
+   "category": "charging point unavailable or faulty",
+   "description": "The cable holster is broken, the plug falls out.",
+   "photos": 2,
+   "time": "2026-10-31T03:15:00.000Z",
+   "incidentId": "INC-0185",
+   "status": "Closed"
+  }
+ ],
+ "incidents": [
+  {
+   "id": "INC-0187",
+   "resourceId": "CP-H01-04",
+   "hubId": "H01",
+   "category": "charging point unavailable or faulty",
+   "description": "Charging point reports a hardware fault (UC-11 E3).",
+   "source": "system",
+   "status": "Open",
+   "created": "2026-11-02T07:12:00.000Z",
+   "blocking": true
+  },
+  {
+   "id": "INC-0189",
+   "resourceId": "H01-P-B12",
+   "hubId": "H01",
+   "category": "parking space blocked or occupied",
+   "description": "Barrier at P-B12 stuck down; space unusable.",
+   "source": "operator",
+   "status": "In Progress",
+   "created": "2026-11-02T06:58:00.000Z",
+   "blocking": true,
+   "owner": "OP-014",
+   "actions": [
+    {
+     "note": "Started handling · barrier stuck, technician called",
+     "time": "2026-11-02T07:00:00.000Z"
+    },
+    {
+     "note": "Blocked P-B12 · PR-4K1C moved to P-B07, PR-3MZ8 cancelled (no replacement) and refund requested",
+     "time": "2026-11-02T07:02:00.000Z",
+     "block": true
+    }
+   ]
+  },
+  {
+   "id": "INC-0191",
+   "resourceId": "H06",
+   "hubId": "H06",
+   "category": "Hub disconnected",
+   "description": "No data from H06 since 14:29:40 (over DATA_STALE_AFTER).",
+   "source": "network warning",
+   "status": "Open",
+   "created": "2026-11-02T07:30:45.000Z",
+   "blocking": false
+  },
+  {
+   "id": "INC-0192",
+   "resourceId": "EM-0042",
+   "hubId": "H03",
+   "category": "vehicle failure",
+   "description": "The motor cut out and won't restart. Battery shows 61%.",
+   "source": "student report",
+   "status": "In Progress",
+   "created": "2026-11-02T07:31:00.000Z",
+   "blocking": false,
+   "owner": "OP-014",
+   "actions": [
+    {
+     "note": "Started handling · called student, motor dead",
+     "time": "2026-11-02T07:33:00.000Z"
+    }
+   ]
+  },
+  {
+   "id": "INC-0183",
+   "resourceId": "H05-D07",
+   "hubId": "H05",
+   "category": "Hub facility problem",
+   "description": "Dock D-07 latch sticky.",
+   "source": "student report",
+   "status": "Resolved",
+   "created": "2026-11-02T02:12:00.000Z",
+   "blocking": true,
+   "resolution": "Latch cleaned and tested."
+  },
+  {
+   "id": "INC-0185",
+   "resourceId": "CP-H05-02",
+   "hubId": "H05",
+   "category": "charging point unavailable or faulty",
+   "description": "Cable holster broken.",
+   "source": "student report",
+   "status": "Resolved",
+   "created": "2026-10-31T03:20:00.000Z",
+   "blocking": false,
+   "resolution": "Holster replaced."
+  },
+  {
+   "id": "INC-0186",
+   "resourceId": "EB-0221",
+   "hubId": "H01",
+   "category": "vehicle failure",
+   "description": "Bell missing.",
+   "source": "student report",
+   "status": "Dismissed",
+   "created": "2026-11-02T01:40:00.000Z",
+   "blocking": false,
+   "dismissReason": "Not a failure: bell is optional equipment."
+  }
+ ],
+ "orders": [
+  {
+   "id": "RO-0314",
+   "fromHub": "H04",
+   "toHub": "H03",
+   "model": "e-bike",
+   "quantity": 3,
+   "deadline": "2026-11-02T07:20:00.000Z",
+   "status": "Assigned",
+   "created": "2026-11-02T06:35:00.000Z",
+   "team": "Team A",
+   "transfers": [
+    {
+     "vehicleId": "EB-0352",
+     "status": "Assigned",
+     "destDock": "H03-D55"
+    },
+    {
+     "vehicleId": "EB-0353",
+     "status": "Assigned",
+     "destDock": "H03-D56"
+    },
+    {
+     "vehicleId": "EB-0354",
+     "status": "Assigned",
+     "destDock": "H03-D57"
+    }
+   ]
+  },
+  {
+   "id": "RO-0312",
+   "fromHub": "H03",
+   "toHub": "H01",
+   "model": "e-bike",
+   "quantity": 4,
+   "deadline": "2026-11-02T07:50:00.000Z",
+   "status": "In Transit",
+   "created": "2026-11-02T06:50:00.000Z",
+   "team": "Team B",
+   "transfers": [
+    {
+     "vehicleId": "EB-0212",
+     "status": "Arrived",
+     "destDock": "H01-D03"
+    },
+    {
+     "vehicleId": "EB-0215",
+     "status": "In Transit",
+     "destDock": "H01-D04"
+    },
+    {
+     "vehicleId": "EB-0218",
+     "status": "In Transit",
+     "destDock": "H01-D05"
+    },
+    {
+     "vehicleId": "EB-0223",
+     "status": "Removed",
+     "destDock": null
+    }
+   ]
+  },
+  {
+   "id": "RO-0313",
+   "fromHub": "H02",
+   "toHub": "H07",
+   "model": "e-bike",
+   "quantity": 2,
+   "deadline": "2026-11-02T09:00:00.000Z",
+   "status": "Draft",
+   "created": "2026-11-02T07:05:00.000Z",
+   "team": "—",
+   "transfers": []
+  },
+  {
+   "id": "RO-0310",
+   "fromHub": "H02",
+   "toHub": "H05",
+   "model": "e-bike",
+   "quantity": 3,
+   "deadline": "2026-11-02T06:30:00.000Z",
+   "status": "Completed",
+   "created": "2026-11-02T05:40:00.000Z",
+   "team": "Team B",
+   "transfers": []
+  },
+  {
+   "id": "RO-0309",
+   "fromHub": "H01",
+   "toHub": "H04",
+   "model": "e-bike",
+   "quantity": 3,
+   "deadline": "2026-11-02T05:45:00.000Z",
+   "status": "Partially Completed",
+   "created": "2026-11-02T04:50:00.000Z",
+   "team": "Team A",
+   "transfers": []
+  },
+  {
+   "id": "RO-0307",
+   "fromHub": "H06",
+   "toHub": "H05",
+   "model": "e-bike",
+   "quantity": 2,
+   "deadline": "2026-11-02T04:00:00.000Z",
+   "status": "Cancelled",
+   "created": "2026-11-02T03:10:00.000Z",
+   "team": "—",
+   "transfers": []
+  }
+ ],
+ "notifications": [
+  {
+   "id": "NT-0003",
+   "studentId": "2412345",
+   "time": "2026-11-02T07:02:00.000Z",
+   "title": "Parking reservation cancelled",
+   "body": "Parking space P-B12 is blocked and no replacement is free. Reservation PR-3MZ8 was cancelled and 15,000 VND will be refunded.",
+   "tone": "danger",
+   "ref": "PR-3MZ8",
+   "read": false
+  },
+  {
+   "id": "NT-0002",
+   "studentId": "2412345",
+   "time": "2026-11-02T05:58:00.000Z",
+   "title": "Charging session moved",
+   "body": "Your charging session CS-5HDP moved from 15:15 to 15:30 at CP-H01-03 (within 15 min, before your needed-by 17:00).",
+   "tone": "info",
+   "ref": "CS-5HDP",
+   "read": false
+  },
+  {
+   "id": "NT-0001",
+   "studentId": "2412345",
+   "time": "2026-10-31T09:20:00.000Z",
+   "title": "Report resolved",
+   "body": "Report IR-20261031-012 about CP-H05-02 was resolved by an operator.",
+   "tone": "ok",
+   "ref": "IR-20261031-012",
+   "read": true
+  }
+ ],
+ "alerts": [
+  {
+   "id": "AL-0040",
+   "time": "2026-11-02T07:21:00.000Z",
+   "hubId": "H02",
+   "kind": "Overload warning (5a)",
+   "message": "H02 dock occupancy at 97% with Vehicle Shortage."
+  }
+ ]
+}

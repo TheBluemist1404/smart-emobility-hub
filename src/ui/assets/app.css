@@ -1,0 +1,48 @@
+/* MVP additions on top of the design system (ds.css is a verbatim copy of ui-design/assets/ds.css). */
+html, body, #root { height: 100%; }
+body.app { background: #E9EDF2; }
+.lucide { width: 18px; height: 18px; flex: none; }
+.ic-sm.lucide { width: 15px; height: 15px; }
+.ic-lg.lucide { width: 24px; height: 24px; }
+
+/* A live phone: fixed device height, the screen scrolls inside it. */
+.stage-phone { display: flex; justify-content: center; padding: 24px 0; }
+.phone.live { height: 844px; min-height: 844px; }
+.phone.live .screen { overflow-y: auto; min-height: 0; scrollbar-width: thin; }
+.phone.live .screen::-webkit-scrollbar { width: 4px; }
+.phone.live .screen::-webkit-scrollbar-thumb { background: var(--ink-300); border-radius: 4px; }
+.phone .tabbar a, .sidebar .nav-item { cursor: pointer; user-select: none; }
+.clickable { cursor: pointer; }
+button[disabled] { opacity: .45; cursor: not-allowed; }
+
+/* A live console: full window width down to 1280 px. */
+.console.live { width: auto; min-width: 1280px; max-width: 1600px; min-height: 100vh; border-radius: 0; margin: 0 auto; }
+.console.live .c-main { min-width: 0; }
+
+/* Toasts pushed over WebSocket. */
+.toast-stack { position: absolute; left: 12px; right: 12px; top: 56px; z-index: 50; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
+.toast-stack .toast { pointer-events: auto; animation: toast-in .25s ease-out; }
+.console-toasts { position: fixed; right: 20px; top: 70px; z-index: 50; display: flex; flex-direction: column; gap: 8px; width: 380px; }
+@keyframes toast-in { from { transform: translateY(-8px); opacity: 0; } to { transform: none; opacity: 1; } }
+
+/* Demo tools drawer (not part of the product design: violet-free, dashed, clearly a tool). */
+.demo-fab { position: fixed; right: 16px; bottom: 16px; z-index: 100; }
+.demo-drawer { position: fixed; right: 16px; bottom: 64px; z-index: 100; width: 380px; max-height: calc(100vh - 90px); overflow-y: auto;
+  background: #0B1324; color: #DCE1EA; border-radius: 14px; box-shadow: 0 20px 50px -10px rgba(0,0,0,.5); border: 1px dashed #475069; font-size: 13px; }
+.demo-drawer h4 { color: #D2FF3D; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; margin: 14px 0 6px; }
+.demo-drawer .sec { padding: 0 14px 10px; border-bottom: 1px solid #17213A; }
+.demo-drawer .btns { display: flex; flex-wrap: wrap; gap: 6px; }
+.demo-drawer button.d { background: #17213A; color: #EEF1F5; border: 1px solid #2A3550; border-radius: 8px; padding: 5px 9px; font: inherit; font-size: 12px; cursor: pointer; }
+.demo-drawer button.d:hover { border-color: #D2FF3D; }
+.demo-drawer button.d.on { background: #D2FF3D; color: #0B1324; border-color: #D2FF3D; font-weight: 700; }
+.demo-drawer select, .demo-drawer input { background: #17213A; color: #EEF1F5; border: 1px solid #2A3550; border-radius: 8px; padding: 4px 6px; font: inherit; font-size: 12px; }
+.demo-drawer .clock { font-family: var(--mono); font-size: 26px; color: #fff; font-weight: 700; }
+.demo-drawer .tmr { font-family: var(--mono); font-size: 11.5px; color: #B9C0CE; display: flex; justify-content: space-between; gap: 8px; padding: 2px 0; }
+
+/* Stage: both views side by side for the presentation. */
+.stage { display: grid; grid-template-columns: 430px 1fr; height: 100vh; background: #E9EDF2; }
+.stage iframe { border: 0; width: 100%; height: 100%; }
+.stage .left { overflow: hidden; display: flex; align-items: center; justify-content: center; }
+.stage .right { overflow: hidden; border-left: 1px solid var(--line-strong); }
+.landing { max-width: 880px; margin: 60px auto; padding: 0 24px; }
+.landing a.card { display: block; padding: 20px; margin-top: 14px; text-decoration: none; color: inherit; }

@@ -9,6 +9,7 @@ import { O01Monitor } from "./Monitor";
 import { O02Orders, type OrderSeed } from "./Orders";
 import { O03Charging } from "./Charging";
 import { O04Incidents } from "./Incidents";
+import { O05Simulation } from "./Simulation";
 
 export interface OpRoute { nav: Nav; hubId?: string; order?: OrderSeed; incidentId?: string; draftFor?: string }
 export type OpGo = (r: OpRoute) => void;
@@ -49,10 +50,7 @@ export function OperatorConsole() {
     case "orders": body = <O02Orders go={go} now={now} seed={route.order} />; break;
     case "charging": body = <O03Charging go={go} now={now} hubId={route.hubId ?? "H01"} />; break;
     case "incidents": body = <O04Incidents go={go} now={now} incidentId={route.incidentId} draftFor={route.draftFor} />; break;
-    default: body = (
-      <div className="c-body"><div className="page-head"><div><h1>What-if simulation</h1></div></div>
-        <div className="banner neutral"><span className="ic"><Icon name="flask-conical" /></span><b>Built in Phase 5.</b><p>UC-13 and UC-14 come next.</p></div></div>
-    );
+    default: body = <O05Simulation go={go} now={now} hubId={route.hubId} />;
   }
 
   return (

@@ -121,8 +121,8 @@ export class RedistributionController implements StatusListener {
   }
 
   /** createAssignedOrder(src, dest, vehicles) : String — UC-14 step 7; same validation as a manual order. */
-  createAssignedOrder(src: string, dest: string, vehicleIds: string[], operatorId = OPERATOR, model = "e-bike", quantity?: number): string {
-    return this.commitOrder({ fromHub: src, toHub: dest, model, quantity: quantity ?? vehicleIds.length, deadline: clock().now() + 60 * MINUTE, vehicleIds }, operatorId, "simulation").id;
+  createAssignedOrder(src: string, dest: string, vehicleIds: string[], operatorId = OPERATOR, model = "e-bike", quantity?: number, deadline?: number): string {
+    return this.commitOrder({ fromHub: src, toHub: dest, model, quantity: quantity ?? vehicleIds.length, deadline: deadline ?? clock().now() + 60 * MINUTE, vehicleIds }, operatorId, "simulation").id;
   }
 
   /**

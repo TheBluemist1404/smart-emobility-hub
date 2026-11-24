@@ -49,7 +49,11 @@ export class SimulationScenario {
       for (const r of recs) {
         if (r.kind === "transfer" && r.params.toHub === id) { extraSupply += r.params.quantity ?? 0; extraDocks -= r.params.quantity ?? 0; }
         if (r.kind === "transfer" && r.params.fromHub === id) { extraDocks += r.params.quantity ?? 0; }
-        if (r.kind === "charging plan" && r.params.hubId === id) extraPoints += r.params.points?.length ?? 0;
+        if (r.kind === "charging plan" && r.params.hubId === id) {
+          extraPoints += r.params.points?.length ?? 0;
+          // A charging plan before the period turns low-battery vehicles into supply (scenarios A and B).
+          if (this.type !== "C charging-point failure") extraSupply += r.params.quantity ?? 0;
+        }
       }
       return this.measureHub(id, { extraSupply, extraDocks, extraPoints });
     });

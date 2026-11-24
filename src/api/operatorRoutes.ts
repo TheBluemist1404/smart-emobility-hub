@@ -52,5 +52,16 @@ export function operatorRoutes(): Router {
   r.post("/incidents/:id/progress", wrap((req) => ctl.incident.saveProgress(req.params.id, String(req.body.note ?? ""), String(req.body.pending ?? ""), num(req.body.version), OPERATOR)));
   r.post("/incidents/:id/resolve", wrap((req) => ctl.incident.resolve(req.params.id, String(req.body.resolution ?? ""), num(req.body.version), OPERATOR)));
   r.post("/incidents/:id/dismiss", wrap((req) => ctl.incident.dismiss(req.params.id, String(req.body.reason ?? ""), req.body.originalId || null, num(req.body.version), OPERATOR)));
+  // ---- UC-13 / UC-14 what-if simulation ----------------------------------------------
+  // Simulation routes never emit "changed": only confirm() touches live state (through UC-10/11).
+  const plain = (fn: (req: Request) => unknown) => (req: Request, res: { json: (x: unknown) => void }, next: (e: unknown) => void) => { try { res.json(fn(req) ?? { ok: true }); } catch (e) { next(e); } };
+  r.get("/sim", plain(() => ctl.simulation.state()));
+  r.post("/sim/start", plain((req) => ctl.simulation.startSimulation(req.body.hubId || undefined)));
+  r.post("/sim/define", plain((req) => ctl.simulation.defineScenario(req.body.type, req.body.hubs ?? [], { start: num(req.body.start), end: num(req.body.end) }, req.body.inputs ?? [])));
+  r.post("/sim/run", plain(() => ctl.simulation.run()));
+  r.post("/sim/apply", plain((req) => ctl.simulation.apply(req.body.ids ?? [])));
+  r.post("/sim/cancel", plain(() => { ctl.simulation.cancel(); return ctl.simulation.state(); }));
+  r.post("/sim/confirm", wrap(() => ctl.simulation.confirm(ctl.redistribution, ctl.charging)));
+  r.post("/sim/discard", plain(() => { ctl.simulation.discard(); return ctl.simulation.state(); }));
   return r;
 }

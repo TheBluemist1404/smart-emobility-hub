@@ -9,6 +9,9 @@ body.app { background: #E9EDF2; }
 .stage-phone { display: flex; justify-content: center; padding: 24px 0; }
 .phone.live { height: 844px; min-height: 844px; }
 .phone.live .screen { overflow-y: auto; min-height: 0; scrollbar-width: thin; }
+.phone.live .screen > * { flex-shrink: 0; }
+.phone.live .screen > .content { flex: 1 0 auto; }
+.phone.live .screen > .actionbar { position: sticky; bottom: 0; z-index: 3; }
 .phone.live .screen::-webkit-scrollbar { width: 4px; }
 .phone.live .screen::-webkit-scrollbar-thumb { background: var(--ink-300); border-radius: 4px; }
 .phone .tabbar a, .sidebar .nav-item { cursor: pointer; user-select: none; }

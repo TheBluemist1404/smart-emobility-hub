@@ -22,6 +22,8 @@ export class SimulatedDataSource implements DataSourceAdapter {
   readonly silentResources = new Set<string>();
   /** Private sessions whose car is plugged in (the student arrived). */
   readonly pluggedIn = new Set<string>();
+  /** The student's phone GPS (UC-07 E1). hubId null = "at the Hub of the vehicle". */
+  studentLocation: { hubId: string | null; inside: boolean } = { hubId: null, inside: true };
   private lateUnlocks: Array<{ dockId: string; vehicleId: string; reply: (r: UnlockResult) => void }> = [];
   private running = false;
 
@@ -73,7 +75,7 @@ export class SimulatedDataSource implements DataSourceAdapter {
     for (const v of db.vehicles.values()) {
       if (v.usage !== "In Use" || this.silentResources.has(v.id)) continue;
       const mins = HEARTBEAT / MINUTE;
-      iot().publish({ type: "telemetry", vehicleId: v.id, soc: Math.max(0, v.soc - 0.35 * mins), odometerKm: v.odometerKm + 0.12 * mins * 2, at: now });
+      iot().publish({ type: "telemetry", vehicleId: v.id, soc: Math.max(0, v.soc - 0.35 * mins), odometerKm: v.odometerKm + 0.12 * mins, at: now });
     }
     // Charging points: start Scheduled sessions whose slot has begun, end finished ones.
     for (const s of db.allocations.values()) {

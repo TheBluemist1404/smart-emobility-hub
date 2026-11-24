@@ -44,6 +44,7 @@ export interface DemoState {
   timers: Array<{ id: number; label: string; dueAt: number }>;
   bank: { mode: string; nextMode: string | null; outstanding: Array<{ requestId: string; type: string; orderRef: string; amount: number; sentAt: number }>; delayMs: number };
   unlock: { mode: string; nextMode: string | null; pending: number };
+  location?: { hubId: string | null; inside: boolean };
   silentHubs: string[]; silentResources: string[]; pluggedIn: string[];
   events: Array<{ time: number; text: string }>;
   hubs: Array<{ id: string; name: string; status: string }>;

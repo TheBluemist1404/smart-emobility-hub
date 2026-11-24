@@ -19,7 +19,7 @@ export abstract class Resource {
   readonly faults = new Set<string>();
   readonly blocks = new Set<string>();
 
-  constructor(public readonly id: string, public readonly hubId: string, public lastUpdateTime: number) {}
+  constructor(public readonly id: string, public hubId: string, public lastUpdateTime: number) {}
 
   abstract get status(): string;
 

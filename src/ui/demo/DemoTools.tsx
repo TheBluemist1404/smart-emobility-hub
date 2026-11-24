@@ -86,7 +86,9 @@ function IoTSection({ state, post }: { state: DemoState; post: Post }) {
   const [soc, setSoc] = useState(15);
   const [pt, setPt] = useState("CP-H01-03");
   const [dock, setDock] = useState("");
-  const trip = ctx?.trips[0];
+  const [tripId, setTripId] = useState("");
+  const trips = [...(ctx?.trips ?? [])].sort((a, b) => Number(b.studentId === "2412345") - Number(a.studentId === "2412345"));
+  const trip = trips.find((t) => t.id === tripId) ?? trips[0];
   return (
     <div className="sec">
       <h4>IoT / Simulated Data Source</h4>
@@ -94,6 +96,12 @@ function IoTSection({ state, post }: { state: DemoState; post: Post }) {
       <div className="btns" style={{ marginTop: 4 }}>
         {["Success", "Failure", "Timeout"].map((m) => <button key={m} className={`d${state.unlock.mode === m ? " on" : ""}`} onClick={() => post("/unlock", { mode: m })}>{m}</button>)}
         {state.unlock.pending > 0 && <button className="d" onClick={() => post("/unlock/late", {})}>Send late release ({state.unlock.pending})</button>}
+      </div>
+
+      <div className="small" style={{ color: "#8A93A8", marginTop: 8 }}>Student phone GPS (UC-07 E1)</div>
+      <div className="btns" style={{ marginTop: 4 }}>
+        <button className={`d${state.location?.inside !== false ? " on" : ""}`} onClick={() => post("/location", { hubId: state.location?.hubId ?? null, inside: true })}>Inside Hub area</button>
+        <button className={`d${state.location?.inside === false ? " on" : ""}`} onClick={() => post("/location", { hubId: state.location?.hubId ?? null, inside: false })}>Outside</button>
       </div>
 
       <div className="small" style={{ color: "#8A93A8", marginTop: 8 }}>Hub feed (UC-01 E1, UC-09 E1)</div>
@@ -130,8 +138,11 @@ function IoTSection({ state, post }: { state: DemoState; post: Post }) {
 
       {trip && (
         <>
-          <div className="small" style={{ color: "#8A93A8", marginTop: 8 }}>Dock latch (UC-08) · {trip.vehicleId}</div>
+          <div className="small" style={{ color: "#8A93A8", marginTop: 8 }}>Dock latch (UC-08)</div>
           <div className="btns" style={{ marginTop: 4 }}>
+            <select value={trip.id} onChange={(e) => setTripId(e.target.value)}>
+              {trips.map((t) => <option key={t.id} value={t.id}>{t.id} · {t.vehicleId} · {t.studentId === "2412345" ? "Khoa" : t.studentId}</option>)}
+            </select>
             <select value={dock} onChange={(e) => setDock(e.target.value)}>
               <option value="">choose a vacant dock…</option>
               {(ctx?.vacantDocks ?? []).map((d) => <option key={d.id} value={d.id}>{d.hubId} · {d.label}</option>)}

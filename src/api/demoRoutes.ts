@@ -48,6 +48,11 @@ export function demoRoutes(): Router {
     if (once) dataSource().nextUnlockMode = mode; else { dataSource().unlockMode = mode; dataSource().nextUnlockMode = null; }
     done(res, "unlock");
   });
+  r.post("/location", (req, res) => {
+    const { hubId, inside } = req.body as { hubId?: string | null; inside?: boolean };
+    dataSource().studentLocation = { hubId: hubId || null, inside: inside !== false };
+    done(res, "location");
+  });
   r.post("/unlock/late", (_req, res) => { dataSource().sendLateUnlock(); done(res, "unlock"); });
 
   r.post("/hub", (req, res) => {
@@ -106,6 +111,7 @@ function state() {
     now: c.now(), speed: c.getSpeed(), paused: c.isPaused(),
     timers: c.pendingTimers().slice(0, 12),
     bank: { mode: bank().mode, nextMode: bank().nextMode, outstanding: bank().listOutstanding(), delayMs: bank().responseDelayMs },
+    location: dataSource().studentLocation,
     unlock: { mode: dataSource().unlockMode, nextMode: dataSource().nextUnlockMode, pending: dataSource().pendingUnlocks() },
     silentHubs: [...dataSource().silentHubs], silentResources: [...dataSource().silentResources],
     pluggedIn: [...dataSource().pluggedIn],

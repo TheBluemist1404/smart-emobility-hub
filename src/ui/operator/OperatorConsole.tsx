@@ -1,22 +1,75 @@
-// ui.operator — OperatorConsole (phase 0 shell).
+// ui.operator — OperatorConsole: the operator console shell, navigation between O01-O06 and
+// the pushed warnings (the client half of OperatorConsole.warn).
 import { useEffect, useState } from "react";
-import { Console } from "../shared/Shells";
+import { Console, type Nav } from "../shared/Shells";
 import { DemoTools } from "../demo/DemoTools";
-import { hms, useClock } from "../shared/live";
+import { Icon } from "../shared/Icon";
+import { getSocket, hms, useClock, useLive } from "../shared/live";
+import { O01Monitor } from "./Monitor";
+import { O02Orders, type OrderSeed } from "./Orders";
+import { O03Charging } from "./Charging";
+import { O04Incidents } from "./Incidents";
+
+export interface OpRoute { nav: Nav; hubId?: string; order?: OrderSeed; incidentId?: string; draftFor?: string }
+export type OpGo = (r: OpRoute) => void;
+interface Alert { id: string; time: number; hubId?: string; kind: string; message: string; acknowledgedBy?: string }
+interface Toast { id: number; message: string }
+
+const CRUMB: Record<Nav, string> = { monitor: "Network monitor", orders: "Redistribution orders", charging: "Smart charging", incidents: "Incidents", sim: "What-if simulation" };
 
 export function OperatorConsole() {
-  const [hubs, setHubs] = useState<Array<{ id: string; name: string; category: string }>>([]);
-  useEffect(() => { fetch("/api/hubs").then((r) => r.json()).then(setHubs); }, []);
   const { now } = useClock();
+  const [route, setRoute] = useState<OpRoute>({ nav: "monitor" });
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const { data: inc } = useLive<{ counts: { open: number; inProgress: number } }>("/operator/incidents");
+  const { data: orders } = useLive<{ orders: Array<{ status: string; overdue: boolean }> }>("/operator/orders");
+  const { data: alerts } = useLive<Alert[]>("/operator/alerts");
+
+  useEffect(() => {
+    const s = getSocket();
+    const onWarn = (e: { message: string }) => {
+      const id = Date.now() + Math.random();
+      setToasts((t) => [...t.slice(-2), { id, message: e.message }]);
+      setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 8000);
+    };
+    s.on("warn", onWarn);
+    return () => { s.off("warn", onWarn); };
+  }, []);
+
+  const go: OpGo = (r) => { setRoute(r); document.querySelector(".console.live .c-main")?.scrollTo(0, 0); };
+  const counts = {
+    incidents: inc ? inc.counts.open + inc.counts.inProgress : 0,
+    orders: orders ? orders.orders.filter((o) => ["Assigned", "In Transit"].includes(o.status)).length : 0,
+  };
+  const unacked = (alerts ?? []).filter((a) => !a.acknowledgedBy).length;
+
+  let body: JSX.Element;
+  switch (route.nav) {
+    case "monitor": body = <O01Monitor go={go} now={now} hubId={route.hubId} />; break;
+    case "orders": body = <O02Orders go={go} now={now} seed={route.order} />; break;
+    case "charging": body = <O03Charging go={go} now={now} hubId={route.hubId ?? "H01"} />; break;
+    case "incidents": body = <O04Incidents go={go} now={now} incidentId={route.incidentId} draftFor={route.draftFor} />; break;
+    default: body = (
+      <div className="c-body"><div className="page-head"><div><h1>What-if simulation</h1></div></div>
+        <div className="banner neutral"><span className="ic"><Icon name="flask-conical" /></span><b>Built in Phase 5.</b><p>UC-13 and UC-14 come next.</p></div></div>
+    );
+  }
+
   return (
     <>
-    <Console nav="monitor" crumb={["Operations", "Network monitor"]} time={hms(now)}>
-      <div className="c-body"><div className="page-head"><h1 className="h2">Network monitor</h1></div>
-        <div className="card"><table className="table"><thead><tr><th>Hub</th><th>Category</th></tr></thead>
-          <tbody>{hubs.map((h) => <tr key={h.id}><td><span className="hub-code">{h.id}</span> {h.name}</td><td>{h.category}</td></tr>)}</tbody></table></div>
-      </div>
-    </Console>
-    <DemoTools side="operator" />
+      <Console nav={route.nav} crumb={["Operations", CRUMB[route.nav]]} time={hms(now)} counts={counts} alerts={unacked} onNav={(n) => go({ nav: n })}>
+        {body}
+      </Console>
+      {toasts.length > 0 && (
+        <div style={{ position: "fixed", right: 20, top: 70, zIndex: 60, display: "flex", flexDirection: "column", gap: 8, width: 380 }}>
+          {toasts.map((t) => (
+            <div key={t.id} className="banner warn compact clickable" style={{ boxShadow: "0 8px 24px rgba(10,20,40,.18)" }} onClick={() => setToasts((x) => x.filter((y) => y.id !== t.id))}>
+              <span className="ic"><Icon name="bell-ring" /></span><b>Warning</b><p>{t.message}</p>
+            </div>
+          ))}
+        </div>
+      )}
+      <DemoTools side="operator" />
     </>
   );
 }

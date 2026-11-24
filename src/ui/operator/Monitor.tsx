@@ -1,7 +1,7 @@
 // O01 Network monitor (UC-09 steps 2-9, 4a, 5a, 5b, E1).
 import { useEffect, useState } from "react";
 import { Icon } from "../shared/Icon";
-import { CampusMap, type Pin } from "../shared/CampusMap";
+import { CampusMap, MAP_POS, type Pin } from "../shared/CampusMap";
 import { ago, api, hms, useLive } from "../shared/live";
 import type { OpGo } from "./OperatorConsole";
 
@@ -40,18 +40,18 @@ export function O01Monitor({ go, now, hubId }: { go: OpGo; now: number; hubId?: 
   const openAlerts = (alerts ?? []).filter((a) => !a.acknowledgedBy);
   const alertFor = (h: string, kind: RegExp) => openAlerts.find((a) => a.hubId === h && kind.test(a.kind));
 
-  const pins: Pin[] = (all?.hubs ?? []).map((h) => ({ code: h.hubId, x: h.x, y: h.y, label: h.status, s: statusTone(h.status) as Pin["s"], sel: h.hubId === pick, onClick: () => setSel(h.hubId) }));
+  const pins: Pin[] = (all?.hubs ?? []).map((h) => ({ code: h.hubId, x: MAP_POS[h.hubId]?.[0] ?? h.x, y: MAP_POS[h.hubId]?.[1] ?? h.y, label: h.status, s: statusTone(h.status) as Pin["s"], sel: h.hubId === pick, onClick: () => setSel(h.hubId) }));
 
   return (
     <div className="c-body">
       <div className="page-head">
         <div><h1>Network monitor</h1>
           <p className="row" style={{ gap: 10 }}><span className="fresh">Updated <span className="mono">{hms(o?.updatedAt ?? 0)}</span> · {ago(now, o?.updatedAt ?? now)}</span><span className="tag param">MONITOR_REFRESH = 5 s</span><span className="small subtle">{o?.reporting ?? "–"} of {total} Hubs reporting</span></p></div>
-        <div className="row" style={{ gap: 10, alignItems: "flex-end" }}>
+        <div className="row" style={{ gap: 8, alignItems: "flex-end" }}>
           <Filter label="Category" value={f.category} options={CAT} all="All categories" onChange={(v) => setF({ ...f, category: v })} />
           <Filter label="Status" value={f.status} options={STATUS} all="All statuses" onChange={(v) => setF({ ...f, status: v })} />
           <Filter label="Vehicle type" value={f.vehicleType} options={["all", "e-bike", "e-motorbike"]} all="All vehicles" onChange={(v) => setF({ ...f, vehicleType: v })} />
-          <label className="filter"><span>Sort</span><select className="input sm" style={{ width: 180 }} value={f.sort} onChange={(e) => setF({ ...f, sort: e.target.value })}><option value="usage">Usage, high first</option><option value="code">Hub code</option></select></label>
+          <label className="filter"><span>Sort</span><select className="input sm" style={{ width: 160 }} value={f.sort} onChange={(e) => setF({ ...f, sort: e.target.value })}><option value="usage">Usage, high first</option><option value="code">Hub code</option></select></label>
         </div>
       </div>
 
@@ -59,12 +59,12 @@ export function O01Monitor({ go, now, hubId }: { go: OpGo; now: number; hubId?: 
         <div className="kpi"><div className="l"><span className="ic"><Icon name="bike" /></span>Vehicles ready</div><div className="v">{k?.vehiclesReady ?? "–"} <small>Available</small></div><div className="d">across reporting Hubs</div></div>
         <div className="kpi"><div className="l"><span className="ic"><Icon name="plug-zap" /></span>Charging points free</div><div className="v">{k?.pointsFree ?? "–"} <small>of {k?.pointsTotal ?? "–"}</small></div><div className="d">{k?.pointsOutOfService ?? 0} Out of Service</div></div>
         <div className="kpi"><div className="l"><span className="ic"><Icon name="layout-grid" /></span>Docks in service</div><div className="v">{k?.docksInService ?? "–"}</div><div className="d">{all?.reporting ?? "–"} of {total} Hubs reporting</div></div>
-        <div className="kpi" style={k?.hubsOnAlert ? { borderColor: "var(--danger-line)" } : undefined}><div className="l"><span className="ic" style={k?.hubsOnAlert ? { background: "var(--danger-bg)", color: "var(--danger)" } : undefined}><Icon name="triangle-alert" /></span>Hubs on alert</div><div className="v" style={k?.hubsOnAlert ? { color: "var(--danger)" } : undefined}>{k?.hubsOnAlert ?? 0}</div><div className="d">{k?.overloaded ?? 0} Overloaded · {k?.risk ?? 0} Risk · {k?.disconnected ?? 0} Disconnected</div></div>
-        <div className="kpi clickable" onClick={() => go({ nav: "incidents" })}><div className="l"><span className="ic"><Icon name="siren" /></span>Active incidents</div><div className="v">{(k?.incidentsOpen ?? 0) + (k?.incidentsInProgress ?? 0)}</div><div className="d">{k?.incidentsOpen ?? 0} Open · {k?.incidentsInProgress ?? 0} In Progress</div></div>
+        <div className="kpi" style={k?.hubsOnAlert ? { borderColor: "var(--danger-line)" } : undefined}><div className="l"><span className="ic" style={k?.hubsOnAlert ? { background: "var(--danger-bg)", color: "var(--danger)" } : undefined}><Icon name="triangle-alert" /></span>Hubs on alert</div><div className="v" style={k?.hubsOnAlert ? { color: "var(--danger)" } : undefined}>{k?.hubsOnAlert ?? 0}</div><div className="d"><span className="nw">{k?.overloaded ?? 0} Overloaded ·</span> <span className="nw">{k?.risk ?? 0} Risk ·</span> <span className="nw">{k?.disconnected ?? 0} Disconnected</span></div></div>
+        <div className="kpi clickable" onClick={() => go({ nav: "incidents" })}><div className="l"><span className="ic"><Icon name="siren" /></span>Active incidents</div><div className="v">{(k?.incidentsOpen ?? 0) + (k?.incidentsInProgress ?? 0)}</div><div className="d"><span className="nw">{k?.incidentsOpen ?? 0} Open ·</span> <span className="nw">{k?.incidentsInProgress ?? 0} In Progress</span></div></div>
       </div>
 
       {(stale.length > 0 || lowBatt.length > 0) && (
-        <div className="grid" style={{ gridTemplateColumns: "1fr 1fr" }}>
+        <div className="grid" style={{ gridTemplateColumns: "repeat(auto-fit, minmax(330px, 1fr))" }}>
           {stale.map((h) => (
             <div key={h.hubId} className="banner neutral"><span className="ic"><Icon name="wifi-off" /></span><b>{h.hubId} · {h.name} is Disconnected (E1)</b>
               <p>No data since {hms(h.updatedAt)} (over DATA_STALE_AFTER 60 s). Removed from automatic recommendations; other Hubs keep refreshing.</p>
@@ -83,25 +83,25 @@ export function O01Monitor({ go, now, hubId }: { go: OpGo; now: number; hubId?: 
       )}
 
       <div className="grid g-12">
-        <section className="card span-4" style={{ overflow: "hidden", display: "flex", flexDirection: "column" }}>
+        <section className="card span-4 r-stack mon-map" style={{ overflow: "hidden", display: "flex", flexDirection: "column" }}>
           <div className="card-head"><span className="h4"><Icon name="map" />Hub map</span><span className="small subtle">Schematic · not to scale</span></div>
           <CampusMap pins={pins} style={{ flex: 1, minHeight: 420, margin: "0 16px 16px" }} legend={[["ok", "Normal"], ["info", "Busy"], ["warn", "Risk"], ["danger", "Overloaded"], ["neutral", "Disconnected"]]} />
         </section>
-        <section className="card span-8" style={{ overflow: "hidden" }}>
+        <section className="card span-8 r-stack" style={{ overflow: "hidden" }}>
           <div className="card-head"><span className="h4"><Icon name="table-2" />Hubs</span><span className="tag"><Icon name="arrow-down-wide-narrow" className="ic-sm" />{f.sort === "usage" ? "Usage, high first" : "Hub code"}</span></div>
           <table className="table">
-            <thead><tr><th>Hub</th><th>Dock occupancy (R)</th><th>Status</th><th>Flags</th><th className="r">Last update</th></tr></thead>
+            <thead><tr><th>Hub</th><th>Dock occupancy (R)</th><th>Status · flags</th><th className="r">Last update</th></tr></thead>
             <tbody>
               {hubs.map((h) => (
                 <tr key={h.hubId} className={`clickable${h.hubId === pick ? " sel" : ""}${h.stale ? " dim" : ""}`} onClick={() => setSel(h.hubId)}>
                   <td><div className="hubcell"><span className="hub-code" style={h.stale ? { background: "var(--ink-500)", color: "#fff" } : undefined}>{h.hubId}</span><div><b>{h.name}</b><span>{h.category}</span></div></div></td>
                   {h.stale ? <td className="subtle">—</td> : <td style={{ width: 150 }}><div className="row"><div className={`meter ${statusTone(h.status) === "ok" ? "" : statusTone(h.status)} grow`} style={{ ["--v" as string]: `${h.occupancy}%` }}><i /></div><b className="num">{h.occupancy}%</b></div><span className="xs subtle num">{h.occupiedDocks} / {h.docksInService}</span></td>}
-                  <td><span className={`chip ${statusTone(h.status)}`}>{h.status}</span></td>
-                  <td>{h.stale ? <span className="subtle small">Not evaluated</span> : h.flags.length ? h.flags.map((x) => <span key={x} className="chip warn nodot" style={{ whiteSpace: "normal", height: "auto", marginRight: 4 }}>{x}</span>) : <span className="subtle">—</span>}</td>
+                  <td><div className="flags"><span className={`chip ${statusTone(h.status)}`}>{h.status}</span>
+                    {h.stale ? <span className="subtle xs">Flags not evaluated</span> : h.flags.map((x) => <span key={x} className="chip warn nodot flag">{x}</span>)}</div></td>
                   <td className="r">{h.stale ? <span className="chip stale nodot mono">{hms(h.updatedAt)}</span> : <span className="mono small">{hms(h.updatedAt)}</span>}</td>
                 </tr>
               ))}
-              {hubs.length === 0 && <tr><td colSpan={5} className="subtle">No Hub matches the filters.</td></tr>}
+              {hubs.length === 0 && <tr><td colSpan={4} className="subtle">No Hub matches the filters.</td></tr>}
             </tbody>
           </table>
         </section>
@@ -115,7 +115,7 @@ export function O01Monitor({ go, now, hubId }: { go: OpGo; now: number; hubId?: 
 function Filter({ label, value, options, all, onChange }: { label: string; value: string; options: string[]; all: string; onChange: (v: string) => void }) {
   return (
     <label className="filter"><span>{label}</span>
-      <select className="input sm" style={{ width: 150 }} value={value} onChange={(e) => onChange(e.target.value)}>
+      <select className="input sm" style={{ width: 140 }} value={value} onChange={(e) => onChange(e.target.value)}>
         {options.map((o) => <option key={o} value={o}>{o === "all" ? all : o}</option>)}
       </select>
     </label>
@@ -132,7 +132,7 @@ function HubPanel({ d, now, go, alert }: { d: HubDetail; now: number; go: OpGo; 
     : { fromHub: d.nearby.find((n) => n.hubId !== d.hubId)?.hubId ?? "", toHub: d.hubId, quantity: Math.max(1, Math.ceil(d.docksInService * 0.1) - d.available + 1) };
   return (
     <div className="grid g-12">
-      <section className={`card ${hot ? "span-7" : "span-12"}`}>
+      <section className={`card ${hot ? "span-7 r-stack-md" : "span-12"}`}>
         <div className="card-head"><div className="row" style={{ gap: 12 }}><span className="hub-code lg">{d.hubId}</span><div><div className="h3">{d.name}</div><span className="fresh">Updated <span className="mono">{hms(d.updatedAt)}</span> · {ago(now, d.updatedAt)}</span></div></div><span className={`chip ${tone} lg`}>{d.status}</span></div>
         <div className="card-body grid" style={{ gridTemplateColumns: "1fr 1fr 1.2fr", gap: 22 }}>
           <div className="stack tight"><span className="eyebrow">Docks · {d.docksInService} in service</span>
@@ -146,7 +146,7 @@ function HubPanel({ d, now, go, alert }: { d: HubDetail; now: number; go: OpGo; 
           <div className="bars" style={{ height: 90 }}>{d.history.map((v, i) => <i key={i} className={v >= 95 ? "danger" : v >= 85 ? "warn" : v >= 70 ? "info" : ""} style={{ ["--h" as string]: `${Math.max(3, v)}%` }} />)}</div></div>
       </section>
       {hot && (
-        <section className="card span-5" style={{ borderColor: tone === "danger" ? "var(--danger-line)" : "var(--warn-line)" }}>
+        <section className="card span-5 r-stack-md" style={{ borderColor: tone === "danger" ? "var(--danger-line)" : "var(--warn-line)" }}>
           <div className="card-head"><span className="h4" style={{ color: `var(--${tone === "danger" ? "danger" : "warn"})` }}><Icon name="octagon-alert" />{d.status === "Overloaded" || d.status === "Risk of Overload" ? "Overload warning (5a)" : "Capacity warning"}</span>{alert && <span className="small subtle">Raised {hms(alert.time).slice(0, 5)}</span>}</div>
           <div className="card-body stack">
             <div className={`banner ${tone === "danger" ? "danger" : "warn"} compact`}><span className="ic"><Icon name="gauge" /></span><b>R = {d.occupancy}% ({d.occupiedDocks} of {d.docksInService} docks){d.flags.length ? ` · ${d.flags.join(" · ")}` : ""}</b>

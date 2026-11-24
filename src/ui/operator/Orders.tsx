@@ -48,21 +48,21 @@ export function O02Orders({ go, now, seed }: { go: OpGo; now: number; seed?: Ord
       )}
 
       <div className="grid g-12">
-        <div className={draft ? "span-7 stack" : "span-12 stack"}>
+        <div className={draft ? "span-7 stack r-stack-md" : "span-12 stack"}>
           <section className="card" style={{ overflow: "hidden" }}>
             <div className="card-head">
               <div className="seg">{TABS.map(([id, l, fn]) => <span key={id} className={`clickable${tab === id ? " on" : ""}`} onClick={() => setTab(id)}>{l} {all.filter(fn).length}</span>)}</div>
               <input className="input sm" style={{ width: 200 }} placeholder="Order, Hub or vehicle" value={q} onChange={(e) => setQ(e.target.value)} />
             </div>
-            <table className="table">
-              <thead><tr><th>Order</th><th>Route</th><th>Vehicles</th><th>Status</th><th>Deadline</th><th>Team</th></tr></thead>
+            <table className={`table${draft ? " drafting" : ""}`}>
+              <thead><tr><th>Order</th><th>Route</th><th>Vehicles</th><th>Status</th><th>Deadline</th><th className="team">Team</th></tr></thead>
               <tbody>{orders.map((o) => (
                 <tr key={o.id} className={`clickable${pick?.id === o.id ? " sel" : ""}`} onClick={() => { setSel(o.id); if (o.status === "Draft") setDraft({ fromHub: o.fromHub, toHub: o.toHub, quantity: o.quantity, model: o.model, draftId: o.id }); }}>
                   <td className="mono strong">{o.id}</td>
                   <td><span className="row" style={{ gap: 6 }}><span className="hub-code">{o.fromHub}</span><Icon name="arrow-right" className="ic-sm" /><span className="hub-code">{o.toHub}</span></span></td>
                   <td className="num">{o.status === "Partially Completed" && o.transfers.length ? `${o.arrived} / ${o.quantity}` : o.quantity}</td>
                   <td><span className={`chip ${tone(o.status)}`}>{o.status}</span>{o.overdue && <span className="chip danger nodot" style={{ marginLeft: 6 }}>Overdue</span>}</td>
-                  <td className="mono small">{o.status === "Draft" ? "—" : hm(o.deadline)}</td><td className="small">{o.team ?? "—"}</td>
+                  <td className="mono small">{o.status === "Draft" ? "—" : hm(o.deadline)}</td><td className="small team" style={{ whiteSpace: "nowrap" }}>{o.team ?? "—"}</td>
                 </tr>))}
                 {orders.length === 0 && <tr><td colSpan={6} className="subtle">No orders.</td></tr>}</tbody>
             </table>
@@ -128,7 +128,7 @@ function NewOrder({ seed, now, go, onClose, onDone }: { seed: OrderSeed; now: nu
     .catch((e: ApiError) => setErr(e.message));
   const toggle = (id: string) => setPicked(chosen.includes(id) ? chosen.filter((x) => x !== id) : [...chosen, id]);
   return (
-    <section className="card span-5" style={{ alignSelf: "start" }}>
+    <section className="card span-5 r-stack-md" style={{ alignSelf: "start" }}>
       <div className="card-head"><span className="h4"><Icon name="truck" />New order{seed.from === "suggestion" ? " · from suggestion" : seed.from === "O01" ? " · from the network monitor" : seed.draftId ? ` · ${seed.draftId}` : ""}</span><span className="chip neutral">Draft</span></div>
       <div className="card-body stack">
         <div className="grid" style={{ gridTemplateColumns: "1fr 1fr", gap: 10 }}>

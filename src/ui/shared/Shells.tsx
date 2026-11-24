@@ -47,8 +47,8 @@ export function Console({ nav, crumb, time, counts, onNav, alerts, children }: {
         <div className="brand"><div className="brand-mark"><Icon name="zap" /></div><div><b>Smart E-Mobility Hub</b><span>Operator console</span></div></div>
         <nav className="nav-group" aria-label="Console"><div className="eyebrow">Operations</div>
           {NAV.map(([id, ic, label]) => (
-            <a key={id} className="nav-item" aria-current={id === nav ? "page" : undefined} onClick={() => onNav?.(id)}>
-              <Icon name={ic} />{label}
+            <a key={id} className="nav-item" title={label} aria-current={id === nav ? "page" : undefined} onClick={() => onNav?.(id)}>
+              <Icon name={ic} /><span className="lbl">{label}</span>
               {counts?.[id] ? <span className={`count${id === "incidents" ? " hot" : ""}`}>{counts[id]}</span> : null}
             </a>
           ))}

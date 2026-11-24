@@ -45,8 +45,9 @@ See the README "Layout" section. The short version:
 - UC-06 E1 (photo upload fails) is not simulated.
 - The time inputs on O05 show in the browser's locale format (12 h on some machines).
 - In scenario C the recommendations are charging plans only. Shortage figures are still shown.
-- The screenshots were taken with a throwaway headless-Chrome script that is not in the repo.
-  To retake them, drive `/student?tools=0` at 430 px and `/operator?tools=0` at 1440 px.
+- To retake every screenshot, run `npm run dev`, then `node tools/screenshots.mjs http://localhost:5173`.
+  It resets the demo, walks DEMO-SCRIPT.md and writes the 28 files in `screenshots/` (about 3 minutes).
+  It needs Chrome or Edge installed (or `CHROME=<path>`). See "Review round" below.
 
 ## Design vs code
 
@@ -56,3 +57,69 @@ See the README section "Where the code differs from the design":
 - Incident `faults`.
 - Suggestions and recommendations are computed in their controllers.
 - DemoClock and SimulatedDataSource are demo-only.
+
+## Review round (2026-11-24)
+
+A visual pass over `/student` at 390 px, `/operator` at 1440 and 1280 px, `/stage` at 800–1920 px
+and the Demo tools panel, compared with `ui-design/screens` and `ds.css`.
+
+### Tools added (`tools/`, no npm dependencies)
+
+- `cdp.mjs`: a small Chrome DevTools Protocol driver (headless Chrome, Node's built-in WebSocket,
+  en-GB locale, Asia/Ho_Chi_Minh time zone). `__ov()` reports sideways scroll, boxes that clip
+  their content, and `--:--` placeholders.
+- `screenshots.mjs`: retakes `screenshots/` (see above).
+- `review-operator.mjs <base> <width> <outDir>` and `review-student.mjs <base> <width> <outDir>`:
+  walk O01–O06 or S01–S12, save shots and print the `__ov()` report for each screen.
+  The trip and ticket cards show up as "clips" on purpose (decorative cut-outs); ignore those.
+
+### Found and fixed
+
+Stage (`/stage`):
+- The operator console overflowed its half and scrolled sideways. Now the phone scales to the
+  height and the console is laid out at max(column, 960 px) and scaled down to fit ("scaled N%"
+  in the stage bar). No sideways scroll at 800, 1000, 1366 or 1920 px.
+- Two Demo tools buttons, one on the student tab bar. The iframes now load with `tools=0` and
+  the stage bar holds the only button.
+- The phone's shadow was cut off at the iframe edge; the student page now centres the phone.
+
+Operator console:
+- KPI and alert cards clipped, header meta broken into pieces, filters row overflowing:
+  the page head wraps, meta items and KPI lines no longer break mid-phrase, alert cards use
+  `auto-fit` columns.
+- Below 1360 px the layout tightens; below 1240 px the sidebar becomes an icon rail and map/table,
+  timeline/queue and the other two-column grids stack.
+- Map labels overlapped: the map uses a schematic layout (`MAP_POS` in `CampusMap.tsx`), shared with
+  the student map. The legend no longer covers a pin.
+- "Hubs on alert" sub-text wrapped badly; it now breaks only between items.
+- Hub table: last column was clipped and flags were crammed. Status and flags are now one column
+  with wrapping chips.
+- Smart charging: the "now" marker was a hard-coded "14:36" in CSS; gridlines assumed 16 slots;
+  the policy grid overflowed; short blocks spilled their text. All now follow the data.
+- Navigation did not scroll back to the top.
+- Demo tools covered the Apply buttons; it now sits in the sidebar.
+- Text: "session(s)" plurals, lowercase categories, "P-B01" breaking at the hyphen.
+
+Student app:
+- `/student` had the phone frame twice and was wider than a 390 px screen. Below 420 px the
+  frame is dropped and the app fills the screen.
+- Datetime fields overflowed at 390 px (S05, S06): they now stack.
+- S09 scan: white text on a light background. The whole screen is dark now.
+- Choice cards showed a tick even when not selected.
+- The pickup countdown ring read like a clock time; it now says "left".
+- Map view: the hub list overlapped the map without a backing; it is now a bottom sheet.
+- Fare: a large gap before "VND".
+- S11: long booking lines pushed the status chips off the card.
+
+### Left as it is
+
+- O05 time inputs follow the browser's locale (12 h on an en-US machine). Native inputs; a
+  custom picker is not worth it for the demo.
+- On the charging timeline the red "now" label covers the first time label when now is close to
+  the start of the horizon.
+- O01 at 1280 px: the third alert banner sits alone on its row.
+- The stage at about 1000 px works but is small (console about 70 %, phone about 0.7). Use
+  1366 px or wider for the live demo.
+- The `__ov()` check reports the stage's left column as clipping; that is the scaled phone
+  iframe, not a bug.
+

@@ -597,7 +597,7 @@ export class ChargingController implements StatusListener {
     }
     pt.scheduleVersion++;
     const sharedHit = hit.some((x) => !x.isCommittedReservation());
-    OperatorConsole.warn(`${pt.id} is Out of Service (${why}). ${hit.length} session(s) stopped: ${moved.length} moved, ${cancelled.length} cancelled${sharedHit ? "; shared vehicles back in the queue — review the 1a proposal" : ""}.`, pt.hubId, "Charging point fault (E3)");
+    OperatorConsole.warn(`${pt.id} is Out of Service (${why}). ${hit.length} session${hit.length === 1 ? "" : "s"} stopped: ${moved.length} moved, ${cancelled.length} cancelled${sharedHit ? "; shared vehicles back in the queue — review the 1a proposal" : ""}.`, pt.hubId, "Charging point fault (E3)");
     if (sharedHit && !db.hubs.get(pt.hubId)!.isStale()) this.generateSchedule(pt.hubId);
     pt.reevaluate();
     bus.changed("schedule");

@@ -53,7 +53,7 @@ export function O03Charging({ go, now, hubId: hub0 }: { go: OpGo; now: number; h
       <div className="page-head">
         <div><h1>Smart charging · {hubId}</h1>
           <p className="row" style={{ gap: 10 }}><span>{p ? <>Proposal generated <span className="mono">{hms(p.generatedAt)}</span> · not applied</> : <>Committed schedule · version <span className="mono">{s.version}</span></>}</span><span className="tag param">SCHEDULE_TIMESLOT = {s.slotMs / 60000} min</span></p></div>
-        <div className="row" style={{ gap: 10, alignItems: "flex-end" }}>
+        <div className="row" style={{ gap: 8, alignItems: "flex-end" }}>
           <label className="filter"><span>Hub</span><select className="input sm" style={{ width: 200 }} value={hubId} onChange={(e) => { setHub(e.target.value); setMsg(null); setErr(null); }}>{HUBS.map(([h, n]) => <option key={h} value={h}>{h} · {n}</option>)}</select></label>
           <label className="filter"><span>Horizon</span><select className="input sm" style={{ width: 150 }} value={hours} onChange={(e) => setHours(Number(e.target.value))}>{[2, 4, 6].map((h) => <option key={h} value={h}>Next {h} hours</option>)}</select></label>
           <button className="btn ghost" onClick={() => setPolicy(!policy)}><Icon name="sliders-horizontal" />Policy</button>
@@ -72,21 +72,21 @@ export function O03Charging({ go, now, hubId: hub0 }: { go: OpGo; now: number; h
       </div>
 
       <div className="grid g-12">
-        <section className="card" style={{ gridColumn: "span 9", overflow: "hidden" }}>
+        <section className="card r-stack-md" style={{ gridColumn: "span 9", overflow: "hidden" }}>
           <div className="card-head"><span className="h4"><Icon name="calendar-range" />Timeline · {hm(hz.start)}–{hm(hz.end)}</span>
             <div className="row" style={{ gap: 14, fontSize: 12, fontWeight: 600, color: "var(--text-2)" }}>
               <span className="row" style={{ gap: 6 }}><i style={{ width: 14, height: 14, borderRadius: 4, background: "var(--ink-900)" }} />Student · committed reservation</span>
               <span className="row" style={{ gap: 6 }}><i style={{ width: 14, height: 14, borderRadius: 4, background: "var(--brand-500)" }} />Shared vehicle</span>
               <span className="row" style={{ gap: 6 }}><i style={{ width: 14, height: 14, borderRadius: 4, background: "var(--warn-bg)", border: "1.5px dashed var(--warn)" }} />Moved (7b)</span></div></div>
-          <div className="tl" style={{ padding: "0 0 4px", gridTemplateColumns: `150px repeat(${slots}, 1fr)` }}>
+          <div className="tl" style={{ padding: "0 0 4px", gridTemplateColumns: `150px repeat(${slots}, minmax(0, 1fr))` }}>
             <div className="hd" style={{ border: 0 }} />
-            {Array.from({ length: slots }, (_, i) => { const t = hz.start + i * s.slotMs; return <div key={i} className={`hd${new Date(t).getUTCMinutes() === 0 ? " hour" : ""}`}>{i % Math.max(1, Math.round(slots / 16)) === 0 ? hm(t) : ""}</div>; })}
-            {s.points.map((pt) => {
+            {Array.from({ length: slots }, (_, i) => { const t = hz.start + i * s.slotMs; return <div key={i} className={`hd${new Date(t).getUTCMinutes() === 0 ? " hour" : ""}`}>{i % Math.max(1, Math.round(slots / 8)) === 0 ? hm(t) : ""}</div>; })}
+            {s.points.map((pt, pi) => {
               const down = pt.status === "Out of Service" || pt.status === "Disconnected";
               return [
                 <div key={`l${pt.id}`} className="lane"><b>{pt.id}</b><span className={`chip ${pointTone(pt.status)}`}>{pt.status}</span></div>,
-                <div key={`t${pt.id}`} className={`track${down ? " out" : ""}`} style={{ gridColumn: `span ${slots}` }} onDragOver={(e) => e.preventDefault()} onDrop={(e) => onDrop(pt.id, e)}>
-                  <span className="now" style={{ left: pct(now) }} />
+                <div key={`t${pt.id}`} className={`track${down ? " out" : ""}`} style={{ gridColumn: `span ${slots}`, ...(down ? {} : { backgroundImage: `repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px calc(100% / ${slots}))` }) }} onDragOver={(e) => e.preventDefault()} onDrop={(e) => onDrop(pt.id, e)}>
+                  <span className="now" style={{ left: pct(now) }}>{pi === 0 && <span className="lbl">{hm(now)}</span>}</span>
                   {down && <div className="blk" style={{ left: "2%", width: "70%", color: "var(--danger)", justifyContent: "center" }}><span className="row" style={{ gap: 6 }}><Icon name="plug" className="ic-sm" />{pt.status}{pt.incidentId ? ` · ${pt.incidentId}` : ""}{pt.status === "Out of Service" ? " (E3)" : " (E5)"} · no sessions planned</span></div>}
                   {blocks.filter((b) => b.pointId === pt.id).map((b) => {
                     const rejected = p?.rejected?.sessionId === b.sessionId;
@@ -95,8 +95,8 @@ export function O03Charging({ go, now, hubId: hub0 }: { go: OpGo; now: number; h
                       <div key={b.sessionId} className={`blk ${cls}`} draggable={!!p && !b.locked} title={b.locked ? "Charging now" : p ? "Drag to another point or time" : ""}
                         onDragStart={(e) => { setDrag(b.sessionId); const r = (e.currentTarget.parentElement as HTMLDivElement).getBoundingClientRect(); e.dataTransfer.setData("text/offset", String(((e.clientX - e.currentTarget.getBoundingClientRect().left) / r.width) * span)); }}
                         style={{ left: pct(b.start), width: `calc(${pct(b.end)} - ${pct(b.start)} - 3px)`, ...(rejected ? { boxShadow: "0 0 0 2px var(--danger)" } : {}), ...(b.emergency ? { outline: "2px solid var(--danger)" } : {}), cursor: p && !b.locked ? "grab" : "default" }}>
-                        {b.committed ? <span className="row" style={{ gap: 5 }}><Icon name="lock" className="ic-sm" />{b.sessionId} · committed</span> : <span>{b.vehicleId}{b.locked ? " · charging" : b.priority !== null ? ` · P ${b.priority.toFixed(2)}` : ""}</span>}
-                        <small>{b.committed ? `${hm(b.start)}–${hm(b.end)} · ${rejected ? "move rejected" : `shift ≤ +${((b.latestStart ?? 0) - (b.originalStart ?? 0)) / 60000} min`}` : b.moved ? `moved (7b) · ${hm(b.start)}` : `${b.soc ?? "?"}% → ${b.targetSoc}%`}</small>
+                        {b.committed ? <span className="row" style={{ gap: 5 }}><Icon name="lock" className="ic-sm" />{b.sessionId}<span className="opt"> · committed</span></span> : <span>{b.vehicleId}{b.locked ? " · charging" : b.priority !== null ? ` · P ${b.priority.toFixed(2)}` : ""}</span>}
+                        <small>{b.committed ? <>{hm(b.start)}–{hm(b.end)}<span className="opt"> · {rejected ? "move rejected" : `shift ≤ +${((b.latestStart ?? 0) - (b.originalStart ?? 0)) / 60000} min`}</span></> : b.moved ? `moved (7b) · ${hm(b.start)}` : `${b.soc ?? "?"}% → ${b.targetSoc}%`}</small>
                       </div>
                     );
                   })}
@@ -122,7 +122,7 @@ export function O03Charging({ go, now, hubId: hub0 }: { go: OpGo; now: number; h
           )}
         </section>
 
-        <section className="card" style={{ gridColumn: "span 3", alignSelf: "start" }}>
+        <section className="card r-stack-md" style={{ gridColumn: "span 3", alignSelf: "start" }}>
           <div className="card-head"><span className="h4"><Icon name="list-ordered" />Charging Queue</span><span className="small subtle">{s.queue.length} waiting</span></div>
           <div className="list">
             {s.queue.map((q) => {
@@ -142,7 +142,7 @@ export function O03Charging({ go, now, hubId: hub0 }: { go: OpGo; now: number; h
             })}
             {s.queue.length === 0 && <div className="li small subtle">No shared vehicle is waiting for charge.</div>}
           </div>
-          <div className="card-body"><span className="hint"><Icon name="info" />P = W_SOC(1 − SoC/100) + W_DEMAND·D + W_WAIT·min(wait/CHARGING_MAX_WAIT, 1) (BR-CHG-01). Student sessions are not in this queue and get no P.</span></div>
+          <div className="card-body"><span className="hint wrap-any"><Icon name="info" />P = W_SOC(1 − SoC/100) + W_DEMAND·D + W_WAIT·min(wait/CHARGING_MAX_WAIT, 1) (BR-CHG-01). Student sessions are not in this queue and get no P.</span></div>
         </section>
       </div>
 
@@ -173,7 +173,7 @@ function Policy({ s, onClose }: { s: Sched; onClose: () => void }) {
   return (
     <section className="card">
       <div className="card-head"><span className="h4"><Icon name="sliders-horizontal" />Charging policy (2a)</span><span className="small subtle">Hub peak capacity {s.policy.peakKw} kW</span></div>
-      <div className="card-body grid" style={{ gridTemplateColumns: "repeat(7, 1fr)", gap: 10 }}>
+      <div className="card-body grid" style={{ gridTemplateColumns: "repeat(auto-fill, minmax(150px, 1fr))", gap: 10 }}>
         {s.policy.params.map((p) => (
           <label key={p.name} className="field" title={p.meaning}><span className="label mono" style={{ fontSize: 11 }}>{p.name}</span>
             <input className="input sm" type="number" step={p.unit === "weight" || p.unit === "ratio" ? 0.05 : 1} value={vals[p.name]} onChange={(e) => { setVals({ ...vals, [p.name]: Number(e.target.value) }); setOk(false); }} />

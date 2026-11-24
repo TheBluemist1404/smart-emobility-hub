@@ -13,6 +13,8 @@ import type { ScenarioType, TimeWindow } from "../../domain/types";
 import type { RedistributionController } from "./RedistributionController";
 import type { ChargingController } from "./ChargingController";
 
+const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
+
 export const SCENARIOS: Array<{ type: ScenarioType; title: string; hint: string }> = [
   { type: "A demand surge", title: "A · Demand surge", hint: "More pickups than usual" },
   { type: "B return wave", title: "B · Return wave", hint: "Many returns to few Hubs" },
@@ -161,7 +163,7 @@ export class SimulationController {
       const failed = s.input<string[]>("failedPoints") ?? [];
       for (const m of s.measures.filter((x) => x.unservedCharging > 0 || x.sessionsToMove > 0)) {
         const pts = failed.filter((p) => b.points.some((x) => x.id === p && x.hubId === m.hubId));
-        recs.push(new Recommendation(id(), "charging plan", `Reschedule charging at ${m.hubId} without ${pts.join(", ")}`, `Charging plan (UC-11) · ${m.sessionsToMove} session(s) to move, ${m.unservedCharging} request(s) unserved before`, { hubId: m.hubId, points: pts }));
+        recs.push(new Recommendation(id(), "charging plan", `Reschedule charging at ${m.hubId} without ${pts.join(", ")}`, `Charging plan (UC-11) · ${plural(m.sessionsToMove, "session")} to move, ${plural(m.unservedCharging, "request")} unserved before`, { hubId: m.hubId, points: pts }));
       }
     } else {
       // Low-battery vehicles can be charged before the period: at a short Hub they become its own
@@ -175,7 +177,7 @@ export class SimulationController {
         const m = s.measures.find((x) => x.hubId === h);
         const gap = m ? Math.max(0, m.shortage - (covered.get(h) ?? 0)) : hs.lowBattery;
         const q = Math.min(gap, hs.lowBattery, hs.freeChargers * lead);
-        if (q >= 1) recs.push(new Recommendation(id(), "charging plan", `Charge ${q} low-battery e-bike${q > 1 ? "s" : ""} at ${h} before ${by}`, `Charging plan (UC-11) · ${hs.lowBattery} below LOW_BATTERY_SOC, ${hs.freeChargers} point(s) free`, { hubId: h, points: [], quantity: q }));
+        if (q >= 1) recs.push(new Recommendation(id(), "charging plan", `Charge ${q} low-battery e-bike${q > 1 ? "s" : ""} at ${h} before ${by}`, `Charging plan (UC-11) · ${hs.lowBattery} below LOW_BATTERY_SOC, ${plural(hs.freeChargers, "point")} free`, { hubId: h, points: [], quantity: q }));
       }
     }
     return recs;
@@ -242,7 +244,7 @@ export class SimulationController {
         if (r.kind === "transfer") {
           const oid = redistribution.createAssignedOrder(r.params.fromHub!, r.params.toHub!, [], OPERATOR, r.params.model ?? "e-bike", now.quantity ?? r.params.quantity, Math.max(s.period.start, clock().now() + 15 * MINUTE));
           r.recordOutcome("Applied", oid);
-          out.push({ id: r.id, title: r.title, outcome: "Applied", reference: oid, note: `${now.quantity} vehicle(s) · Assigned · due ${fmtHM(db.orders.get(oid)!.deadline)}` });
+          out.push({ id: r.id, title: r.title, outcome: "Applied", reference: oid, note: `${plural(now.quantity ?? 0, "vehicle")} · Assigned · due ${fmtHM(db.orders.get(oid)!.deadline)}` });
         } else {
           const hubId = r.params.hubId!;
           const p = charging.generateSchedule(hubId);
@@ -251,7 +253,7 @@ export class SimulationController {
           // E3: the schedule is committed but a point did not confirm the profile dispatch.
           const outcome = stale.length ? "Pending Reconciliation" : "Applied";
           r.recordOutcome(outcome, `schedule v${res.version}`);
-          out.push({ id: r.id, title: r.title, outcome, reference: `Schedule v${res.version}`, note: stale.length ? `Committed; dispatch to ${stale.map((x) => x.id).join(", ")} not confirmed yet (E3).` : `${res.applied} session(s) scheduled at ${hubId}` });
+          out.push({ id: r.id, title: r.title, outcome, reference: `Schedule v${res.version}`, note: stale.length ? `Committed; dispatch to ${stale.map((x) => x.id).join(", ")} not confirmed yet (E3).` : `${plural(res.applied, "session")} scheduled at ${hubId}` });
         }
       } catch (e) {
         r.recordOutcome("Not Applied", null);

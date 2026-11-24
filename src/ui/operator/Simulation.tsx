@@ -91,7 +91,7 @@ export function O05Simulation({ go, now, hubId }: { go: OpGo; now: number; hubId
         <div className="sim-banner"><span className="pill">SIMULATION</span>Results do not change live data. Baseline captured {hms(st.baseline.takenAt)} (live state unchanged).<span className="grow" /><span style={{ fontWeight: 600, opacity: 0.85 }}>Isolated copy · {st.baseline.hubs.length} Hubs</span></div>
         <div className="inner">
           <div className="grid g-12">
-            <section className="card span-4">
+            <section className="card span-4 r-stack-md">
               <div className="card-head"><span className="h4"><Icon name="sliders-horizontal" />Scenario</span>{err?.field ? <span className="chip danger">Invalid</span> : <span className="chip ok">Valid</span>}</div>
               <div className="card-body stack">
                 <div className="stack tight">
@@ -130,12 +130,12 @@ export function O05Simulation({ go, now, hubId }: { go: OpGo; now: number; hubId
               </div>
             </section>
 
-            <div className="span-8 stack loose">
+            <div className="span-8 stack loose r-stack-md">
               {!s && <div className="card pad-lg"><p className="muted">Choose a scenario and run it. The simulation uses the baseline copy only.</p></div>}
               {s && t && (
                 <>
                   <div className="grid" style={{ gridTemplateColumns: "repeat(4,1fr)", gap: 14 }}>
-                    <Kpi icon="users" label="Demand met" v={`${t.demandMet}%`} after={`→ ${t.demandMetAfter}%`} d={<><span className="sim-tag">simulated</span> after recs</>} />
+                    <Kpi icon="users" label="Demand met" v={`${t.demandMet}%`} after={`→ ${t.demandMetAfter}%`} d={<span className="sim-tag">simulated</span>} />
                     <Kpi icon="hourglass" label="Average wait" v={`${t.avgWait}`} after={`min → ${t.avgWaitAfter}`} d={<span className="sim-tag">simulated</span>} />
                     <Kpi icon="circle-minus" label="Hubs short" v={`${t.short.length}`} after={`→ ${t.shortAfter.length}`} d={t.short.length ? `${t.short.join(", ")} below S/D` : "none"} />
                     {s.scenario!.type === "C charging-point failure"
@@ -210,7 +210,7 @@ function Kpi({ icon, label, v, after, d }: { icon: string; label: string; v: str
 function Flag({ m }: { m: Measure }) {
   if (m.shortage > 0) return <span className={`chip ${m.demandMetPct < 70 ? "danger" : "warn"}`}>Shortage −{m.shortage}</span>;
   if (m.overflow > 0) return <span className="chip danger">Dock overflow {m.overflow}</span>;
-  if (m.unservedCharging > 0 || m.sessionsToMove > 0) return <span className="chip warn">{m.sessionsToMove} session(s) to move · {m.unservedCharging} unserved</span>;
+  if (m.unservedCharging > 0 || m.sessionsToMove > 0) return <span className="chip warn">{m.sessionsToMove} session{m.sessionsToMove === 1 ? "" : "s"} to move · {m.unservedCharging} unserved</span>;
   if (m.supply > m.demand) return <span className="chip info">Surplus {m.supply - m.demand}</span>;
   return <span className="chip ok">Balanced</span>;
 }

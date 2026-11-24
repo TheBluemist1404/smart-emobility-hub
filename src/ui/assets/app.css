@@ -18,34 +18,132 @@ body.app { background: #E9EDF2; }
 .clickable { cursor: pointer; }
 button[disabled] { opacity: .45; cursor: not-allowed; }
 
-/* A live console: full window width down to 1280 px. */
-.console.live { width: auto; min-width: 1280px; max-width: 1600px; min-height: 100vh; border-radius: 0; margin: 0 auto; }
-.console.live .c-main { min-width: 0; }
-
 /* Toasts pushed over WebSocket. */
 .toast-stack { position: absolute; left: 12px; right: 12px; top: 56px; z-index: 50; display: flex; flex-direction: column; gap: 8px; pointer-events: none; }
 .toast-stack .toast { pointer-events: auto; animation: toast-in .25s ease-out; }
 .console-toasts { position: fixed; right: 20px; top: 70px; z-index: 50; display: flex; flex-direction: column; gap: 8px; width: 380px; }
 @keyframes toast-in { from { transform: translateY(-8px); opacity: 0; } to { transform: none; opacity: 1; } }
 
-/* Demo tools drawer (not part of the product design: violet-free, dashed, clearly a tool). */
-.demo-fab { position: fixed; right: 16px; bottom: 16px; z-index: 100; }
-.demo-drawer { position: fixed; right: 16px; bottom: 64px; z-index: 100; width: 380px; max-height: calc(100vh - 90px); overflow-y: auto;
+/* On a phone-sized window the device frame goes away and the app fills the screen. */
+@media (max-width: 420px) {
+  .stage-phone { padding: 0; }
+  .phone.live { width: 100%; height: 100vh; height: 100dvh; min-height: 0; margin: 0; border-radius: 0; box-shadow: none; }
+  .phone.live .statusbar .island { display: none; }
+  .student-page.tools .phone.live .statusbar .sys { visibility: hidden; }
+}
+
+/* ── Live console: fills the window, sidebar and top bar stay put. ── */
+.console.live { --side-w: 248px; width: auto; min-width: 0; max-width: 1600px; min-height: 100vh; border-radius: 0; margin: 0 auto; box-shadow: none;
+  grid-template-columns: var(--side-w) 1fr; background: linear-gradient(90deg, var(--ink-900) var(--side-w), var(--canvas) var(--side-w)); }
+.console.live .c-main { min-width: 0; }
+.console.live .sidebar { position: sticky; top: 0; height: 100vh; align-self: start; overflow-y: auto; }
+.console.live .topbar { position: sticky; top: 0; z-index: 20; }
+.console.live .crumbs { white-space: nowrap; }
+.console.live .search { width: auto; flex: 0 1 300px; min-width: 0; overflow: hidden; white-space: nowrap; }
+.console.live .topbar .fresh { white-space: nowrap; }
+/* Page head: the title block and the controls wrap as whole groups, never mid-phrase. */
+.console.live .page-head { flex-wrap: wrap; row-gap: 14px; }
+.console.live .page-head > div:first-child { flex: 1 1 auto; min-width: 0; }
+.console.live .page-head p.row { flex-wrap: wrap; row-gap: 4px; }
+.console.live .page-head p.row > * { white-space: nowrap; }
+.console.live .page-head > .row { flex-wrap: wrap; gap: 8px; }
+.kpi .d .nw { white-space: nowrap; }
+.kpi .l { white-space: nowrap; }
+.hint.wrap-any, .wrap-any { overflow-wrap: anywhere; }
+/* Hub table: long flags wrap inside a rounded chip. */
+.table .chip.flag { white-space: nowrap; height: 22px; font-size: 11.5px; }
+/* Charging timeline: blocks drop their secondary text when they are short. */
+.blk { container-type: inline-size; }
+.blk > span, .blk > small { overflow: hidden; text-overflow: ellipsis; }
+@container (max-width: 150px) { .blk .opt { display: none; } }
+.tl .now::before { content: none; }
+.tl .now .lbl { position: absolute; top: -18px; left: -18px; font-family: var(--mono); font-size: 10px; font-weight: 700; color: var(--white); background: var(--danger); padding: 1px 4px; border-radius: 4px; }
+
+@media (max-width: 1359px) {
+  .console.live .c-body { padding: 20px 20px 32px; gap: 16px; }
+  .console.live .topbar { padding: 0 20px; }
+  .console.live .grid { gap: 14px; }
+  .console.live .kpi { padding: 14px; }
+  .console.live .kpi .l { font-size: 12px; gap: 6px; }
+  .console.live .kpi .l .ic { width: 24px; height: 24px; }
+  .console.live .kpi .l .ic .lucide { width: 15px; height: 15px; }
+  .console.live .kpi .v { font-size: 27px; }
+  .console.live .r-stack { grid-column: span 12 !important; }
+  .console.live .mon-map .map { min-height: 340px !important; }
+  .console.live .table th, .console.live .table td { padding-left: 10px; padding-right: 10px; }
+  .console.live .table.drafting .team { display: none; }
+}
+@media (max-width: 1239px) {
+  .console.live { --side-w: 76px; }
+  .console.live .sidebar { padding: 22px 12px; }
+  .console.live .brand { padding: 0; justify-content: center; }
+  .console.live .brand > div:last-child, .console.live .nav-group .eyebrow, .console.live .nav-item .lbl, .console.live .side-foot > div:last-child { display: none; }
+  .console.live .nav-item { justify-content: center; padding: 11px 0; }
+  .console.live .nav-item .count { position: absolute; top: 1px; right: 2px; margin: 0; font-size: 10px; padding: 0 5px; }
+  .console.live .nav-item[aria-current="page"]::before { left: -12px; }
+  .console.live .side-foot { justify-content: center; padding: 8px 0; }
+  .console.live .search { display: none; }
+  .console.live .r-stack-md { grid-column: span 12 !important; }
+}
+@media (max-width: 1099px) {
+  .console.live .kpi .l .ic { display: none; }
+}
+
+/* Demo tools (not part of the product design: dashed, navy and volt, clearly a tool). */
+.demo-fab { z-index: 100; background: #0B1324 !important; color: #D2FF3D !important; border: 1px dashed #475069 !important; white-space: nowrap; }
+.demo-fab.v-operator { position: fixed; left: 16px; bottom: 86px; width: 216px; justify-content: center; }
+.demo-fab.v-student { position: fixed; right: 10px; top: 10px; }
+.demo-fab.v-stage { position: relative; }
+.demo-drawer { position: fixed; z-index: 100; width: 380px; max-width: calc(100vw - 20px); overflow-y: auto;
   background: #0B1324; color: #DCE1EA; border-radius: 14px; box-shadow: 0 20px 50px -10px rgba(0,0,0,.5); border: 1px dashed #475069; font-size: 13px; }
+.demo-drawer.v-operator { left: 16px; bottom: 132px; max-height: calc(100vh - 150px); }
+.demo-drawer.v-student { right: 10px; top: 52px; max-height: calc(100vh - 64px); }
+.demo-drawer.v-stage { right: 12px; top: 52px; max-height: calc(100vh - 64px); }
+@media (max-width: 1239px) {
+  .demo-fab.v-operator { left: 12px; width: 52px; padding: 0; }
+  .demo-fab.v-operator .txt { display: none; }
+  .demo-drawer.v-operator { left: 88px; bottom: 16px; max-height: calc(100vh - 32px); }
+}
+/* On /student between phone and desktop widths, leave room above the phone for the button. */
+@media (min-width: 421px) and (max-width: 899px) { .student-page.tools .stage-phone { padding-top: 56px; } }
 .demo-drawer h4 { color: #D2FF3D; font-size: 12px; letter-spacing: .06em; text-transform: uppercase; margin: 14px 0 6px; }
 .demo-drawer .sec { padding: 0 14px 10px; border-bottom: 1px solid #17213A; }
 .demo-drawer .btns { display: flex; flex-wrap: wrap; gap: 6px; }
 .demo-drawer button.d { background: #17213A; color: #EEF1F5; border: 1px solid #2A3550; border-radius: 8px; padding: 5px 9px; font: inherit; font-size: 12px; cursor: pointer; }
 .demo-drawer button.d:hover { border-color: #D2FF3D; }
 .demo-drawer button.d.on { background: #D2FF3D; color: #0B1324; border-color: #D2FF3D; font-weight: 700; }
-.demo-drawer select, .demo-drawer input { background: #17213A; color: #EEF1F5; border: 1px solid #2A3550; border-radius: 8px; padding: 4px 6px; font: inherit; font-size: 12px; }
+.demo-drawer select, .demo-drawer input { background: #17213A; color: #EEF1F5; border: 1px solid #2A3550; border-radius: 8px; padding: 4px 6px; font: inherit; font-size: 12px; max-width: 100%; }
 .demo-drawer .clock { font-family: var(--mono); font-size: 26px; color: #fff; font-weight: 700; }
 .demo-drawer .tmr { font-family: var(--mono); font-size: 11.5px; color: #B9C0CE; display: flex; justify-content: space-between; gap: 8px; padding: 2px 0; }
+.demo-drawer .tmr > span:first-child { min-width: 0; overflow-wrap: anywhere; }
+.demo-drawer .tmr > span:last-child { flex: none; }
 
-/* Stage: both views side by side for the presentation. */
-.stage { display: grid; grid-template-columns: 430px 1fr; height: 100vh; background: #E9EDF2; }
-.stage iframe { border: 0; width: 100%; height: 100%; }
-.stage .left { overflow: hidden; display: flex; align-items: center; justify-content: center; }
-.stage .right { overflow: hidden; border-left: 1px solid var(--line-strong); }
+/* Stage: both views side by side for the presentation, each scaled to fit. */
+.stage { display: flex; flex-direction: column; height: 100vh; background: #E9EDF2; overflow: hidden; }
+.stage-bar { flex: none; height: 48px; display: flex; align-items: center; background: var(--ink-900); color: var(--ink-300); font-size: 12.5px; font-weight: 600; padding-right: 12px; }
+.stage-bar .lbl { display: flex; align-items: center; gap: 8px; padding: 0 16px; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.stage-bar .lbl b { color: var(--white); font-weight: 700; }
+.stage-bar .lbl .brand-mark { width: 26px; height: 26px; border-radius: 8px; flex: none; }
+.stage-bar .lbl .brand-mark .lucide { width: 15px; height: 15px; }
+.stage-bar .grow { flex: 1; }
+.stage-body { flex: 1; min-height: 0; display: flex; }
+.stage-body .left { flex: none; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.stage-body .right { flex: 1; min-width: 0; overflow: hidden; border-left: 1px solid var(--line-strong); position: relative; }
+.stage-body iframe { border: 0; display: block; transform-origin: 0 0; }
+.stage-body .right iframe { position: absolute; left: 0; top: 0; }
 .landing { max-width: 880px; margin: 60px auto; padding: 0 24px; }
 .landing a.card { display: block; padding: 20px; margin-top: 14px; text-decoration: none; color: inherit; }
+.table .flags { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
+.table .flags .chip.flag { margin: 0; }
+.banner { align-content: start; }
+.console.live .card-head { flex-wrap: wrap; row-gap: 8px; }
+.tl .hd { white-space: nowrap; overflow: visible; }
+.ring.sm .u { font-size: 9.5px; margin-top: 2px; }
+.field input[type="datetime-local"] { width: 100%; min-width: 0; }
+/* S09 scan: a dark screen from the status bar down, as in the design. */
+.phone.live .screen:has(.scan-screen) { background: var(--ink-900); color: var(--white); }
+.phone.live:has(.scan-screen) .statusbar { background: var(--ink-900); color: var(--white); }
+.choice:not(.on) .check .lucide { display: none; }
+
+/* The phone sits in the middle of a tall window (and of the stage column), so its shadow is never cut off. */
+@media (min-width: 421px) { .student-page { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; } }

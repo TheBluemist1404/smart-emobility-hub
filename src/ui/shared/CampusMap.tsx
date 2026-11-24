@@ -2,6 +2,10 @@
 import type { CSSProperties, ReactNode } from "react";
 
 export interface Pin { code: string; x: number; y: number; label?: string; s?: "ok" | "info" | "warn" | "danger" | "stale" | "neutral"; sel?: boolean; onClick?: () => void }
+// Where each Hub sits on the schematic map (percent). The seed coordinates put some labels on
+// top of each other and off the edge; the map is "not to scale", so it uses a spread-out layout
+// that keeps every label readable and clear of the legend.
+export const MAP_POS: Record<string, [number, number]> = { H01: [74, 32], H02: [72, 57], H03: [28, 78], H04: [50, 16], H05: [70, 78], H06: [24, 31], H07: [32, 54] };
 const STATUS_COLOR: Record<string, string> = { ok: "#14A36D", info: "#3B6FF0", warn: "#E2A336", danger: "#E5484D", neutral: "#8A93A8", stale: "#C9932B" };
 
 export function CampusMap({ pins, legend, scale, style, children }: { pins: Pin[]; legend?: Array<[string, string]>; scale?: string; style?: CSSProperties; children?: ReactNode }) {

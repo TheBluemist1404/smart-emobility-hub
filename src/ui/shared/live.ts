@@ -68,6 +68,8 @@ export const dayLabel = (ms: number) => {
   const d = new Date(ms + H7);
   return `${["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"][d.getUTCDay()]} ${String(d.getUTCDate()).padStart(2, "0")}/${String(d.getUTCMonth() + 1).padStart(2, "0")}`;
 };
+/** Sentence case for stored lower-case labels ("vehicle failure" → "Vehicle failure"). */
+export const cap = (s: string) => (s ? s.charAt(0).toUpperCase() + s.slice(1) : s);
 export const vnd = (n: number) => `${Math.round(n).toLocaleString("en-US")} VND`;
 export const mmss = (ms: number) => {
   const s = Math.max(0, Math.ceil(ms / 1000));

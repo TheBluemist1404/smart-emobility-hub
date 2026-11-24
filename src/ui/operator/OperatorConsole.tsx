@@ -37,7 +37,7 @@ export function OperatorConsole() {
     return () => { s.off("warn", onWarn); };
   }, []);
 
-  const go: OpGo = (r) => { setRoute(r); document.querySelector(".console.live .c-main")?.scrollTo(0, 0); };
+  const go: OpGo = (r) => { setRoute(r); window.scrollTo(0, 0); };
   const counts = {
     incidents: inc ? inc.counts.open + inc.counts.inProgress : 0,
     orders: orders ? orders.orders.filter((o) => ["Assigned", "In Transit"].includes(o.status)).length : 0,

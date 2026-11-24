@@ -9,7 +9,7 @@ const path = window.location.pathname.replace(/\/+$/, "") || "/";
 document.body.classList.add("app");
 
 function App() {
-  if (path.startsWith("/student")) return <div className="stage-phone"><MobileApp /></div>;
+  if (path.startsWith("/student")) return <div className={`student-page${new URLSearchParams(location.search).get("tools") === "0" ? "" : " tools"}`}><MobileApp /></div>;
   if (path.startsWith("/operator")) return <OperatorConsole />;
   if (path.startsWith("/stage")) return <Stage />;
   return <Landing />;

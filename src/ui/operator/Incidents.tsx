@@ -1,7 +1,7 @@
 // O04 Incidents (UC-12 steps 2-11, 3a, 3b, 5a, 6, 7, 8a, 8b, 8c, 9, 9b, E1, E2).
 import { useEffect, useState } from "react";
 import { Icon } from "../shared/Icon";
-import { ApiError, api, hm, hms, useLive } from "../shared/live";
+import { ApiError, api, cap, hm, hms, useLive } from "../shared/live";
 import type { OpGo } from "./OperatorConsole";
 
 interface Row { id: string; status: string; source: string; resourceId: string; resourceLabel: string; hubId: string; onTrip: boolean; category: string; createdAt: number; owner: string | null; blocking: boolean; reports: number }
@@ -41,7 +41,7 @@ export function O04Incidents({ go, now, incidentId, draftFor }: { go: OpGo; now:
         <button className="btn primary" onClick={() => setCreating("")}><Icon name="plus" />New incident</button>
       </div>
       <div className="grid g-12">
-        <section className="card span-7" style={{ overflow: "hidden", alignSelf: "start" }}>
+        <section className="card span-7 r-stack-md" style={{ overflow: "hidden", alignSelf: "start" }}>
           <div className="card-head">
             <div className="seg">{(["active", "resolved", "dismissed"] as const).map((t) => <span key={t} className={`clickable${tab === t ? " on" : ""}`} onClick={() => setTab(t)}>{t[0].toUpperCase() + t.slice(1)} {data?.[t].length ?? 0}</span>)}</div>
             <input className="input sm" style={{ width: 210 }} placeholder="Incident, resource, Hub" value={q} onChange={(e) => setQ(e.target.value)} />
@@ -51,12 +51,12 @@ export function O04Incidents({ go, now, incidentId, draftFor }: { go: OpGo; now:
             <tbody>{rows.map((r) => (
               <tr key={r.id} className={`clickable${pick === r.id ? " sel" : ""}`} onClick={() => { setSel(r.id); setCreating(null); }}>
                 <td className="mono strong">{r.id}</td><td><span className={`chip ${tone(r.status)}`}>{r.status}</span></td><td className="small">{srcLabel(r.source)}</td>
-                <td><b className="mono small">{r.resourceId}</b><div className="xs subtle">{r.onTrip ? "On the road · trip" : r.hubId}</div></td>
-                <td className="small" style={{ textTransform: "capitalize" }}>{r.category}</td><td className="r mono small">{hm(r.createdAt)}</td></tr>))}
+                <td><b className="mono small">{r.resourceId}</b>{r.onTrip ? <div className="xs subtle">On the road · trip</div> : r.hubId !== r.resourceId && <div className="xs subtle">{r.hubId}</div>}</td>
+                <td className="small">{cap(r.category)}</td><td className="r mono small">{hm(r.createdAt)}</td></tr>))}
               {rows.length === 0 && <tr><td colSpan={6} className="subtle">No incidents.</td></tr>}</tbody>
           </table>
         </section>
-        <div className="span-5 stack">
+        <div className="span-5 stack r-stack-md">
           {creating !== null ? <Create resourceId={creating} onDone={(id) => { setCreating(null); setSel(id); setTab("active"); }} onCancel={() => setCreating(null)} />
             : pick ? <Panel id={pick} go={go} now={now} /> : <div className="banner neutral"><span className="ic"><Icon name="siren" /></span><b>No incident selected.</b></div>}
         </div>
@@ -75,7 +75,7 @@ function Create({ resourceId, onDone, onCancel }: { resourceId: string; onDone: 
       <div className="card-head"><span className="h4"><Icon name="plus" />New incident (3a)</span><span className="chip warn">Open</span></div>
       <div className="card-body stack">
         <label className="field"><span className="label">Resource or Hub</span><input className="input" placeholder="e.g. EB-0217, CP-H01-02, H01-P-B12, H06" value={r} onChange={(e) => setR(e.target.value.trim())} /></label>
-        <label className="field"><span className="label">Category</span><select className="input" value={cat} onChange={(e) => setCat(e.target.value)}>{CATS.map((c) => <option key={c}>{c}</option>)}</select></label>
+        <label className="field"><span className="label">Category</span><select className="input" value={cat} onChange={(e) => setCat(e.target.value)}>{CATS.map((c) => <option key={c} value={c}>{cap(c)}</option>)}</select></label>
         <label className="field"><span className="label">Description</span><textarea className="input area" rows={3} value={desc} onChange={(e) => setDesc(e.target.value)} style={{ fontFamily: "inherit" }} /></label>
         {err && <span className="err"><Icon name="circle-alert" />{err}</span>}
         <div className="row" style={{ gap: 8, justifyContent: "flex-end" }}><button className="btn ghost" onClick={onCancel}>Cancel</button>
@@ -123,7 +123,7 @@ function Panel({ id, go, now }: { id: string; go: OpGo; now: number }) {
       )}
       <section className="card">
         <div className="card-head"><div><div className="row" style={{ gap: 8 }}><span className="h3 mono">{d.id}</span><span className={`chip ${tone(d.status)}`}>{d.status}</span></div>
-          <div className="small subtle" style={{ textTransform: "capitalize" }}>{d.category} · {srcLabel(d.source)}{d.owner ? ` · handled by ${d.owner === "OP-014" ? "Tran Lan" : d.owner}` : ""}</div></div></div>
+          <div className="small subtle">{cap(d.category)} · {srcLabel(d.source)}{d.owner ? ` · handled by ${d.owner === "OP-014" ? "Tran Lan" : d.owner}` : ""}</div></div></div>
         <div className="card-body stack">
           {changed && <div className="banner warn compact"><span className="ic"><Icon name="refresh-cw" /></span><b>Someone else changed {d.id}.</b><p>Your next save would be rejected (E2). <a className="clickable" onClick={() => setVer(d.version)}>Load the latest</a></p></div>}
           <div className="card pad" style={{ boxShadow: "none" }}>

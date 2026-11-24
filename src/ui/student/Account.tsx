@@ -1,5 +1,5 @@
 // S11 My bookings and S12 Notifications.
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { Icon } from "../shared/Icon";
 import { api, dayLabel, hm, mmss, useLive, vnd } from "../shared/live";
 import { chipTone } from "./Discover";
@@ -74,7 +74,7 @@ export function S11Bookings({ go, home, now }: { go: Go; home: Home | null; now:
               return (
                 <div key={a.id} className="bk clickable" onClick={() => open(a)}>
                   <div className="lead" style={{ width: 44, height: 44, borderRadius: 13, background: `var(--${tone === "neutral" || tone === "stale" ? "ink-100" : tone + "-bg"})`, color: `var(--${tone === "neutral" || tone === "stale" ? "ink-700" : tone})`, display: "grid", placeItems: "center" }}><Icon name={info.icon} /></div>
-                  <div><div className="t">{info.title}</div><div className="s">{info.sub}</div></div>
+                  <div><div className="t">{info.title}</div><div className="s">{info.sub.split(" · ").map((part, i) => <Fragment key={i}>{i ? " · " : ""}<span style={{ whiteSpace: "nowrap" }}>{part}</span></Fragment>)}</div></div>
                   <span className={`chip ${tone}`}>{a.kind === "Trip" && (a as TripView).fareStatus ? `${a.status} · ${(a as TripView).fareStatus}` : a.status}</span>
                   {info.notes.map((n) => <div key={n.text} className="note" style={n.tone ? { background: `var(--${n.tone}-bg)`, color: `var(--${n.tone})` } : undefined}><Icon name={n.icon} />{n.text}</div>)}
                 </div>

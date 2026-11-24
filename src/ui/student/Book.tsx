@@ -120,7 +120,7 @@ export function S05Parking({ go, home, now, hubId: hub0 }: { go: Go; home: Home;
           ))}
         </div>
         <VehiclePicker home={home} value={veh} onChange={setVeh} />
-        <div className="two">
+        <div className="stack" style={{ gap: 14 }}>
           <div className="field"><label>Arrival</label><input className="input" type="datetime-local" value={arr} onChange={(e) => setArr(e.target.value)} /></div>
           <div className="field"><label>Departure</label><input className={`input${local ? " error" : ""}`} type="datetime-local" value={dep} onChange={(e) => setDep(e.target.value)} /></div>
         </div>
@@ -226,7 +226,7 @@ export function S06Charging({ go, home, now, hubId: hub0 }: { go: Go; home: Home
             <div className="field"><label>Target</label><input className="input" type="number" min={0} max={100} value={tgt} onChange={(e) => setTgt(Number(e.target.value))} /></div>
           </div>
         </div>
-        <div className="two">
+        <div className="stack" style={{ gap: 14 }}>
           <div className="field"><label>Window from</label><input className="input" type="datetime-local" value={from} onChange={(e) => setFrom(e.target.value)} /></div>
           <div className="field"><label>Window to</label><input className="input" type="datetime-local" value={to} onChange={(e) => setTo(e.target.value)} /></div>
         </div>

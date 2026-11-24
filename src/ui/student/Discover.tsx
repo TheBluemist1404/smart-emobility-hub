@@ -1,7 +1,7 @@
 // S01 Find a Hub (UC-01 steps 1-5, 3a, 4a, E1) and S02 Hub detail (UC-01 steps 5-6).
 import { useState } from "react";
 import { Icon } from "../shared/Icon";
-import { CampusMap } from "../shared/CampusMap";
+import { CampusMap, MAP_POS } from "../shared/CampusMap";
 import { ago, hm, hms, useLive, vnd } from "../shared/live";
 import type { Go, Home, HubDetail, RosterHub } from "./types";
 
@@ -60,10 +60,10 @@ export function S01HubSearch({ go, now, home }: { go: Go; now: number; home: Hom
 
       {view === "map" && (
         <CampusMap style={{ height: 380, borderRadius: 0 }} scale={nearMe ? "You are here ●" : undefined}
-          pins={sorted.map((h) => ({ code: h.hubId, x: h.x, y: h.y, label: h.distanceKm !== null ? `${h.distanceKm} km` : `${h.available} veh.`, s: h.stale ? "stale" : "ok", sel: h === first && nearMe, onClick: () => go({ s: "S02", hubId: h.hubId }) }))} />
+          pins={sorted.map((h) => ({ code: h.hubId, x: MAP_POS[h.hubId]?.[0] ?? h.x, y: MAP_POS[h.hubId]?.[1] ?? h.y, label: h.distanceKm !== null ? `${h.distanceKm} km` : `${h.available} veh.`, s: h.stale ? "stale" : "ok", sel: h === first && nearMe, onClick: () => go({ s: "S02", hubId: h.hubId }) }))} />
       )}
 
-      <div className="content" style={view === "map" ? { marginTop: -36, position: "relative", zIndex: 2 } : undefined}>
+      <div className="content" style={view === "map" ? { marginTop: -22, position: "relative", zIndex: 2, background: "var(--canvas)", borderRadius: "22px 22px 0 0", boxShadow: "0 -8px 20px -12px rgba(7,13,26,.25)" } : undefined}>
         {home?.blocked && (
           <div className="banner danger compact"><span className="ic"><Icon name="ban" /></span><b>Fare {vnd(home.blocked.fare)} unpaid.</b>
             <p>New reservations and rentals are blocked until it is paid (BR-PAY-04). <a className="clickable" onClick={() => go({ s: "S10" })}>Pay now</a></p></div>

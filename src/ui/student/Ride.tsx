@@ -33,7 +33,7 @@ function S09Scan({ go, home }: { go: Go; home: Home }) {
     <>
       <div className="m-appbar" style={{ background: "var(--ink-900)" }}><span className="icon-btn on-dark clickable" onClick={() => go({ s: "S01" })}><Icon name="x" /></span>
         <div className="title"><div className="h4" style={{ color: "#fff" }}>Scan to pick up</div><div className="sub" style={{ color: "var(--ink-300)" }}>{vr ? `${vr.id} · ${vr.vehicleId}` : "Walk-up rental"}</div></div><span className="icon-btn on-dark"><Icon name="flashlight" /></span></div>
-      <div className="content" style={{ paddingTop: 6 }}>
+      <div className="content scan-screen" style={{ paddingTop: 6 }}>
         <div className="viewfinder clickable" title={vr ? `Simulate scanning ${vr.vehicleId}` : "Type a vehicle ID below"} onClick={() => vr && start(vr.vehicleId)}>
           <div className="qr" /><div className="box"><i /><i /><i /><i /></div><div className="scanline" />
           <div className="cap">{vr ? `Tap to scan the QR code on ${vr.vehicleId}` : "Scan the QR code on the vehicle or the dock"}</div>
@@ -119,7 +119,7 @@ function Pickup({ go, home, now }: { go: Go; home: Home; now: number }) {
       <div className="m-appbar"><span className="icon-btn clickable" onClick={() => api("/student/pickup/cancel", {})}><Icon name="chevron-left" /></span><div className="title"><div className="h4">Check the vehicle</div><div className="sub">{p.vehicleId} · {p.hubId} · Dock {p.dock}</div></div><span /></div>
       <div className="content" style={{ paddingTop: 4 }}>
         <div className="card pad row" style={{ gap: 14 }}>
-          <div className="ring sm warn" style={{ ["--p" as string]: Math.max(0, Math.round((left / 180_000) * 100)) }}><div><span className="t">{mmss(left)}</span></div></div>
+          <div className="ring sm warn" style={{ ["--p" as string]: Math.max(0, Math.round((left / 180_000) * 100)) }}><div><span className="t">{mmss(left)}</span><span className="u">left</span></div></div>
           <div className="grow"><span className="chip info">{p.walkUp ? "Walk-up · vehicle Held" : "Pickup In Progress"}</span><p className="small muted" style={{ marginTop: 6 }}>Unlock within 3 min (INSPECTION_TIMEOUT). {p.walkUp ? "Unlock fee " + vnd(p.unlockFee) + " is added to the fare." : "Your reservation can't expire while you check."}</p></div>
         </div>
         <div className="section-title"><span className="h4">Before you ride</span><span className="small subtle">{checked.filter(Boolean).length} of 4 checked</span></div>
@@ -254,7 +254,7 @@ function S10Summary({ trip, now, onDone }: { trip: TripView; now: number; onDone
       <div className="content" style={{ paddingTop: 4 }}>
         <div className="trip stack">
           <div className="row between"><span className="lbl">Trip closed at {hm(trip.endTime!)}</span><span className={`chip ${chipTone("Unpaid")}`} style={{ background: "rgba(255,241,214,.12)", color: "#FFD48A", borderColor: "rgba(255,212,138,.35)" }}>Unpaid</span></div>
-          <div className="big">{trip.fare.toLocaleString("en-US")} <span style={{ fontSize: 18, color: "var(--white)" }}>VND</span></div>
+          <div className="big">{trip.fare.toLocaleString("en-US")}<span style={{ fontSize: 18, color: "var(--white)", fontFamily: "var(--font)", fontWeight: 700, letterSpacing: 0, marginLeft: 8 }}>VND</span></div>
           <div className="three" style={{ marginTop: 4 }}><div><div className="lbl">Duration</div><b>{dur}</b></div><div><div className="lbl">Distance</div><b>{trip.distanceKm} km</b></div><div><div className="lbl">Vehicle</div><b className="mono">{trip.vehicleId}</b></div></div>
         </div>
         <div className="card pad-lg"><dl className="kv">

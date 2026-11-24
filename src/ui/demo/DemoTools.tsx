@@ -6,7 +6,7 @@ import { Icon } from "../shared/Icon";
 
 const MIN = 60_000;
 
-export function DemoTools({ side, extra }: { side: "student" | "operator"; extra?: ReactNode }) {
+export function DemoTools({ side, extra }: { side: "student" | "operator" | "stage"; extra?: ReactNode }) {
   const [open, setOpen] = useState(false);
   const { now, state } = useClock();
   const post = (url: string, body: unknown) => api(`/demo${url}`, body).catch((e: Error) => alert(e.message));
@@ -14,11 +14,11 @@ export function DemoTools({ side, extra }: { side: "student" | "operator"; extra
 
   return (
     <>
-      <button className="btn sm demo-fab" style={{ background: "#0B1324", color: "#D2FF3D", border: "1px dashed #475069" }} onClick={() => setOpen(!open)}>
-        <Icon name="flask-round" className="ic-sm" />Demo tools · <span className="mono">{hms(now)}</span>{state && state.speed !== 1 ? ` ×${state.speed}` : ""}{state?.paused ? " ⏸" : ""}
+      <button className={`btn sm demo-fab v-${side}`} title="Demo tools" aria-expanded={open} onClick={() => setOpen(!open)}>
+        <Icon name="flask-round" className="ic-sm" /><span className="txt">Demo tools · <span className="mono">{hms(now)}</span>{state && state.speed !== 1 ? ` ×${state.speed}` : ""}{state?.paused ? " ⏸" : ""}</span>
       </button>
       {open && state && (
-        <div className="demo-drawer" role="dialog" aria-label="Demo tools">
+        <div className={`demo-drawer v-${side}`} role="dialog" aria-label="Demo tools">
           <div className="sec">
             <h4>Demo clock</h4>
             <div className="row between"><span className="clock">{hms(now)}</span><span className="small" style={{ color: "#8A93A8" }}>Mon 02/11/2026 · {side}</span></div>

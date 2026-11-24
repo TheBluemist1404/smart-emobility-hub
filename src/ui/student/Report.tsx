@@ -1,7 +1,7 @@
 // S07 Report an issue (UC-06) and S08 report during a trip (UC-06 2b, UC-12 8c).
 import { useMemo, useState } from "react";
 import { Icon } from "../shared/Icon";
-import { ApiError, api, hm, useLive } from "../shared/live";
+import { ApiError, api, cap, hm, useLive } from "../shared/live";
 import type { Go, Home } from "./types";
 
 interface Proposed { resourceId: string; kind: string; label: string; hubId: string | null; why: string; allocationId: string; category: string; location?: string | null }
@@ -115,7 +115,7 @@ function S07Sent({ go, r }: { go: Go; r: ReportResult }) {
         <div className="ticket">
           <div className="row between"><div><div className="lbl">Issue report</div><div className="code" style={{ fontSize: 22 }}>{r.reportId}</div></div><span className="chip warn" style={{ background: "rgba(255,241,214,.12)", color: "#FFD48A", borderColor: "rgba(255,212,138,.35)" }}>{r.status}</span></div>
           <div className="cut" />
-          <dl className="kv"><dt>Category</dt><dd style={{ textTransform: "capitalize" }}>{r.category}</dd><dt>Resource</dt><dd className="mono">{r.resourceLabel}</dd><dt>Sent</dt><dd className="mono">{hm(r.time)}</dd></dl>
+          <dl className="kv"><dt>Category</dt><dd>{cap(r.category)}</dd><dt>Resource</dt><dd className="mono">{r.resourceLabel}</dd><dt>Sent</dt><dd className="mono">{hm(r.time)}</dd></dl>
         </div>
         <div className="card pad stack tight">
           <b>What happens next</b>

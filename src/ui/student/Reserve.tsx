@@ -102,7 +102,7 @@ export function VRScreen({ go, id, now }: { go: Go; id: string; now: number }) {
             <dl className="kv"><dt>Vehicle</dt><dd><span className="mono">{a.vehicleId}</span> · {a.vehicle?.status}</dd><dt>Hub</dt><dd>{a.hubId} · {a.hubName}</dd><dt>Dock</dt><dd className="mono">{a.vehicle?.dock ?? "—"}</dd><dt>Pick up before</dt><dd className="mono" style={{ color: "var(--volt)" }}>{hm(a.expiresAt!)}</dd></dl>
           </div>
           <div className="card pad row" style={{ gap: 14 }}>
-            <div className="ring sm" style={{ ["--p" as string]: Math.max(0, Math.round((left / total) * 100)) }}><div><span className="t">{mmss(left)}</span></div></div>
+            <div className="ring sm" style={{ ["--p" as string]: Math.max(0, Math.round((left / total) * 100)) }}><div><span className="t">{mmss(left)}</span><span className="u">left</span></div></div>
             <div className="grow"><b>Pickup window</b><p className="small muted">Scan the vehicle at the Hub before {hm(a.expiresAt!)}. After that it expires and the fee is not refunded.</p></div>
           </div>
         </div>

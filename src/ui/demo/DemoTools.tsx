@@ -3,12 +3,20 @@
 import { useState, type ReactNode } from "react";
 import { api, hms, mmss, useClock, useLive, vnd, type DemoState } from "../shared/live";
 import { Icon } from "../shared/Icon";
+import { simulatorWarnings } from "../shared/simStatus";
 
 const MIN = 60_000;
 
 export function DemoTools({ side, extra }: { side: "student" | "operator" | "stage"; extra?: ReactNode }) {
   const [open, setOpen] = useState(false);
+  const [armed, setArmed] = useState(false);
   const { now, state } = useClock();
+  // Two taps instead of confirm(): a dialog blocks the page and is easy to miss on a phone.
+  const reset = () => {
+    if (!armed) { setArmed(true); setTimeout(() => setArmed(false), 4000); return; }
+    setArmed(false);
+    post("/reset", {});
+  };
   const post = (url: string, body: unknown) => api(`/demo${url}`, body).catch((e: Error) => alert(e.message));
   if (new URLSearchParams(location.search).get("tools") === "0") return null;
 
@@ -19,6 +27,13 @@ export function DemoTools({ side, extra }: { side: "student" | "operator" | "sta
       </button>
       {open && state && (
         <div className={`demo-drawer v-${side}`} role="dialog" aria-label="Demo tools">
+          <div className="shared-note">
+            <b>Shared demo:</b> everyone on this URL sees the same data. Press Reset demo if things look odd.
+            <div className="btns">
+              <button className={`d reset${armed ? " armed" : ""}`} onClick={reset}>{armed ? "Tap again to reset" : "Reset demo"}</button>
+              {simulatorWarnings(state).length > 0 && <button className="d" onClick={() => post("/normal", {})}>Bank &amp; unlock back to normal</button>}
+            </div>
+          </div>
           <div className="sec">
             <h4>Demo clock</h4>
             <div className="row between"><span className="clock">{hms(now)}</span><span className="small" style={{ color: "#8A93A8" }}>Mon 02/11/2026 · {side}</span></div>
@@ -31,7 +46,7 @@ export function DemoTools({ side, extra }: { side: "student" | "operator" | "sta
             <div className="btns" style={{ marginTop: 6 }}>
               {[1, 10, 60].map((s) => <button key={s} className={`d${state.speed === s ? " on" : ""}`} onClick={() => post("/clock", { action: "speed", speed: s })}>×{s}</button>)}
               <button className="d" onClick={() => post("/clock", { action: state.paused ? "resume" : "pause" })}>{state.paused ? "Resume" : "Pause"}</button>
-              <button className="d" onClick={() => { if (confirm("Reset the whole demo to 14:36:00 and the seed data?")) post("/reset", {}); }}>Reset demo</button>
+              <button className={`d${armed ? " reset armed" : ""}`} onClick={reset}>{armed ? "Tap again to reset" : "Reset demo"}</button>
             </div>
             <div style={{ marginTop: 8 }}>
               {state.timers.length === 0 && <div className="tmr">No timers running</div>}

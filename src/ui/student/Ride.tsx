@@ -7,17 +7,22 @@ import { Soc, chipTone } from "./Discover";
 import { BankMeter } from "./Reserve";
 import type { Go, Home, PickupSummary, TripView } from "./types";
 import { BreakdownCard, type ReportResult } from "./Report";
+import { summaryToShow } from "./tripSummary";
 
 const vehIcon = (t: string) => (t === "electric bicycle" ? "bike" : "motorbike");
 
+/** Trips whose summary the student closed with "Done" (kept while the page is open). */
+const seenTrips = new Set<string>();
+
 /** The Trip tab: whichever of S09a-e / S10 fits the student's state right now. */
 export function TripTab({ go, home, now }: { go: Go; home: Home; now: number }) {
-  const [doneTrip, setDoneTrip] = useState<string | null>(null);
-  const [returning, setReturning] = useState(false);
+  const [, setSeen] = useState(0);
+  const [returning, setReturning] = useState<string | null>(null);
   if (home.pickup) return <Pickup go={go} home={home} now={now} />;
-  if (home.trip) return returning ? <S10Return home={home} trip={home.trip} now={now} onBack={() => setReturning(false)} /> : <S09Trip go={go} trip={home.trip} now={now} onEnd={() => setReturning(true)} />;
-  const lt = home.lastTrip;
-  if (lt && lt.id !== doneTrip && (lt.fareStatus === "Unpaid" || now - (lt.endTime ?? 0) < 30 * 60_000)) return <S10Summary trip={lt} now={now} onDone={() => { setDoneTrip(lt.id); go({ s: "S01" }); }} />;
+  if (home.trip) return returning === home.trip.id ? <S10Return home={home} trip={home.trip} now={now} onBack={() => setReturning(null)} /> : <S09Trip go={go} trip={home.trip} now={now} onEnd={() => setReturning(home.trip!.id)} />;
+  const pickupWaiting = !!home.reservation && ["Confirmed", "Pickup In Progress"].includes(home.reservation.status);
+  const lt = summaryToShow(home.lastTrip, now, seenTrips, pickupWaiting);
+  if (lt) return <S10Summary trip={lt} now={now} onDone={() => { seenTrips.add(lt.id); setSeen((x) => x + 1); go({ s: "S01" }); }} />;
   return <S09Scan go={go} home={home} />;
 }
 
@@ -176,16 +181,30 @@ interface Docks { hubId: string; name: string; vacant: Array<{ dockId: string; l
 function S10Return({ home, trip, now, onBack }: { home: Home; trip: TripView; now: number; onBack: () => void }) {
   const [hubId, setHubId] = useState(home.location.hubId ?? trip.hubId);
   const { data: d } = useLive<Docks>(`/student/docks/${hubId}`);
-  const [msg, setMsg] = useState<string | null>(null);
-  const end = () => api<{ status: string; message?: string }>("/student/trip/end", {}).then((r) => setMsg(r.message ?? null));
+  const [msg, setMsg] = useState<{ tone: "warn" | "danger" | "info"; title: string; body: string } | null>(null);
+  const [notEngaged, setNotEngaged] = useState(false);
+  const [busy, setBusy] = useState<string | null>(null);
+  const end = () => api<{ status: string; message?: string }>("/student/trip/end", {})
+    .then((r) => setMsg(r.message ? { tone: "warn", title: "Not docked yet", body: r.message } : null))
+    .catch((e: Error) => setMsg({ tone: "danger", title: "Couldn't end the trip", body: e.message }));
+  // Demo: the student pushes the vehicle into this dock. The simulated dock reports the latch
+  // (or "not engaged") over the IoT gateway; the trip closes on that report (UC-08 step 5).
+  const dockIt = (x: { dockId: string; label: string }) => {
+    setBusy(x.dockId);
+    setMsg(notEngaged ? { tone: "info", title: `Pushing into ${x.label}…`, body: "" } : null);
+    api("/demo/latch", { dockId: x.dockId, vehicleId: trip.vehicleId, engaged: !notEngaged })
+      .then(() => { if (notEngaged) setMsg({ tone: "warn", title: `Dock ${x.label} did not lock ${trip.vehicleId} (E3)`, body: "The latch did not engage, so the trip and the fare keep running. Push it in again: switch back to \"Clicks in\" and tap a dock." }); })
+      .catch((e: Error) => setMsg({ tone: "danger", title: "That dock can't take it", body: e.message }))
+      .finally(() => setBusy(null));
+  };
   const full = d && d.vacant.length === 0;
   return (
     <>
-      <div className="m-appbar"><span className="icon-btn clickable" onClick={onBack}><Icon name="chevron-left" /></span><div className="title"><div className="h4">Return {trip.vehicleId}</div><div className="sub">Trip {hhmmss(now - trip.startTime)}</div></div><span /></div>
+      <div className="m-appbar"><span className="icon-btn clickable" onClick={onBack}><Icon name="chevron-left" /></span><div className="title"><div className="h4">Return {trip.vehicleId}</div><div className="sub">Trip {hhmmss(now - trip.startTime)} · {vnd(trip.fareSoFar)} so far</div></div><span /></div>
       <div className="content" style={{ paddingTop: 4 }}>
         <div className="row" style={{ gap: 6, flexWrap: "wrap" }}>
           <span className="small muted">Returning at</span>
-          {["H01", "H02", "H03", "H04", "H05", "H07"].map((h) => <span key={h} className={`tag clickable${h === hubId ? " on" : ""}`} style={h === hubId ? { background: "var(--ink-900)", color: "#fff" } : undefined} onClick={() => setHubId(h)}>{h}</span>)}
+          {["H01", "H02", "H03", "H04", "H05", "H07"].map((h) => <span key={h} className={`tag clickable${h === hubId ? " on" : ""}`} style={h === hubId ? { background: "var(--ink-900)", color: "#fff" } : undefined} onClick={() => { setHubId(h); setMsg(null); }}>{h}</span>)}
         </div>
         {d && full && (
           <>
@@ -201,10 +220,19 @@ function S10Return({ home, trip, now, onBack }: { home: Home; trip: TripView; no
           <div className="card pad-lg stack tight">
             <div className="row between"><b>{d.hubId} · {d.name}</b><span className="chip ok">{d.vacant.length} vacant</span></div>
             <p className="small muted">Push {trip.vehicleId} into any vacant dock until it clicks. The dock reports the latch and the trip closes by itself.</p>
-            <div className="row" style={{ gap: 6, flexWrap: "wrap" }}>{d.vacant.slice(0, 8).map((x) => <span key={x.dockId} className="tag mono">{x.label}</span>)}{d.vacant.length > 8 && <span className="tag">+{d.vacant.length - 8}</span>}</div>
+            <span className="hint"><Icon name="hand" />Tap a dock to simulate docking (demo)</span>
+            <div className={`dock-grid${notEngaged ? " not-engaged" : ""}`}>
+              {d.vacant.slice(0, 12).map((x) => <button key={x.dockId} disabled={!!busy} aria-label={`Dock ${x.label}`} onClick={() => dockIt(x)}>{busy === x.dockId ? "…" : x.label}</button>)}
+            </div>
+            {d.vacant.length > 12 && <span className="xs subtle">+{d.vacant.length - 12} more vacant docks</span>}
+            <div className="row" style={{ gap: 6, flexWrap: "wrap", marginTop: 2 }}>
+              <span className="xs subtle">Dock result:</span>
+              <span className={`tag clickable${!notEngaged ? " on" : ""}`} style={!notEngaged ? { background: "var(--ink-900)", color: "#fff" } : undefined} onClick={() => setNotEngaged(false)}>Clicks in</span>
+              <span className={`tag clickable${notEngaged ? " on" : ""}`} style={notEngaged ? { background: "var(--ink-900)", color: "#fff" } : undefined} onClick={() => setNotEngaged(true)}>Not engaged (E3)</span>
+            </div>
           </div>
         )}
-        {msg && <div className="banner warn"><span className="ic"><Icon name="triangle-alert" /></span><b>Not docked yet</b><p>{msg}</p></div>}
+        {msg && <div className={`banner ${msg.tone}`}><span className="ic"><Icon name={msg.tone === "info" ? "loader" : msg.tone === "danger" ? "circle-x" : "triangle-alert"} /></span><b>{msg.title}</b>{msg.body && <p>{msg.body}</p>}</div>}
         <span className="fresh">Docks updated <span className="mono">{hms(now)}</span></span>
       </div>
       <div className="actionbar"><button className="btn primary block lg" onClick={end}><Icon name="flag" />I've docked it — End Trip</button></div>
@@ -218,6 +246,21 @@ function S10Summary({ trip, now, onDone }: { trip: TripView; now: number; onDone
   const paying = trip.fareStatus === "Unpaid" && (!p || p.result === null);
   useEffect(() => setErr(null), [trip.fareStatus]);
   const dur = hhmmss((trip.endTime ?? now) - trip.startTime);
+  if (trip.closedByIncident) {
+    return (
+      <>
+        <div className="m-appbar"><span className="icon-btn clickable" onClick={onDone}><Icon name="x" /></span><div className="title"><div className="h4">Trip closed by an operator</div><div className="sub">{trip.id} · {trip.vehicleId}</div></div><span /></div>
+        <div className="content" style={{ paddingTop: 4 }}>
+          <div className="result"><div className="badge ok"><Icon name="shield-check" /></div><div className="h2">Breakdown confirmed</div>
+            <p className="small muted" style={{ maxWidth: 300 }}>An operator confirmed that {trip.vehicleId} broke down (incident <span className="mono strong">{trip.closedByIncident}</span>). Your trip was closed at {hm(trip.endTime!)}, when you reported it, and you pay nothing for it.</p></div>
+          <div className="card pad-lg"><dl className="kv"><dt>Fare</dt><dd className="total num">{vnd(0)}</dd><dt>Status</dt><dd><span className="chip ok">Waived</span></dd>
+            <dt>Incident</dt><dd className="mono">{trip.closedByIncident}</dd><dt>Started</dt><dd>{hm(trip.startTime)} at {trip.hubId}</dd><dt>Closed</dt><dd className="mono">{hm(trip.endTime!)}</dd></dl></div>
+          <div className="banner info compact"><span className="ic"><Icon name="wrench" /></span><b>You don't need to return {trip.vehicleId}.</b><p>It is now Under Maintenance; staff will collect it. You can rent another vehicle right away.</p></div>
+        </div>
+        <div className="actionbar"><button className="btn primary block lg" onClick={onDone}>Done</button></div>
+      </>
+    );
+  }
   if (trip.fareStatus === "Paid" || trip.fareStatus === "Waived") {
     return (
       <>
@@ -225,7 +268,7 @@ function S10Summary({ trip, now, onDone }: { trip: TripView; now: number; onDone
         <div className="content" style={{ paddingTop: 4 }}>
           <div className="result"><div className="badge ok"><Icon name="receipt" /></div><div className="h2">Thanks for riding</div><p className="small muted">{trip.fareStatus === "Waived" ? "Fare waived" : "Fare paid"} · see you next time</p></div>
           <div className="card pad-lg"><dl className="kv"><dt>Fare</dt><dd className="total num">{vnd(trip.fare)}</dd><dt>Status</dt><dd><span className="chip ok">{trip.fareStatus}</span></dd>
-            <dt>Transaction</dt><dd className="mono small">{trip.transactionRef ?? "—"}</dd><dt>Route</dt><dd>{trip.hubId} → {trip.endHubId}</dd><dt>Time</dt><dd className="mono">{hm(trip.startTime)} → {hm(trip.endTime!)}</dd></dl></div>
+            <dt>Transaction</dt><dd className="mono small">{trip.transactionRef ?? "—"}</dd><dt>Route</dt><dd>{trip.hubId} → {trip.endHubId ?? "—"}{trip.endDock ? ` · ${trip.endDock}` : ""}</dd><dt>Time</dt><dd className="mono">{hm(trip.startTime)} → {hm(trip.endTime!)}</dd></dl></div>
           <div className="card pad row" style={{ gap: 12 }}><div className="lead" style={{ width: 40, height: 40, borderRadius: 12, background: "var(--brand-50)", color: "var(--brand-700)", display: "grid", placeItems: "center" }}><Icon name="leaf" /></div>
             <div className="grow small"><b>{trip.distanceKm} km on electric power</b><div className="muted">About {(trip.distanceKm * 0.14).toFixed(1)} kg CO₂ saved vs. a petrol motorbike</div></div></div>
         </div>

@@ -13,7 +13,9 @@ Open <http://localhost:5173/stage>. The left side is the student phone (Nguyen M
 2412345). The right side is the operator console (Tran Lan · OP-014). Both sides share one
 server, so a change on one side shows on the other within a second.
 
-The **Demo tools** button (bottom right of each side) opens a drawer with:
+The **Demo tools** button (bottom right of each side) opens a drawer. At its top a note says
+the demo is shared (everyone on the URL sees the same data) and holds **Reset demo** (tap it
+twice to confirm). Below that:
 
 - **Clock:** skip ahead (+30 s, +1 min, +5 min, +15 min, +1 h), "Next timer", speed ×1/×10/×60,
   pause, and **Reset demo** (back to Mon 02/11/2026 14:36 and the seed data).
@@ -23,10 +25,15 @@ The **Demo tools** button (bottom right of each side) opens a drawer with:
 - **Hubs:** cut or restore a Hub's data feed (H06 starts cut).
 - **Vehicles and points:** set a battery level, disconnect a vehicle or point, report a
   charging-point fault, plug in a charging session.
-- **Trip:** latch the vehicle into a chosen dock, or "Not engaged".
+- **Trip:** latch the vehicle into a chosen dock, or "Not engaged". The student can also do
+  this from the return screen (step 3.5), so it works without Demo tools.
 - **Transfers:** Departed, Arrived or Breakdown for each redistribution transfer.
 
 Press **Reset demo** before each run.
+
+The Bank and Dock unlock settings apply to everyone on the URL. While either is not at
+Success, both views show an amber "Demo simulator changed" banner with a **Back to normal**
+button. Use it after each failure demo.
 
 ## 1. Student: find and reserve a vehicle (UC-01, UC-02, UC-03) — 2 min
 
@@ -59,11 +66,18 @@ show "Payment Failed" with the hold released (UC-02 E2).
 3. Optional failure: before step 2, set **Dock unlock → Failure**. The app shows E3, an
    incident is opened on the dock, and the reservation moves to another e-bike.
 4. Skip the clock **+15 min**: the fare so far grows.
-5. In Demo tools → **Trip**, choose a vacant dock at any Hub and press **Latch**.
-6. Tap **I've docked it — End Trip**. The fare is charged; the receipt shows the time and
-   distance parts.
-7. Optional: set **Bank → Next: Failed** before step 6. The fare becomes "Unpaid" and the
+5. Tap **End Trip**. The return screen lists the vacant docks of the chosen Hub ("Tap a dock
+   to simulate docking (demo)"). Tapping **I've docked it — End Trip** before docking shows
+   "Not docked yet" (E3): the trip only closes on the dock's latch report.
+6. Tap a vacant dock, e.g. **D-01**. The simulated dock reports the latch, the trip closes and
+   the fare is charged; the receipt shows the time and distance parts.
+7. Optional E3: set **Dock result → Not engaged (E3)** and tap a dock. The app says the latch
+   did not engage and the trip keeps running. Switch back to **Clicks in** and tap a dock.
+8. Optional: set **Bank → Next: Failed** before step 6. The fare becomes "Unpaid" and the
    student is blocked from new reservations until **Pay now** succeeds (UC-08 E2).
+9. Optional UC-12 8c: during the trip tap **The vehicle broke down** and send the report. On
+   the console, open the incident and press **Confirm breakdown during trip**. The phone opens
+   "Trip closed by an operator": the incident ID, the close time and the waived fare.
 
 ## 4. Student: parking, charging and reporting (UC-04, UC-05, UC-06) — 1.5 min
 
@@ -102,4 +116,4 @@ show "Payment Failed" with the hold released (UC-02 E2).
 
 ## Close
 
-Press **Reset demo**. Run `npm test` to show the 63 tests, labelled with their TC IDs, pass.
+Press **Reset demo**. Run `npm test` to show the 71 tests, labelled with their TC IDs, pass.

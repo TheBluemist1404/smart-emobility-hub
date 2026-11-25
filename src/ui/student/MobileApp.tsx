@@ -1,8 +1,9 @@
 // ui.student — MobileApp: the student app shell, navigation between S01-S12 and the pushed
 // notifications (the client half of MobileApp.notify).
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Phone, type Tab } from "../shared/Shells";
 import { DemoTools } from "../demo/DemoTools";
+import { SimWarning } from "../demo/SimWarning";
 import { Icon } from "../shared/Icon";
 import { getSocket, hm, useClock, useLive } from "../shared/live";
 import { S01HubSearch, S02HubDetail } from "./Discover";
@@ -28,7 +29,7 @@ function tabOf(r: Route): Tab {
 
 export function MobileApp() {
   const [route, setRoute] = useState<Route>({ s: "S01" });
-  const { now } = useClock();
+  const { now, state: demo } = useClock();
   const { data: home } = useLive<Home>("/student/home");
   const [toasts, setToasts] = useState<Toast[]>([]);
 
@@ -49,6 +50,14 @@ export function MobileApp() {
   // A started pickup or trip takes the student to the Trip tab.
   const active = home?.pickup ? "pickup" : home?.trip ? "trip" : null;
   useEffect(() => { if (active) setRoute({ s: "S09" }); }, [active]);
+  // A trip that closes while the student looks elsewhere (docked, or closed by an operator
+  // after a breakdown) opens its summary on the Trip tab instead of vanishing.
+  const tripId = home?.trip?.id ?? null;
+  const prevTrip = useRef<string | null>(null);
+  useEffect(() => {
+    if (prevTrip.current && !tripId && home?.lastTrip?.id === prevTrip.current) setRoute({ s: "S09" });
+    prevTrip.current = tripId;
+  }, [tripId, home?.lastTrip?.id]);
 
   const go = (r: Route) => { setRoute(r); document.querySelector(".phone.live .screen")?.scrollTo(0, 0); };
   const onTab = (t: Exclude<Tab, "none">) => go(t === "hubs" ? { s: "S01" } : t === "trip" ? { s: "S09" } : t === "bookings" ? { s: "bookings" } : { s: "report" });
@@ -85,7 +94,7 @@ export function MobileApp() {
   return (
     <>
       <div className="stage-phone">
-        <Phone tab={tabOf(route)} dark={dark} time={hm(now)} onTab={onTab} overlay={overlay}>{body}</Phone>
+        <Phone tab={tabOf(route)} dark={dark} time={hm(now)} onTab={onTab} overlay={overlay}><SimWarning state={demo} compact />{body}</Phone>
       </div>
       <DemoTools side="student" />
     </>

@@ -8,7 +8,7 @@ Pushed to GitHub. A new session only needs this file, the README and the docs be
 ```powershell
 npm install
 npm run dev     # one port, 5173: /stage, /student, /operator (?tools=0 hides Demo tools)
-npm test        # 63 Vitest tests, named by TC ID (CORE-nn for platform tests)
+npm test        # 71 Vitest tests, named by TC ID (CORE-nn platform, DEMO-nn demo tools)
 npm run typecheck
 ```
 
@@ -148,3 +148,40 @@ Student app:
 - The `__ov()` check reports the stage's left column as clipping; that is the scaled phone
   iframe, not a bug.
 
+
+## Public-URL fixes (2026-11-25)
+
+A tester on the Render URL could not finish a rental. The backend worked; the UI did not.
+
+### Found and fixed
+
+- **Return was a dead end without Demo tools.** S10 listed the vacant docks as plain tags, and
+  "I've docked it — End Trip" only works after something latches the vehicle, which only the
+  Demo tools drawer could do. Now each vacant dock is a button ("Tap a dock to simulate
+  docking (demo)") that posts `/api/demo/latch`; the trip still closes on the dock's latch
+  report through `RentalController` (UC-08 step 5). A "Dock result: Clicks in / Not engaged (E3)"
+  switch shows E3. Works on `/student?tools=0` and inside `/stage`.
+- **The demo latch accepted any dock.** `/api/demo/latch` now goes through
+  `src/api/demoActions.ts#demoLatch`, which refuses an unknown or non-vacant dock and a vehicle
+  with no open trip (409/404 with a message).
+- **Shared simulators broke other visitors silently.** The bank and unlock modes are global.
+  Both views now show a "Demo simulator changed" banner whenever the bank mode or next-mode,
+  or the unlock mode or next-mode, is not Success (`src/ui/shared/simStatus.ts`,
+  `src/ui/demo/SimWarning.tsx`), with **Back to normal** (`POST /api/demo/normal`).
+  The drawer opens with a "Shared demo" note and a prominent **Reset demo**.
+  Reset uses two taps instead of `confirm()`.
+- **A trip closed by an operator vanished.** After UC-12 8c (e.g. TR-0943 closed by INC-0194
+  with the fare waived) the Trip tab fell back to the scan screen once 30 demo-minutes had
+  passed since the report time, and the student stayed on whatever tab they were on. Now the
+  phone jumps to the Trip tab when the open trip closes, and an operator-closed trip shows
+  "Trip closed by an operator" (incident ID, close time, fare 0 VND Waived, "you don't need to
+  return it") until the student taps Done (`src/ui/student/tripSummary.ts`).
+- **An old receipt hid the scan screen.** With a new confirmed reservation, "I'm at the Hub —
+  scan to pick up" opened the previous trip's receipt (still inside its 30 min). A waiting
+  pickup now wins over a paid receipt; an Unpaid fare still wins over everything.
+- **The "Trip tab opens S10 return" state leaked to the next trip.** `returning` is now keyed to
+  the trip ID.
+- Smaller: the reservation-payment screen said "No fee was charged" next to "Your bank
+  confirmed late"; the waived receipt showed "H01 → null".
+
+Tests: `tests/demo.test.ts` (DEMO-01 to DEMO-03, 8 tests). Total 71.

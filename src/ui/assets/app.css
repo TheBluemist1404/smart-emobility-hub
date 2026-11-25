@@ -147,3 +147,18 @@ button[disabled] { opacity: .45; cursor: not-allowed; }
 
 /* The phone sits in the middle of a tall window (and of the stage column), so its shadow is never cut off. */
 @media (min-width: 421px) { .student-page { min-height: 100vh; display: flex; flex-direction: column; justify-content: center; } }
+
+/* Shared-simulator warning (bank / dock unlock not at Success) and the Demo tools note. */
+.sim-warning > .btn { grid-column: 2; justify-self: start; margin-top: 6px; }
+.sim-warning.on-phone { margin: 6px 10px 0; position: sticky; top: 0; z-index: 4; box-shadow: 0 6px 16px rgba(10,20,40,.12); }
+.sim-warning.in-console { margin: 14px 24px 0; }
+.demo-drawer .shared-note { margin: 12px 14px 0; padding: 9px 11px; border-radius: 10px; background: #2A2410; border: 1px solid #6B5A1A; color: #FFE7A3; font-size: 12px; line-height: 1.45; }
+.demo-drawer .shared-note .btns { margin-top: 8px; }
+.demo-drawer button.d.reset { background: #D2FF3D; color: #0B1324; border-color: #D2FF3D; font-weight: 700; }
+.demo-drawer button.d.reset.armed { background: #FF8A8A; border-color: #FF8A8A; }
+/* S10 return: vacant docks the student can tap to simulate docking. */
+.dock-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.dock-grid button { height: 40px; border-radius: 10px; border: 1px solid var(--ok-line); background: var(--ok-bg); color: var(--ok); font: inherit; font-family: var(--mono, monospace); font-weight: 700; font-size: 13px; cursor: pointer; }
+.dock-grid button:hover:not(:disabled) { border-color: var(--ok); }
+.dock-grid button:disabled { opacity: .5; cursor: default; }
+.dock-grid.not-engaged button { border-color: var(--warn-line); background: var(--warn-bg); color: var(--warn); }

@@ -156,8 +156,8 @@ export function PaymentFailed({ a, title, what, onRetry, onBack }: { a: Allocati
         {timedOut
           ? <div className="result"><div className="badge warn"><Icon name="clock-alert" /></div><div className="h2">No response from your bank</div><p className="small muted" style={{ maxWidth: 290 }}>We waited and did not receive a result in time.</p></div>
           : <div className="result"><div className="badge danger"><Icon name="circle-x" /></div><div className="h2">Payment failed</div><p className="small muted" style={{ maxWidth: 290 }}>Declined by the Bank System{p?.failureCode ? `: ${p.failureCode}` : ""}.</p></div>}
-        <div className="banner ok compact"><span className="ic"><Icon name="shield-check" /></span><b>No fee was charged.</b>
-          <p>{timedOut ? "If the bank later confirms a charge, it is refunded automatically (BR-PAY-03)." : `The hold on your ${what} has been released.`}</p></div>
+        {!late && <div className="banner ok compact"><span className="ic"><Icon name="shield-check" /></span><b>No fee was charged.</b>
+          <p>{timedOut ? "If the bank later confirms a charge, it is refunded automatically (BR-PAY-03)." : `The hold on your ${what} has been released.`}</p></div>}
         {late && <div className="banner info compact"><span className="ic"><Icon name="rotate-ccw" /></span><b>Your bank confirmed late.</b><p>{p?.refund?.result === "Success" ? `Refunded · ${p.refund.transactionRef}` : "The refund is on its way."}</p></div>}
         <div className="card pad-lg"><dl className="kv"><dt>Amount</dt><dd className="num">{vnd(a.fee)}</dd><dt>Reservation</dt><dd><span className="chip danger">Payment Failed</span></dd>
           <dt>{what === "vehicle" ? "Vehicle" : what === "space" ? "Space" : "Slot"}</dt><dd>Released</dd>{p?.requestedAt ? <><dt>Requested</dt><dd className="mono">{hms(p.requestedAt)}</dd></> : null}</dl></div>

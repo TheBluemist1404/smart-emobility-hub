@@ -130,11 +130,17 @@ student's location, Hub and resource data feeds (disconnect / reconnect), batter
 charging-point faults, plug-in, the dock latch at return, and redistribution transfers
 (Departed, Arrived, Breakdown).
 
+The demo state is shared: everyone on the same URL sees the same data and the same simulator
+settings. The drawer says so at the top, next to **Reset demo**. While the bank or dock unlock
+is not at Success, both views show a warning banner with **Back to normal**. On the student's
+return screen each vacant dock can be tapped to simulate docking (or "Not engaged"), so a
+rental can be finished without the drawer.
+
 ## Tests
 
-`npm test` runs 63 Vitest tests. Each test name starts with its TC ID from
+`npm test` runs 71 Vitest tests. Each test name starts with its TC ID from
 `sub3-design/descriptions/test-cases.md` (for example `TC-UC02-08`). Tests of the platform
-parts that have no TC ID are labelled `CORE-nn`.
+parts that have no TC ID are labelled `CORE-nn`; the demo-tool tests are labelled `DEMO-nn`.
 
 ## Where the code differs from the design
 

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Console, type Nav } from "../shared/Shells";
 import { DemoTools } from "../demo/DemoTools";
+import { SimWarning } from "../demo/SimWarning";
 import { Icon } from "../shared/Icon";
 import { getSocket, hms, useClock, useLive } from "../shared/live";
 import { O01Monitor } from "./Monitor";
@@ -19,7 +20,7 @@ interface Toast { id: number; message: string }
 const CRUMB: Record<Nav, string> = { monitor: "Network monitor", orders: "Redistribution orders", charging: "Smart charging", incidents: "Incidents", sim: "What-if simulation" };
 
 export function OperatorConsole() {
-  const { now } = useClock();
+  const { now, state: demo } = useClock();
   const [route, setRoute] = useState<OpRoute>({ nav: "monitor" });
   const [toasts, setToasts] = useState<Toast[]>([]);
   const { data: inc } = useLive<{ counts: { open: number; inProgress: number } }>("/operator/incidents");
@@ -56,6 +57,7 @@ export function OperatorConsole() {
   return (
     <>
       <Console nav={route.nav} crumb={["Operations", CRUMB[route.nav]]} time={hms(now)} counts={counts} alerts={unacked} onNav={(n) => go({ nav: n })}>
+        <SimWarning state={demo} console />
         {body}
       </Console>
       {toasts.length > 0 && (

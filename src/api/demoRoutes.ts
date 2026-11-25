@@ -9,6 +9,7 @@ import { db } from "../domain/store";
 import { Trip } from "../domain/allocation/Trip";
 import { ChargingSession } from "../domain/allocation/ChargingSession";
 import { boot } from "./boot";
+import { backToNormal, demoLatch } from "./demoActions";
 import { bus } from "../platform/events/bus";
 
 export function demoRoutes(): Router {
@@ -43,6 +44,8 @@ export function demoRoutes(): Router {
     done(res, "bank");
   });
 
+  r.post("/normal", (_req, res) => { backToNormal(); done(res, "normal"); });
+
   r.post("/unlock", (req, res) => {
     const { mode, once } = req.body as { mode: UnlockMode; once?: boolean };
     if (once) dataSource().nextUnlockMode = mode; else { dataSource().unlockMode = mode; dataSource().nextUnlockMode = null; }
@@ -71,9 +74,9 @@ export function demoRoutes(): Router {
     done(res, "battery");
   });
   r.post("/point-fault", (req, res) => { dataSource().pointFault(String(req.body.pointId)); done(res, "pointFault"); });
-  r.post("/latch", (req, res) => {
+  r.post("/latch", (req, res, next) => {
     const { dockId, vehicleId, engaged } = req.body as { dockId: string; vehicleId: string; engaged: boolean };
-    if (engaged) dataSource().latch(dockId, vehicleId); else dataSource().latchNotEngaged(dockId, vehicleId);
+    try { demoLatch(String(dockId), String(vehicleId), engaged !== false); } catch (e) { return next(e); }
     done(res, "latch");
   });
   r.post("/transfer", (req, res) => {

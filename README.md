@@ -138,7 +138,7 @@ rental can be finished without the drawer.
 
 ## Tests
 
-`npm test` runs 71 Vitest tests. Each test name starts with its TC ID from
+`npm test` runs 82 Vitest tests. Each test name starts with its TC ID from
 `sub3-design/descriptions/test-cases.md` (for example `TC-UC02-08`). Tests of the platform
 parts that have no TC ID are labelled `CORE-nn`; the demo-tool tests are labelled `DEMO-nn`.
 

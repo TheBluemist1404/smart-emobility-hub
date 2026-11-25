@@ -325,7 +325,12 @@ export class ChargingController implements StatusListener {
 
   /** - validatePolicy(policy : Policy) : Violation — each value in range, and the weights sum to 1. */
   private validatePolicy(values: Record<string, number>): { parameter: string; message: string } | null {
-    for (const [k, val] of Object.entries(values)) if (!config().validateRange(k, val)) { const p = config().get(k); return { parameter: k, message: `${k} must be between ${p.min} and ${p.max}.` }; }
+    for (const [k, val] of Object.entries(values)) {
+      const p = config().get(k);
+      const unit = (n: number) => (p.unit === "ms" ? `${n / MINUTE} min` : `${n}${p.unit === "%" ? " %" : ""}`);
+      if (typeof val !== "number" || !Number.isFinite(val)) return { parameter: k, message: `Enter a number for ${k}.` };
+      if (!config().validateRange(k, val)) return { parameter: k, message: `${k} must be between ${unit(p.min)} and ${unit(p.max)}.` };
+    }
     const w = (n: string) => values[n] ?? config().value(n);
     const sum = w("W_SOC") + w("W_DEMAND") + w("W_WAIT");
     if (Math.abs(sum - 1) > 0.001) return { parameter: "W_SOC", message: `W_SOC + W_DEMAND + W_WAIT must total 1.0 (now ${sum.toFixed(2)}).` };
@@ -518,7 +523,7 @@ export class ChargingController implements StatusListener {
       throw new UserError("Someone changed this Hub's schedule after the proposal was generated (E4). Generate it again.", 409, "E4");
     }
     const pts = this.hubPoints(p.hubId);
-    const shifted: ChargingSession[] = [], cancelled: string[] = [];
+    const shifted: Array<{ s: ChargingSession; prev: Slot | null }> = [], cancelled: string[] = [];
     const live = p.blocks.filter((b) => !b.locked);
     for (const b of live) {
       const s = db.allocations.get(b.sessionId) as ChargingSession;
@@ -526,7 +531,7 @@ export class ChargingController implements StatusListener {
       for (const pt of pts) pt.bookings = pt.bookings.filter((x) => x.ref !== s.id);
       if (s.isCommittedReservation()) {
         s.slot = { pointId: b.pointId, start: b.start, end: b.end };
-        if (prev && (prev.start !== b.start || prev.pointId !== b.pointId)) { shifted.push(s); this.armGrace(s); }
+        if (prev && (prev.start !== b.start || prev.pointId !== b.pointId)) { shifted.push({ s, prev }); this.armGrace(s); }
       } else s.schedule({ pointId: b.pointId, start: b.start, end: b.end });
     }
     for (const pt of pts) pt.commit(live.map((b) => ({ sessionId: b.sessionId, pointId: b.pointId, start: b.start, end: b.end })));
@@ -540,7 +545,7 @@ export class ChargingController implements StatusListener {
     const version = ChargingPoint.getActiveSchedule(p.hubId).version;
     this.writeAuditLog(operatorId, p.hubId, version);
     bus.changed("schedule");
-    return { applied: live.length, shifted: shifted.map((s) => s.id), cancelled, version };
+    return { applied: live.length, shifted: shifted.map((x) => x.s.id), cancelled, version };
   }
 
   private cancelCommitted(s: ChargingSession, why: string): void {
@@ -551,11 +556,16 @@ export class ChargingController implements StatusListener {
   }
 
   /** - notifyShifted(students) : void — a shift is never silent (BR-CHG-02). */
-  private notifyShifted(sessions: ChargingSession[]): void {
-    for (const s of sessions) {
-      const orig = s.originalStart ?? s.slot!.start;
-      MobileApp.notify(s.studentId, "Charging session moved", `Your charging session ${s.id} moved from ${fmtHM(orig)} to ${fmtHM(s.slot!.start)} at ${s.slot!.pointId} (within ${config().value("CHARGING_SHIFT_TOLERANCE") / MINUTE} min${s.neededBy ? `, before your needed-by ${fmtHM(s.neededBy)}` : ""}).`, "info", s.id);
-    }
+  private notifyShifted(moves: Array<{ s: ChargingSession; prev: Slot | null }>): void {
+    for (const { s, prev } of moves) MobileApp.notify(s.studentId, "Charging session moved", ChargingController.shiftMessage(s, prev), "info", s.id);
+  }
+
+  /** The student's notice for a moved session: where it was, where it is now, and the BR-CHG-02 bound. */
+  static shiftMessage(s: ChargingSession, prev: Slot | null): string {
+    const now = s.slot!;
+    const from = prev ? `${fmtHM(prev.start)} at ${prev.pointId}` : fmtHM(s.originalStart ?? now.start);
+    const booked = s.originalStart ?? prev?.start ?? now.start;
+    return `Your charging session ${s.id} moved from ${from} to ${fmtHM(now.start)} at ${now.pointId} (no later than ${config().value("CHARGING_SHIFT_TOLERANCE") / MINUTE} min after your booked ${fmtHM(booked)}${s.neededBy ? `, before your needed-by ${fmtHM(s.neededBy)}` : ""}).`;
   }
 
   /** - writeAuditLog() : void — who committed which schedule version and when. */
@@ -592,7 +602,7 @@ export class ChargingController implements StatusListener {
         spot = other.findFreeSlot({ from: start, to: start + tol + dur, durationMs: dur });
         if (spot) { other.book(spot, s.id); other.scheduleVersion++; break; }
       }
-      if (spot) { s.slot = spot; s.setStatus("Scheduled", `moved off ${pt.id}`); this.armGrace(s); this.notifyShifted([s]); moved.push(s.id); }
+      if (spot) { s.slot = spot; s.setStatus("Scheduled", `moved off ${pt.id}`); this.armGrace(s); this.notifyShifted([{ s, prev: was ?? null }]); moved.push(s.id); }
       else { this.cancelCommitted(s, `${pt.id} ${why} and no point is free within ${tol / MINUTE} min`); cancelled.push(s.id); }
     }
     pt.scheduleVersion++;

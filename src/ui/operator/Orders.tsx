@@ -14,11 +14,12 @@ const HUBS = ["H01", "H02", "H03", "H04", "H05", "H06", "H07"];
 const tone = (s: string) => ({ Draft: "neutral", Assigned: "info", "In Transit": "info", Completed: "ok", "Partially Completed": "warn", Cancelled: "neutral", Arrived: "ok", Removed: "danger", Released: "neutral" } as Record<string, string>)[s] ?? "neutral";
 const TABS: Array<[string, string, (o: Order) => boolean]> = [["all", "All", () => true], ["active", "Active", (o) => ["Assigned", "In Transit"].includes(o.status)], ["draft", "Draft", (o) => o.status === "Draft"], ["done", "Done", (o) => ["Completed", "Partially Completed", "Cancelled"].includes(o.status)]];
 
-export function O02Orders({ go, now, seed }: { go: OpGo; now: number; seed?: OrderSeed }) {
+export function O02Orders({ go, now, seed, orderId }: { go: OpGo; now: number; seed?: OrderSeed; orderId?: string }) {
   const { data } = useLive<{ orders: Order[]; suggestions: Suggestion[]; refreshedAt: number }>("/operator/orders");
   const [tab, setTab] = useState("all");
   const [q, setQ] = useState("");
-  const [sel, setSel] = useState<string | null>(null);
+  const [sel, setSel] = useState<string | null>(orderId ?? null);
+  useEffect(() => { if (orderId) { setSel(orderId); setTab("all"); setQ(""); } }, [orderId]);
   const [draft, setDraft] = useState<OrderSeed | null>(seed ?? null);
   useEffect(() => { if (seed) setDraft(seed); }, [seed]);
   const orders = (data?.orders ?? []).filter(TABS.find((t) => t[0] === tab)![2]).filter((o) => !q || `${o.id} ${o.fromHub} ${o.toHub} ${o.transfers.map((t) => t.vehicleId).join(" ")}`.toLowerCase().includes(q.toLowerCase()));
@@ -102,6 +103,7 @@ function Transfers({ o, now }: { o: Order; now: number }) {
           <button className="btn ghost sm" onClick={() => setAskCancel(true)}><Icon name="ban" />Cancel order…</button></div>}
         {askCancel && <div className="row" style={{ gap: 8 }}><input className="input sm grow" placeholder="Reason for cancelling" value={reason} onChange={(e) => setReason(e.target.value)} />
           <button className="btn danger sm" onClick={() => run(`/operator/orders/${o.id}/cancel`, { reason })}>Cancel order (2c)</button><button className="btn ghost sm" onClick={() => setAskCancel(false)}>Back</button></div>}
+        {open && !o.overdue && <span className="small row" style={{ gap: 6 }}><Icon name="alarm-clock" className="ic-sm" />Deadline <b className="mono">{hm(o.deadline)}</b> · <span className="mono">{Math.max(0, Math.ceil((o.deadline - now) / 60_000))} min</span> left</span>}
         <span className="xs subtle">Created {hms(o.createdAt)} · {o.source}{now > o.deadline && open ? " · overdue" : ""}</span>
       </div>
     </section>
@@ -119,7 +121,7 @@ function NewOrder({ seed, now, go, onClose, onDone }: { seed: OrderSeed; now: nu
   const key = JSON.stringify({ ...body, deadline: 0 });
   useEffect(() => {
     if (!d.fromHub || !d.toHub) { setV(null); return; }
-    api<Shortfall>("/operator/orders/validate", body).then((r) => { setV(r); if (!picked) setPicked(null); }).catch((e: Error) => setErr(e.message));
+    api<Shortfall>("/operator/orders/validate", body).then((r) => { setV(r); setErr(null); }).catch((e: Error) => setErr(e.message));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
   const chosen = picked ?? (v?.candidates.filter((c) => c.eligible).slice(0, d.quantity).map((c) => c.id) ?? []);

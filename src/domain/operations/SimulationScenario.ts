@@ -48,7 +48,7 @@ export class SimulationScenario {
       let extraSupply = 0, extraDocks = 0, extraPoints = 0;
       for (const r of recs) {
         if (r.kind === "transfer" && r.params.toHub === id) { extraSupply += r.params.quantity ?? 0; extraDocks -= r.params.quantity ?? 0; }
-        if (r.kind === "transfer" && r.params.fromHub === id) { extraDocks += r.params.quantity ?? 0; }
+        if (r.kind === "transfer" && r.params.fromHub === id) { extraSupply -= r.params.quantity ?? 0; extraDocks += r.params.quantity ?? 0; }
         if (r.kind === "charging plan" && r.params.hubId === id) {
           extraPoints += r.params.points?.length ?? 0;
           // A charging plan before the period turns low-battery vehicles into supply (scenarios A and B).
@@ -68,11 +68,13 @@ export class SimulationScenario {
     const extra = this.type === "A demand surge"
       ? (this.input<number>("extraDemand") ?? 0) + Math.round(baseDemand * ((this.input<number>("extraDemandPct") ?? 0) / 100)) : 0;
     const demand = baseDemand + extra;
-    const supply = h.available + adj.extraSupply;
-    const shortage = Math.max(0, demand - supply);
+    // Scenario B: the returned vehicles can be picked up again, and each pickup frees a dock, so
+    // overflow = returns − (free docks + pickups) (TC-UC13-02).
     const returns = this.type === "B return wave" ? (this.input<number>("extraReturns") ?? 0) : 0;
+    const supply = h.available + adj.extraSupply + returns;
+    const shortage = Math.max(0, demand - supply);
     const freeDocks = h.vacantDocks + adj.extraDocks;
-    const overflow = Math.max(0, returns - freeDocks);
+    const overflow = Math.max(0, returns - (freeDocks + demand));
     const failed = this.type === "C charging-point failure" ? (this.input<string[]>("failedPoints") ?? []).filter((p) => this.baseline.points.some((x) => x.id === p && x.hubId === hubId)).length : 0;
     const workingPoints = Math.max(0, h.chargers - h.pointsOutOfService - failed + adj.extraPoints);
     const waitingLow = h.lowBattery;

@@ -8,6 +8,7 @@ import { Hub, type NetworkSnapshot } from "../../domain/network/Hub";
 import { SimulationScenario, type Measure, type ScenarioInput } from "../../domain/operations/SimulationScenario";
 import { Recommendation } from "../../domain/operations/Recommendation";
 import { UserError } from "../../api/errors";
+import { config } from "../../platform/config/ConfigurationRegistry";
 import { bus } from "../../platform/events/bus";
 import type { ScenarioType, TimeWindow } from "../../domain/types";
 import type { RedistributionController } from "./RedistributionController";
@@ -69,11 +70,13 @@ export class SimulationController {
     if (period.start < this.baseline!.takenAt - 15 * MINUTE || period.start > this.baseline!.takenAt + 24 * HOUR) return { field: "period", message: "The period must start within the next 24 h." };
     const val = (n: ScenarioInput["name"]) => inputs.find((i) => i.name === n)?.value;
     if (type === "A demand surge") {
-      const pct = Number(val("extraDemandPct") ?? 0);
+      const raw: unknown = val("extraDemandPct");
+      const pct = typeof raw === "number" ? raw : typeof raw === "string" && raw.trim() !== "" ? Number(raw) : NaN;
       if (!Number.isFinite(pct) || pct < -90 || pct > 300) return { field: "extraDemandPct", message: "Pickup demand must be between −90% and +300%." };
     }
     if (type === "B return wave") {
-      const n = Number(val("extraReturns") ?? 0);
+      const raw: unknown = val("extraReturns");
+      const n = typeof raw === "number" ? raw : typeof raw === "string" && raw.trim() !== "" ? Number(raw) : NaN;
       if (!Number.isInteger(n) || n < 1 || n > 300) return { field: "extraReturns", message: "Extra returns must be a whole number from 1 to 300." };
     }
     if (type === "C charging-point failure") {
@@ -138,7 +141,7 @@ export class SimulationController {
     const eligibleAt = (h: string) => b.vehicles.filter((v) => v.hubId === h && v.eligible && v.model === "e-bike").length;
     const donors = () => b.hubs.filter((h) => !h.stale).map((h) => ({ h, spare: Math.min(surplus(h.hubId), eligibleAt(h.hubId)) })).filter((x) => x.spare > 0).sort((x, y) => y.spare - x.spare);
     // Scenario C is about charging capacity: its recommendations are charging plans only.
-    const short = s.type === "C charging-point failure" ? [] : s.measures.filter((m) => m.shortage > 0).sort((x, y) => y.shortage - x.shortage);
+    const short = s.type === "C charging-point failure" ? [] : s.measures.filter((m) => m.shortage > 0 && m.overflow === 0).sort((x, y) => y.shortage - x.shortage);
     const by = fmtHM(s.period.start);
     for (const m of short) {
       let need = m.shortage;
@@ -154,10 +157,21 @@ export class SimulationController {
       const alt = b.hubs.filter((h) => !h.stale && h.hubId !== m.hubId && surplus(h.hubId) > 0).map((h) => ({ h, km: Math.round(Math.hypot(h.x - b.hubs.find((x) => x.hubId === m.hubId)!.x, h.y - b.hubs.find((x) => x.hubId === m.hubId)!.y) * 0.04 * 10) / 10 })).sort((x, y) => x.km - y.km)[0];
       if (alt) recs.push(new Recommendation(id(), "alternative Hub", `Point students at ${m.hubId} to ${alt.h.hubId} (${alt.km} km) when ${m.hubId} is short`, "Alternative-Hub advice · information only, never applied as a live change", { hubs: [m.hubId, alt.h.hubId] }));
     }
+    // Overflow (scenario B): move vehicles out before T to Hubs outside the wave, but leave the Hub
+    // at least HUB_SHORTAGE_RATIO of its docks in vehicles (TC-UC13-02).
     for (const m of s.measures.filter((x) => x.overflow > 0)) {
-      const dest = b.hubs.filter((h) => !h.stale && h.hubId !== m.hubId && !s.hubs.includes(h.hubId)).sort((x, y) => (docks.get(y.hubId) ?? 0) - (docks.get(x.hubId) ?? 0))[0];
-      const q = Math.min(m.overflow, eligibleAt(m.hubId), docks.get(dest?.hubId ?? "") ?? 0);
-      if (dest && q > 0) recs.push(new Recommendation(id(), "transfer", `Transfer ${q} e-bike${q > 1 ? "s" : ""} ${m.hubId} → ${dest.hubId} before ${by} to free docks`, `Redistribution order (UC-10) · frees ${q} docks for the return wave`, { fromHub: m.hubId, toHub: dest.hubId, quantity: q, model: "e-bike" }));
+      const hs = b.hubs.find((x) => x.hubId === m.hubId)!;
+      const keep = Math.ceil((config().value("HUB_SHORTAGE_RATIO") / 100) * hs.docksInService);
+      let left = Math.min(m.overflow, eligibleAt(m.hubId), Math.max(0, (avail.get(m.hubId) ?? 0) - keep));
+      const dests = b.hubs.filter((h) => !h.stale && h.hubId !== m.hubId && !s.hubs.includes(h.hubId)).sort((x, y) => (docks.get(y.hubId) ?? 0) - (docks.get(x.hubId) ?? 0));
+      for (const dest of dests) {
+        const q = Math.min(left, docks.get(dest.hubId) ?? 0);
+        if (q <= 0) continue;
+        recs.push(new Recommendation(id(), "transfer", `Transfer ${q} e-bike${q > 1 ? "s" : ""} ${m.hubId} → ${dest.hubId} before ${by} to free docks`, `Redistribution order (UC-10) · frees ${q} of the ${m.overflow} docks ${m.hubId} is short in the return wave`, { fromHub: m.hubId, toHub: dest.hubId, quantity: q, model: "e-bike" }));
+        docks.set(dest.hubId, (docks.get(dest.hubId) ?? 0) - q); avail.set(m.hubId, (avail.get(m.hubId) ?? 0) - q);
+        left -= q;
+        if (left <= 0) break;
+      }
     }
     if (s.type === "C charging-point failure") {
       const failed = s.input<string[]>("failedPoints") ?? [];
@@ -244,7 +258,10 @@ export class SimulationController {
         if (r.kind === "transfer") {
           const oid = redistribution.createAssignedOrder(r.params.fromHub!, r.params.toHub!, [], OPERATOR, r.params.model ?? "e-bike", now.quantity ?? r.params.quantity, Math.max(s.period.start, clock().now() + 15 * MINUTE));
           r.recordOutcome("Applied", oid);
-          out.push({ id: r.id, title: r.title, outcome: "Applied", reference: oid, note: `${plural(now.quantity ?? 0, "vehicle")} · Assigned · due ${fmtHM(db.orders.get(oid)!.deadline)}` });
+          // 6a: the live state may hold fewer vehicles than simulated; say so instead of a silent cut.
+          const asked = r.params.quantity ?? 0, got = now.quantity ?? asked;
+          const size = got < asked ? `Adjusted to ${got} of ${asked} vehicles (live state changed)` : plural(got, "vehicle");
+          out.push({ id: r.id, title: r.title, outcome: "Applied", reference: oid, note: `${size} · Assigned · due ${fmtHM(db.orders.get(oid)!.deadline)}` });
         } else {
           const hubId = r.params.hubId!;
           const p = charging.generateSchedule(hubId);

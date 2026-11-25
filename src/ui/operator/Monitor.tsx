@@ -8,12 +8,13 @@ import type { OpGo } from "./OperatorConsole";
 export interface HubSnap {
   hubId: string; name: string; category: string; status: string; flags: string[]; occupancy: number | null; occupiedDocks: number; docksInService: number;
   vacantDocks: number; allocatedDocks: number; available: number; vehicles: number; lowBattery: number; freeChargers: number; chargers: number; pointsOutOfService: number;
-  updatedAt: number; stale: boolean; x: number; y: number;
+  updatedAt: number; stale: boolean; x: number; y: number; readyOfType?: number;
 }
 interface Overview { updatedAt: number; hubs: HubSnap[]; reporting: number; kpis: Record<string, number> }
 interface HubDetail extends Omit<HubSnap, "vehicles"> {
   docks: Array<{ id: string; label: string; status: string }>; vehicles: Array<{ id: string; status: string; soc: number }>; points: Array<{ id: string; status: string }>;
   nearby: Array<{ hubId: string; name: string; netFreeDocks: number; status: string; km: number }>; acknowledged: string | null; history: number[];
+  orderSeed: { fromHub: string; toHub: string; quantity: number; model: string } | null;
 }
 interface Alert { id: string; time: number; hubId?: string; kind: string; message: string; acknowledgedBy?: string }
 
@@ -90,18 +91,19 @@ export function O01Monitor({ go, now, hubId }: { go: OpGo; now: number; hubId?: 
         <section className="card span-8 r-stack" style={{ overflow: "hidden" }}>
           <div className="card-head"><span className="h4"><Icon name="table-2" />Hubs</span><span className="tag"><Icon name="arrow-down-wide-narrow" className="ic-sm" />{f.sort === "usage" ? "Usage, high first" : "Hub code"}</span></div>
           <table className="table">
-            <thead><tr><th>Hub</th><th>Dock occupancy (R)</th><th>Status · flags</th><th className="r">Last update</th></tr></thead>
+            <thead><tr><th>Hub</th><th>Dock occupancy (R)</th><th className="r" title="Vehicles with status Available">Ready{f.vehicleType !== "all" ? ` · ${f.vehicleType}` : ""}</th><th>Status · flags</th><th className="r">Last update</th></tr></thead>
             <tbody>
               {hubs.map((h) => (
                 <tr key={h.hubId} className={`clickable${h.hubId === pick ? " sel" : ""}${h.stale ? " dim" : ""}`} onClick={() => setSel(h.hubId)}>
                   <td><div className="hubcell"><span className="hub-code" style={h.stale ? { background: "var(--ink-500)", color: "#fff" } : undefined}>{h.hubId}</span><div><b>{h.name}</b><span>{h.category}</span></div></div></td>
                   {h.stale ? <td className="subtle">—</td> : <td style={{ width: 150 }}><div className="row"><div className={`meter ${statusTone(h.status) === "ok" ? "" : statusTone(h.status)} grow`} style={{ ["--v" as string]: `${h.occupancy}%` }}><i /></div><b className="num">{h.occupancy}%</b></div><span className="xs subtle num">{h.occupiedDocks} / {h.docksInService}</span></td>}
+                  <td className="r num">{h.stale ? <span className="subtle">—</span> : <b>{h.readyOfType ?? h.available}</b>}</td>
                   <td><div className="flags"><span className={`chip ${statusTone(h.status)}`}>{h.status}</span>
                     {h.stale ? <span className="subtle xs">Flags not evaluated</span> : h.flags.map((x) => <span key={x} className="chip warn nodot flag">{x}</span>)}</div></td>
                   <td className="r">{h.stale ? <span className="chip stale nodot mono">{hms(h.updatedAt)}</span> : <span className="mono small">{hms(h.updatedAt)}</span>}</td>
                 </tr>
               ))}
-              {hubs.length === 0 && <tr><td colSpan={4} className="subtle">No Hub matches the filters.</td></tr>}
+              {hubs.length === 0 && <tr><td colSpan={5} className="subtle">No Hub matches the filters.</td></tr>}
             </tbody>
           </table>
         </section>
@@ -127,7 +129,7 @@ function HubPanel({ d, now, go, alert }: { d: HubDetail; now: number; go: OpGo; 
   const vstat = ["Available", "Reserved", "Waiting for Charge", "Charging", "In Redistribution", "Under Maintenance", "Disconnected"];
   const hot = d.status === "Overloaded" || d.status === "Risk of Overload" || d.flags.length > 0;
   const tone = statusTone(d.status);
-  const seed = d.status === "Overloaded" || d.status === "Risk of Overload"
+  const seed = d.orderSeed ? { fromHub: d.orderSeed.fromHub, toHub: d.orderSeed.toHub, quantity: d.orderSeed.quantity } : d.status === "Overloaded" || d.status === "Risk of Overload"
     ? { fromHub: d.hubId, toHub: d.nearby[0]?.hubId ?? "", quantity: Math.max(1, Math.min(d.nearby[0]?.netFreeDocks ?? 1, Math.ceil(d.occupiedDocks - 0.8 * d.docksInService))) }
     : { fromHub: d.nearby.find((n) => n.hubId !== d.hubId)?.hubId ?? "", toHub: d.hubId, quantity: Math.max(1, Math.ceil(d.docksInService * 0.1) - d.available + 1) };
   return (
@@ -155,7 +157,7 @@ function HubPanel({ d, now, go, alert }: { d: HubDetail; now: number; go: OpGo; 
             <div className="card" style={{ boxShadow: "none", overflow: "hidden" }}><div className="list">
               {d.nearby.map((n) => <div key={n.hubId} className="li"><span className="hub-code">{n.hubId}</span><div className="grow"><div className="t">{n.name}</div><div className="s">{n.km} km · {n.netFreeDocks} net free docks</div></div><span className={`chip ${statusTone(n.status)}`}>{n.status}</span></div>)}
             </div></div>
-            <button className="btn primary block" onClick={() => go({ nav: "orders", order: { ...seed, model: "e-bike", from: "O01" } })}><Icon name="truck" />Create Redistribution Order</button>
+            <button className="btn primary block" onClick={() => go({ nav: "orders", order: { ...seed, model: d.orderSeed?.model ?? "e-bike", from: "O01" } })}><Icon name="truck" />Create Redistribution Order</button>
             <button className="btn secondary block" onClick={() => go({ nav: "sim", hubId: d.hubId })}><Icon name="flask-conical" />Run What-if Simulation</button>
             {d.acknowledged ? <span className="hint"><Icon name="check" />Acknowledged; you will be warned again only if the severity changes.</span>
               : <button className="btn ghost block" onClick={() => api("/operator/alerts/ack", { id: alert?.id ?? d.hubId })}><Icon name="check" />Acknowledge</button>}

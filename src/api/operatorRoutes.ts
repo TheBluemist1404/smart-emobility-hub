@@ -3,6 +3,7 @@ import { Router, type Request } from "express";
 import { db } from "../domain/store";
 import { bus } from "../platform/events/bus";
 import { ctl } from "./controllers";
+import { searchOperator } from "./operatorSearch";
 
 export const OPERATOR = "OP-014";
 
@@ -20,7 +21,8 @@ export function operatorRoutes(): Router {
     const q = req.query as Record<string, string>;
     res.json({ ...o, hubs: ctl.monitoring.filter({ category: q.category as never, status: q.status as never, vehicleType: q.vehicleType, sort: q.sort as never }) });
   });
-  r.get("/hub/:id", (req, res) => res.json(ctl.monitoring.getHubDetails(req.params.id)));
+  r.get("/hub/:id", (req, res, next) => { try { res.json({ ...ctl.monitoring.getHubDetails(req.params.id), orderSeed: ctl.redistribution.orderSeedFor(req.params.id) }); } catch (e) { next(e); } });
+  r.get("/search", (req, res) => res.json(searchOperator(String(req.query.q ?? ""))));
   r.get("/alerts", (_req, res) => res.json(db.alerts.slice().reverse().slice(0, 40)));
   r.post("/alerts/ack", wrap((req) => ctl.monitoring.acknowledge(String(req.body.id), OPERATOR)));
 

@@ -11,10 +11,10 @@ import { O02Orders, type OrderSeed } from "./Orders";
 import { O03Charging } from "./Charging";
 import { O04Incidents } from "./Incidents";
 import { O05Simulation } from "./Simulation";
+import { AlertBell, HeaderSearch, type Alert } from "./TopBar";
 
-export interface OpRoute { nav: Nav; hubId?: string; order?: OrderSeed; incidentId?: string; draftFor?: string }
+export interface OpRoute { nav: Nav; hubId?: string; order?: OrderSeed; orderId?: string; incidentId?: string; draftFor?: string }
 export type OpGo = (r: OpRoute) => void;
-interface Alert { id: string; time: number; hubId?: string; kind: string; message: string; acknowledgedBy?: string }
 interface Toast { id: number; message: string }
 
 const CRUMB: Record<Nav, string> = { monitor: "Network monitor", orders: "Redistribution orders", charging: "Smart charging", incidents: "Incidents", sim: "What-if simulation" };
@@ -43,12 +43,11 @@ export function OperatorConsole() {
     incidents: inc ? inc.counts.open + inc.counts.inProgress : 0,
     orders: orders ? orders.orders.filter((o) => ["Assigned", "In Transit"].includes(o.status)).length : 0,
   };
-  const unacked = (alerts ?? []).filter((a) => !a.acknowledgedBy).length;
 
   let body: JSX.Element;
   switch (route.nav) {
     case "monitor": body = <O01Monitor go={go} now={now} hubId={route.hubId} />; break;
-    case "orders": body = <O02Orders go={go} now={now} seed={route.order} />; break;
+    case "orders": body = <O02Orders go={go} now={now} seed={route.order} orderId={route.orderId} />; break;
     case "charging": body = <O03Charging go={go} now={now} hubId={route.hubId ?? "H01"} />; break;
     case "incidents": body = <O04Incidents go={go} now={now} incidentId={route.incidentId} draftFor={route.draftFor} />; break;
     default: body = <O05Simulation go={go} now={now} hubId={route.hubId} />;
@@ -56,7 +55,7 @@ export function OperatorConsole() {
 
   return (
     <>
-      <Console nav={route.nav} crumb={["Operations", CRUMB[route.nav]]} time={hms(now)} counts={counts} alerts={unacked} onNav={(n) => go({ nav: n })}>
+      <Console nav={route.nav} crumb={["Operations", CRUMB[route.nav]]} time={hms(now)} counts={counts} search={<HeaderSearch go={go} />} bell={<AlertBell alerts={alerts ?? []} go={go} />} onNav={(n) => go({ nav: n })}>
         <SimWarning state={demo} console />
         {body}
       </Console>

@@ -38,8 +38,8 @@ const NAV: Array<[Nav, string, string]> = [
   ["incidents", "siren", "Incidents"], ["sim", "flask-conical", "What-if simulation"],
 ];
 
-export function Console({ nav, crumb, time, counts, onNav, alerts, children }: {
-  nav: Nav; crumb: string[]; time: string; counts?: Partial<Record<Nav, number>>; onNav?: (n: Nav) => void; alerts?: number; children: ReactNode;
+export function Console({ nav, crumb, time, counts, onNav, search, bell, children }: {
+  nav: Nav; crumb: string[]; time: string; counts?: Partial<Record<Nav, number>>; onNav?: (n: Nav) => void; search: ReactNode; bell: ReactNode; children: ReactNode;
 }) {
   return (
     <div className="console live">
@@ -63,9 +63,9 @@ export function Console({ nav, crumb, time, counts, onNav, alerts, children }: {
               : <span key={i} className="row" style={{ gap: 6 }}><span>{s}</span><Icon name="chevron-right" className="ic-sm" /></span>)}
           </div>
           <div className="grow" />
-          <div className="search"><Icon name="search" className="ic-sm" />Search Hub, vehicle, order, incident<kbd>/</kbd></div>
+          {search}
           <span className="fresh"><span>Live · <span className="mono">{time}</span></span></span>
-          <button className="icon-btn" aria-label="Alerts"><Icon name="bell" />{alerts ? <span className="dot" style={{ boxShadow: "0 0 0 2px #fff", background: "#E5484D" }} /> : null}</button>
+          {bell}
         </header>
         {children}
       </div>

@@ -35,7 +35,7 @@ export class RedistributionController implements StatusListener {
   view(o: RedistributionOrder) {
     return {
       id: o.id, fromHub: o.fromHub, toHub: o.toHub, model: o.model, quantity: o.quantity, deadline: o.deadline, status: o.status,
-      overdue: o.overdue || o.isOverdue(), team: (o as unknown as { team?: string }).team ?? null, source: o.source, createdAt: o.createdAt, cancelReason: o.cancelReason,
+      overdue: o.isOpen() && (o.overdue || o.isOverdue()), team: (o as unknown as { team?: string }).team ?? null, source: o.source, createdAt: o.createdAt, cancelReason: o.cancelReason,
       arrived: o.transfers.filter((t) => t.status === "Arrived").length, history: o.history,
       transfers: o.transfers.map((t) => {
         const v = db.vehicles.get(t.vehicleId);
@@ -46,7 +46,12 @@ export class RedistributionController implements StatusListener {
   }
 
   /** BR-HUB-01 driven suggestions: overloaded Hubs push to the freest Hub, shortage Hubs pull from the fullest. */
-  private suggestions(): Suggestion[] {
+  /** The pre-filled order for UC-09 5a "Create Redistribution Order" on one Hub, from the same rules. */
+  orderSeedFor(hubId: string): Suggestion | null {
+    return this.suggestions(Infinity).find((s) => s.fromHub === hubId || s.toHub === hubId) ?? null;
+  }
+
+  private suggestions(limit = 3): Suggestion[] {
     const live = Hub.getLatestStatus().filter((h) => !h.stale);
     const out: Suggestion[] = [];
     const busy = (id: string) => [...db.orders.values()].some((o) => o.isOpen() && (o.fromHub === id || o.toHub === id) && o.status !== "Draft");
@@ -64,7 +69,7 @@ export class RedistributionController implements StatusListener {
       const need = Math.max(1, Math.ceil(config().value("HUB_SHORTAGE_RATIO") / 100 * h.docksInService) - h.available + 1);
       out.push({ fromHub: src.x.hubId, toHub: h.hubId, model: "e-bike", quantity: Math.min(need, src.n, db.hubs.get(h.hubId)!.netFreeDocks()), reason: "Vehicle Shortage", detail: `${h.hubId} has ${h.available} Available, below ${config().value("HUB_SHORTAGE_RATIO")}% of ${h.docksInService} docks` });
     }
-    return out.filter((s) => s.quantity > 0).slice(0, 3);
+    return out.filter((s) => s.quantity > 0).slice(0, limit);
   }
 
   /** validateOrder(draft : OrderDraft) : Shortfall — UC-10 step 6, E1, E2. */
@@ -91,11 +96,12 @@ export class RedistributionController implements StatusListener {
     checks.push({ label: "Both Hubs reporting", ok: !src.isStale() && !dst.isStale(), detail: `${fmtTime(src.lastUpdateTime)} · ${fmtTime(dst.lastUpdateTime)}` });
     checks.push({ label: "Deadline in the future", ok: d.deadline > clock().now(), detail: fmtHM(d.deadline) });
     const alternatives: Shortfall["alternatives"] = [];
-    if (eligible < q) for (const h of db.hubs.values()) if (h.id !== src.id && h.id !== dst.id && !h.isStale()) { const n = Vehicle.countEligible(h, d.model); if (n >= q) alternatives.push({ hubId: h.id, name: h.name, value: n, role: "source" }); }
-    if (netFree < q) for (const h of db.hubs.values()) if (h.id !== src.id && h.id !== dst.id && !h.isStale()) { const n = h.netFreeDocks(); if (n >= q) alternatives.push({ hubId: h.id, name: h.name, value: n, role: "destination" }); }
+    if (eligible < q && src.id !== dst.id) for (const h of db.hubs.values()) if (h.id !== src.id && h.id !== dst.id && !h.isStale()) { const n = Vehicle.countEligible(h, d.model); if (n >= q) alternatives.push({ hubId: h.id, name: h.name, value: n, role: "source" }); }
+    if (netFree < q && src.id !== dst.id) for (const h of db.hubs.values()) if (h.id !== src.id && h.id !== dst.id && !h.isStale()) { const n = h.netFreeDocks(); if (n >= q) alternatives.push({ hubId: h.id, name: h.name, value: n, role: "destination" }); }
     const failed = checks.find((c) => !c.ok);
     let message: string | null = null;
-    if (q < 1) message = "Quantity must be at least 1.";
+    if (src.id === dst.id) message = "The source and destination must be different Hubs.";
+    else if (q < 1) message = "Quantity must be at least 1.";
     else if (src.isStale() || dst.isStale()) message = `${src.isStale() ? src.id : dst.id} is Disconnected and can't be a source or destination (E1).`;
     else if (eligible < q) message = `Only ${eligible} eligible ${d.model} at ${src.id}; ${q} requested (E1).`;
     else if (netFree < q) message = `${dst.id} has only ${netFree} net free docks; ${q} requested (E2).`;

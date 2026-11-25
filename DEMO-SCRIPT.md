@@ -91,7 +91,9 @@ show "Payment Failed" with the hold released (UC-02 E2).
 ## 5. Operator: monitor, redistribute, charge (UC-09, UC-10, UC-11) — 1.5 min
 
 1. **Network monitor** (O01): KPIs, the E1 banner for H06, the 5b low-battery banners for
-   H02 and H04. Click **H02** (Overloaded) to open its panel.
+   H02 and H04. Click **H02** (Overloaded) to open its panel. Optional: type a vehicle, order or
+   incident ID (e.g. `RO-0312`) in the header search and press Enter, or open the bell to see
+   and acknowledge the alerts.
 2. **Create Redistribution Order** from the panel, or use a suggestion on
    **Redistribution orders** (O02). Confirm → RO-… "Assigned"; the vehicles show
    "In Redistribution" and the destination docks "Allocated".
@@ -116,4 +118,4 @@ show "Payment Failed" with the hold released (UC-02 E2).
 
 ## Close
 
-Press **Reset demo**. Run `npm test` to show the 71 tests, labelled with their TC IDs, pass.
+Press **Reset demo**. Run `npm test` to show the 82 tests, labelled with their TC IDs, pass.

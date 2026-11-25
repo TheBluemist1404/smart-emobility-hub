@@ -51,8 +51,10 @@ export function O05Simulation({ go, now, hubId }: { go: OpGo; now: number; hubId
   useEffect(() => { if (st?.scenario) setSel(st.recommendations.filter((r) => r.actionable).map((r) => r.id)); }, [st?.scenario?.id, st?.run]);
 
   const runIt = async () => {
-    const inputs = type === "A demand surge" ? [{ name: "extraDemandPct", value: Number(pct) }]
-      : type === "B return wave" ? [{ name: "extraReturns", value: Number(returns) }] : [{ name: "failedPoints", value: points }];
+    // A blank field is sent as null, so the server reports it (E2) instead of running it as 0.
+    const num = (x: string) => (x.trim() === "" ? null : Number(x));
+    const inputs = type === "A demand surge" ? [{ name: "extraDemandPct", value: num(pct) }]
+      : type === "B return wave" ? [{ name: "extraReturns", value: num(returns) }] : [{ name: "failedPoints", value: points }];
     setBusy(true);
     try {
       if (!st?.scenario) await api("/operator/sim/start", {});

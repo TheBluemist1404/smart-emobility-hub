@@ -51,11 +51,16 @@ export class MonitoringController implements StatusListener {
   }
 
   /** filter(criteria : FilterCriteria) : Hub[*] — UC-09 4a. */
-  filter(c: FilterCriteria): HubSnapshot[] {
-    let hubs = Hub.getLatestStatus();
+  filter(c: FilterCriteria): Array<HubSnapshot & { readyOfType?: number }> {
+    let hubs: Array<HubSnapshot & { readyOfType?: number }> = Hub.getLatestStatus();
     if (c.category && c.category !== "all") hubs = hubs.filter((h) => h.category === c.category);
     if (c.status && c.status !== "all") hubs = hubs.filter((h) => h.status === c.status);
-    if (c.vehicleType && c.vehicleType !== "all") hubs = hubs.filter((h) => [...db.vehicles.values()].some((v) => v.hubId === h.hubId && v.model === c.vehicleType));
+    // Vehicle type (UC-09 4a): every Hub parks both types, so the filter keeps the Hubs that have a
+    // vehicle of that type ready to rent ("Available", fresh data) and reports how many.
+    if (c.vehicleType && c.vehicleType !== "all") {
+      const ready = (hubId: string) => [...db.vehicles.values()].filter((v) => v.hubId === hubId && v.model === c.vehicleType && v.status === "Available").length;
+      hubs = hubs.filter((h) => !h.stale).map((h) => ({ ...h, readyOfType: ready(h.hubId) })).filter((h) => h.readyOfType > 0);
+    }
     if (c.sort === "code") return hubs.sort((a, b) => a.hubId.localeCompare(b.hubId));
     return hubs.sort((a, b) => (b.occupancy ?? -1) - (a.occupancy ?? -1));
   }
@@ -84,8 +89,8 @@ export class MonitoringController implements StatusListener {
       kpis: {
         vehiclesReady: live.reduce((s, h) => s + h.available, 0),
         pointsFree: live.reduce((s, h) => s + h.freeChargers, 0),
-        pointsTotal: hubs.reduce((s, h) => s + h.chargers, 0),
-        pointsOutOfService: hubs.reduce((s, h) => s + h.pointsOutOfService, 0),
+        pointsTotal: live.reduce((s, h) => s + h.chargers, 0),
+        pointsOutOfService: live.reduce((s, h) => s + h.pointsOutOfService, 0),
         docksInService: live.reduce((s, h) => s + h.docksInService, 0),
         hubsOnAlert: hubs.filter((h) => ["Overloaded", "Risk of Overload", "Disconnected"].includes(h.status)).length,
         overloaded: hubs.filter((h) => h.status === "Overloaded").length,

@@ -8,7 +8,7 @@ Pushed to GitHub. A new session only needs this file, the README and the docs be
 ```powershell
 npm install
 npm run dev     # one port, 5173: /stage, /student, /operator (?tools=0 hides Demo tools)
-npm test        # 71 Vitest tests, named by TC ID (CORE-nn platform, DEMO-nn demo tools)
+npm test        # 82 Vitest tests, named by TC ID (CORE-nn platform, DEMO-nn demo tools)
 npm run typecheck
 ```
 
@@ -185,3 +185,84 @@ A tester on the Render URL could not finish a rental. The backend worked; the UI
   confirmed late"; the waived receipt showed "H01 → null".
 
 Tests: `tests/demo.test.ts` (DEMO-01 to DEMO-03, 8 tests). Total 71.
+
+## Operator QA (2026-11-25)
+
+Every O01–O06 screen and action was clicked through in the real UI (preview "mvp", 1440 px,
+1280 px and inside `/stage`), with the student side in a second tab for the cross-actor paths.
+
+### Found and fixed
+
+O01 Network monitor (UC-09):
+- **The header search did nothing** (a static box). It now searches Hubs, vehicles, orders,
+  incidents, charging points, docks and parking spaces (`GET /api/operator/search?q=`,
+  `src/api/operatorSearch.ts`) and opens the right screen: Hub → its monitor panel, order → O02
+  with the order selected, incident → O04 with it open, charging point → O03 for its Hub.
+  Arrow keys + Enter work; "/" focuses it. It now also shows below 1240 px and in `/stage`.
+- **The bell did nothing.** It opens the alert list (`src/ui/operator/TopBar.tsx`): newest first,
+  Acknowledge per alert or all, and clicking an alert opens its Hub (TC-UC09-05).
+- **The vehicle-type filter never changed the list** (every Hub parks both types). It now keeps
+  the Hubs with at least one "Available" vehicle of that type, and the Hub table has a "Ready"
+  column that counts that type.
+- "Charging points free X of Y": Y counted the Disconnected H06, X did not. Both now count
+  reporting Hubs only.
+- "Create Redistribution Order" from an overloaded Hub pre-filled 5 vehicles while only 4 were
+  eligible. It now uses the same rule as the O02 suggestions (`orderSeedFor`).
+
+O02 Redistribution (UC-10):
+- Same source and destination showed the E1 "only N eligible" message and alternative Hubs. It
+  now says "The source and destination must be different Hubs."
+- A cancelled (or completed) order kept its red "Overdue" chip. Overdue now applies to open
+  orders only.
+- A validation error in the new-order form never cleared after the inputs were fixed.
+- The transfers card now shows the deadline and minutes left for an open order.
+
+O03 Smart charging (UC-11):
+- The student's "Charging session moved" notice said "moved from 15:15 to 15:15" after a point
+  fault: it quoted the original booking, not the slot it left. It now says "moved from 15:30 at
+  CP-H01-03 to 15:15 at CP-H01-01 (no later than 15 min after your booked 15:15 …)".
+- Policy: a blank field was saved as 0, and time limits were stated in ms ("between 0 and
+  3600000"). Blank is refused; limits read "between 0 min and 60 min".
+
+O05 What-if (UC-13) and O06 Apply (UC-14):
+- A blank % or returns field ran as 0. It is now refused with the field error (E2).
+- **Scenario B was wrong.** Overflow ignored the pickups (TC-UC13-02: overflow = returns −
+  (free docks + pickups)), returned vehicles were not counted as supply, and the Hubs in the
+  wave got "transfer more vehicles in" recommendations while overflowing. Now returns add supply,
+  overflow follows TC-UC13-02, overflowing Hubs only move vehicles out (to Hubs outside the wave,
+  several if needed), and each keeps HUB_SHORTAGE_RATIO of its docks in vehicles. The "after"
+  figures also subtract vehicles a Hub gives away.
+- When the live state shrank a transfer between review and confirm (6a), the result said
+  "Applied · 1 vehicle" under a "Transfer 6 e-bikes" title. It now says "Adjusted to 1 of 6
+  vehicles (live state changed)".
+
+Tests: `tests/operator-qa.test.ts` (11 tests, labelled TC-UC09-06, TC-UC10-03/08/14,
+TC-UC11-07/16, TC-UC13-02/11, TC-UC14-04, CORE-06/07). Total 82.
+
+### Checked and working (no change)
+
+KPIs add up against `/api/operator/network`; category, status and sort filters; H06 E1 banner
+and restoring its feed (banner clears, KPIs grow to 7 Hubs); 5b banners and "Open charging
+schedule"; map pins and the Hub panel; Acknowledge; "Updated … s ago" ticks every
+MONITOR_REFRESH and student-side changes (a report, a reservation) appear at once over the
+socket. O02: order create/confirm, Draft resume, quantity and capacity checks with "Use Hx",
+Departed → Arrived → Completed / Partially Completed, Breakdown (incident opened, vehicle Under
+Maintenance), counts moving on O01 and in the student Hub view, cancel with reason, overdue
+warning after the clock passes the deadline. O03: Generate, drag within / beyond
+CHARGING_SHIFT_TOLERANCE, onto an Out of Service point, onto a taken slot, Apply (student notified),
+Discard, policy weights must total 1, point fault moves the paid session. O04: new incident
+(validation), student report → incident, Start handling → Block → "Vehicle replaced" on the
+phone, Resolve, Save progress, Dismiss as duplicate, E2 version conflict with Reload, 8c
+"Confirm breakdown during trip". O05/O06: scenarios A, B, C with valid and invalid inputs,
+partial apply, advisory items cannot be ticked, live change between review and confirm.
+Demo-simulator banner and Back to normal; two-tap Reset demo; no sideways scroll at 1440/1280
+or in `/stage`; no dead buttons on any screen; no JS exceptions in the console.
+
+### Left as it is
+
+- The charging schedule "version" is the sum of the Hub's point versions, so it jumps by the
+  number of points per apply (4 → 8 at H01). Correct for the E4 check, odd to read.
+- A student report adds two action lines to its incident ("Opened from student report" and
+  "Report IR-… from student …").
+- A vehicle that broke down in transit is still counted at its source Hub in O01 (not docked).
+- Browser consoles log the API's 4xx validation answers as failed requests; they are expected.

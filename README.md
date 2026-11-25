@@ -6,7 +6,7 @@ end, with all state in memory, loaded from `seed/seed.json`.
 
 ## Run it
 
-Needs Node 20 or later (tested with Node 24).
+Needs Node 20 or later (tested with Node 24; `engines.node` pins 24.x for Render).
 
 ```powershell
 npm install
@@ -24,11 +24,48 @@ Then open:
 Set `PORT` to use another port. The fonts and icons come from Google Fonts and npm; an
 internet connection is only needed for the fonts.
 
+## Deploy on Render
+
+`render.yaml` is a Render Blueprint for one free web service. It runs
+`npm ci && npm run build`, then `npm start`, checks `/healthz`, and redeploys on every push to
+`main`. Node is pinned by `engines.node` in `package.json` (24.x).
+
+One-time steps in the Render dashboard:
+
+1. Go to <https://dashboard.render.com> and sign in with GitHub.
+2. Click **New → Blueprint**.
+3. Connect GitHub if asked, and give Render access to `TheBluemist1404/smart-emobility-hub`.
+4. Pick that repository. Render reads `render.yaml` and shows the service
+   `smart-emobility-hub` (plan Free).
+5. Click **Apply** (or **Deploy Blueprint**). The first build takes a few minutes.
+6. Open the service; its URL is `https://<name>.onrender.com`. Use `/stage`, `/student` or
+   `/operator` on that URL.
+
+Free-tier behaviour:
+
+- The service sleeps after about 15 minutes with no traffic. The next request wakes it, which
+  takes about 30–60 seconds. **Open the URL a minute before the demo.**
+- All state is in memory. It resets to the seed data on every restart, wake-up after sleep,
+  and deploy. That is the same as **Reset demo**.
+- One instance only. Everyone who opens the URL shares the same demo state.
+
+To try the production build locally:
+
+```powershell
+npm ci
+npm run build
+$env:PORT = "10000"; $env:NODE_ENV = "production"; npm start
+```
+
+Then open <http://localhost:10000/stage>.
+
 ## Scripts
 
 | Command | What |
 |---|---|
 | `npm run dev` | Starts everything on one port |
+| `npm run build` | Builds the front-end into `dist/` (`vite build`) |
+| `npm start` | Production mode: serves `dist/`, the API and the WebSocket on `PORT` (0.0.0.0), with `/healthz` |
 | `npm test` | Runs the Vitest suite (test cases labelled with their TC IDs) |
 | `npm run typecheck` | TypeScript check |
 | `npm run seed` | Regenerates `seed/seed.json` from `seed/generate.ts` |

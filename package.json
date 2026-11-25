@@ -4,9 +4,13 @@
   "private": true,
   "description": "MVP of the Smart E-Mobility Hub (HCMUT HK261 Software Engineering, group 4, CC03)",
   "type": "module",
+  "engines": {
+    "node": "24.x"
+  },
   "scripts": {
     "dev": "tsx watch --clear-screen=false --exclude \"src/ui/**\" server/main.ts",
-    "start": "tsx server/main.ts",
+    "build": "vite build",
+    "start": "tsx server/main.ts --prod",
     "test": "vitest run",
     "typecheck": "tsc --noEmit",
     "seed": "tsx seed/generate.ts"

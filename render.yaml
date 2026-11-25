@@ -1,0 +1,15 @@
+# Render Blueprint: one free web service runs the whole MVP (API, WebSocket push and the
+# built React front-end on one port). In-memory state resets on every restart or deploy.
+services:
+  - type: web
+    name: smart-emobility-hub
+    runtime: node
+    plan: free
+    branch: main
+    autoDeploy: true
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_ENV
+        value: production

@@ -1,7 +1,7 @@
 # Handoff
 
-State on 2026-11-24: phases 0–6 are all done and committed locally (last commit is Phase 6).
-Nothing is pushed. A new session only needs this file, the README and the docs below.
+State on 2026-11-25: phases 0–6 are done, and the MVP is deployable on Render (see "Production build and Render").
+Pushed to GitHub. A new session only needs this file, the README and the docs below.
 
 ## Run and test
 
@@ -14,6 +14,31 @@ npm run typecheck
 
 `tsx watch` restarts the server, and with it the in-memory demo state, on every server-file edit.
 UI-only edits do not restart it.
+
+## Production build and Render (2026-11-25)
+
+The repo is public at `TheBluemist1404/smart-emobility-hub` (branch `main`).
+
+- `npm run build` runs `vite build` into `dist/` (gitignored).
+- `npm start` runs `tsx server/main.ts --prod`. Production mode is on with `--prod` or
+  `NODE_ENV=production`. It serves `dist/` with an SPA fallback (any non-`/api/` GET gets
+  `index.html`), the API and socket.io on `PORT`, bound to `0.0.0.0`. Without `dist/index.html`
+  it exits with an error. In dev, Vite is imported only on the dev path.
+- `/healthz` returns `{"ok":true}` in both modes.
+- The client's socket connects with `io()`, so it uses the page's own host and `wss` on https.
+- `tsx`, `vite` and `@vitejs/plugin-react` are in `dependencies`, so `npm ci` with
+  `NODE_ENV=production` (which skips devDependencies) still builds and runs.
+- `engines.node` is `24.x` (tested with Node 24.14.1).
+- `render.yaml` is the Blueprint: one free web service, `npm ci && npm run build`,
+  `npm start`, health check `/healthz`, auto-deploy on push to `main`, `NODE_ENV=production`.
+  Dashboard steps are in the README section "Deploy on Render".
+- Free tier: sleeps after about 15 min idle, cold start about 30–60 s, and the in-memory
+  state resets on every restart or deploy. Everyone on the URL shares one demo state.
+
+Verified locally on 2026-11-25 with `PORT=10000 NODE_ENV=production npm start`: `/stage`,
+`/student` and `/operator` load on a hard refresh with no console errors; demo steps 1–2
+(reserve EB-0217, operator blocks it) push "Vehicle replaced" to the student tab over the
+WebSocket without a reload. `npm test` (63) and `npm run typecheck` pass.
 
 ## Package layout
 

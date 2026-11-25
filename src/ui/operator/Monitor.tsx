@@ -1,5 +1,5 @@
 // O01 Network monitor (UC-09 steps 2-9, 4a, 5a, 5b, E1).
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Icon } from "../shared/Icon";
 import { CampusMap, MAP_POS, type Pin } from "../shared/CampusMap";
 import { ago, api, hms, useLive } from "../shared/live";
@@ -29,10 +29,16 @@ export function O01Monitor({ go, now, hubId }: { go: OpGo; now: number; hubId?: 
   const { data: all } = useLive<Overview>("/operator/network");
   const { data: alerts } = useLive<Alert[]>("/operator/alerts");
   const [sel, setSel] = useState<string | null>(hubId ?? null);
-  useEffect(() => { if (hubId) setSel(hubId); }, [hubId]);
+  // A Hub chosen from outside the page (search, alert bell) is below the fold: scroll its panel into view once it loads.
+  const scrollTo = useRef<string | null>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => { if (hubId) { setSel(hubId); scrollTo.current = hubId; } }, [hubId]);
   const hubs = o?.hubs ?? [];
   const pick = sel ?? (all?.hubs.slice().sort((a, b) => (b.occupancy ?? -1) - (a.occupancy ?? -1))[0]?.hubId ?? null);
   const { data: d } = useLive<HubDetail>(pick ? `/operator/hub/${pick}` : null);
+  useEffect(() => {
+    if (d && scrollTo.current === d.hubId) { scrollTo.current = null; panelRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }); }
+  }, [d, hubId]);
   const k = all?.kpis;
   const total = all?.hubs.length ?? 7;
 
@@ -109,7 +115,7 @@ export function O01Monitor({ go, now, hubId }: { go: OpGo; now: number; hubId?: 
         </section>
       </div>
 
-      {d && <HubPanel d={d} now={now} go={go} alert={alertFor(d.hubId, /5a|Overload/)} />}
+      <div ref={panelRef} style={{ scrollMarginTop: 72 }}>{d && <HubPanel d={d} now={now} go={go} alert={alertFor(d.hubId, /5a|Overload/)} />}</div>
     </div>
   );
 }

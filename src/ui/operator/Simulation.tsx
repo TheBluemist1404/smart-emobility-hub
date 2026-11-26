@@ -381,7 +381,7 @@ function ChargingPlanCard({ c, type }: { c: ChargingDetail; type: SType }) {
             </table>
           )}
           <span className="hint"><Icon name="info" />{fail
-            ? `"moved": was on a failing point in ${w}. "shifted": moved to make room. "stops early": already charging, so it would stop when the point fails. Apply keeps ${c.points.join(", ")} free in ${w} (they stay In Service) and commits this plan; Smart charging then shows it.`
+            ? `"moved": was on a failing point in ${w}. "shifted": moved to make room. "stops early": already charging, so it would stop when the point fails. Apply keeps ${c.points.join(", ")} free in ${w} (${c.points.length === 1 ? "it stays" : "they stay"} In Service) and commits this plan; Smart charging then shows it.`
             : `Each surge request needs ${c.surge?.durationMin ?? 60} min on a point and arrives spread over ${w}. Apply keeps ${c.points.join(", ") || "no point"} free in ${w} for students' bookings; shared vehicles charge outside it. A session already charging on a kept point finishes as planned.`}</span>
         </div>
       </div>

@@ -299,7 +299,7 @@ export class SimulationController {
         const moved = moves.filter((m) => m.outcome === "moved" || m.outcome === "shifted").length;
         const cancelled = moves.filter((m) => m.outcome === "cancelled, fee refunded").length;
         recs.push(new Recommendation(id(), "charging plan", `Re-plan charging at ${hubId} without ${failed.join(", ")} for ${win}`,
-          `Charging plan (UC-11) · ${plural(moved, "session")} move, ${cancelled} cancelled with a refund, ${plural(after.unserved, "request")} unserved · applying keeps these points free in ${win}; they stay In Service`,
+          `Charging plan (UC-11) · ${plural(moved, "session")} move, ${cancelled} cancelled with a refund, ${plural(after.unserved, "request")} unserved · applying keeps ${failed.length === 1 ? "this point" : "these points"} free in ${win}; ${failed.length === 1 ? "it stays" : "they stay"} In Service`,
           { hubId, points: failed, window: w, purpose: "failure" }));
         if (after.unserved > normal.unserved) { const a = altFor(hubId); if (a) recs.push(new Recommendation(id(), "alternative Hub", `Point students who need to charge at ${hubId} to ${a.h.id} (${a.km} km, ${plural(a.free, "point")} free now)`, "Alternative-Hub advice · information only, never applied as a live change", { hubs: [hubId, a.h.id] })); }
         return;
@@ -450,7 +450,7 @@ export class SimulationController {
           const outcome = stale.length ? "Pending Reconciliation" : "Applied";
           r.recordOutcome(outcome, `schedule v${res.version}`);
           const future = w && w.start > clock().now() + config().value("SCHEDULE_TIMESLOT");
-          const keptNote = w ? ` ${keep!.points.join(", ")} take no session ${fmtHM(w.start)}–${fmtHM(w.end)}${future ? " (a later window: sessions before it are unchanged)" : ""}; they stay In Service.` : "";
+          const keptNote = w ? ` ${keep!.points.join(", ")} ${keep!.points.length === 1 ? "takes" : "take"} no session ${fmtHM(w.start)}–${fmtHM(w.end)}${future ? " (a later window: sessions before it are unchanged)" : ""}; ${keep!.points.length === 1 ? "it stays" : "they stay"} In Service.` : "";
           const moved = res.shifted.length ? ` ${res.shifted.join(", ")} moved (students notified).` : "";
           const cancelled = res.cancelled.length ? ` ${res.cancelled.join(", ")} cancelled and refunded.` : "";
           out.push({ id: r.id, title: r.title, outcome, reference: `Schedule v${res.version}`,

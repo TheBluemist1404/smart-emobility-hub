@@ -34,7 +34,9 @@ button[disabled] { opacity: .45; cursor: not-allowed; }
 
 /* ── Live console: fills the window, sidebar and top bar stay put. ── */
 .console.live { --side-w: 248px; width: auto; min-width: 0; max-width: 1600px; min-height: 100vh; border-radius: 0; margin: 0 auto; box-shadow: none;
-  grid-template-columns: var(--side-w) 1fr; background: linear-gradient(90deg, var(--ink-900) var(--side-w), var(--canvas) var(--side-w)); }
+  grid-template-columns: var(--side-w) 1fr; background: linear-gradient(90deg, var(--ink-900) var(--side-w), var(--canvas) var(--side-w));
+  /* clip, not hidden: "hidden" makes .console the scroll container, so the sticky sidebar and topbar scrolled away. */
+  overflow: clip; }
 .console.live .c-main { min-width: 0; }
 .console.live .sidebar { position: sticky; top: 0; height: 100vh; align-self: start; overflow-y: auto; }
 .console.live .topbar { position: sticky; top: 0; z-index: 20; }
@@ -179,4 +181,28 @@ button[disabled] { opacity: .45; cursor: not-allowed; }
   .console.live .search kbd { display: none; }
   .console.live .search-pop { width: 340px; }
   .console.live .bell-pop { width: 360px; }
+}
+
+/* O03: short blocks keep their ID readable (details in the tooltip); kept-free windows; load bars with kW. */
+.blk.narrow { padding: 3px 4px; font-size: 10px; letter-spacing: -.02em; }
+.blk.narrow small, .blk.narrow .opt { display: none; }
+.blk.narrow > span { text-overflow: clip; }
+.tl .keepfree { position: absolute; top: 4px; bottom: 4px; border: 1.5px dashed var(--sim); border-radius: 9px; background: repeating-linear-gradient(135deg, var(--sim-bg) 0 6px, transparent 6px 12px); z-index: 0; display: flex; align-items: flex-end; padding: 0 6px 2px; pointer-events: none; }
+.tl .keepfree span { font-size: 9.5px; font-weight: 700; color: var(--sim); white-space: nowrap; overflow: hidden; }
+.tl .track .blk { z-index: 1; }
+.load-bars { display: grid; gap: 4px; height: 80px; align-items: end; }
+.load-bars i { position: relative; background: var(--brand-500); border-radius: 4px 4px 1px 1px; min-height: 0; }
+.load-bars i:hover { background: var(--brand-700, #0B5D3B); }
+.load-bars i b { position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); font: 700 9.5px var(--mono); color: var(--text-2); padding-bottom: 1px; white-space: nowrap; }
+
+/* O01 Hubs table: fits its card at 1280-1440 px. Flags wrap inside their chip and the last column
+   never shrinks below its time. */
+.hub-table { table-layout: auto; width: 100%; }
+.hub-table .chip.flag { white-space: normal; height: auto; min-height: 22px; line-height: 1.25; padding-top: 2px; padding-bottom: 2px; text-align: left; }
+.hub-table .flags { min-width: 0; }
+.hub-table th.upd, .hub-table td:last-child { white-space: nowrap; width: 1%; }
+.hub-table .hubcell b { white-space: normal; }
+@media (max-width: 1499px) {
+  .console.live .hub-table th, .console.live .hub-table td { padding-left: 8px; padding-right: 8px; }
+  .console.live .hub-table td:nth-child(2) { width: 120px !important; }
 }

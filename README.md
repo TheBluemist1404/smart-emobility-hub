@@ -115,7 +115,7 @@ tests/                Vitest suites
 | UC-10 Redistribution | O02 | Done, with transfers driven from Demo tools |
 | UC-11 Smart charging | O03 | Done, with priority BR-CHG-01 and point faults |
 | UC-12 Incidents | O04 | Done, with blocking and the cross-actor push |
-| UC-13 What-if simulation | O05 | Done (scenarios A, B, C) |
+| UC-13 What-if simulation | O05 | Done (scenarios A, B, C, D) |
 | UC-14 Apply recommendations | O06 | Done |
 
 The demo walk-through is in [DEMO-SCRIPT.md](DEMO-SCRIPT.md). Screenshots are in
@@ -138,7 +138,7 @@ rental can be finished without the drawer.
 
 ## Tests
 
-`npm test` runs 82 Vitest tests. Each test name starts with its TC ID from
+`npm test` runs 94 Vitest tests. Each test name starts with its TC ID from
 `sub3-design/descriptions/test-cases.md` (for example `TC-UC02-08`). Tests of the platform
 parts that have no TC ID are labelled `CORE-nn`; the demo-tool tests are labelled `DEMO-nn`.
 
@@ -156,8 +156,9 @@ parts that have no TC ID are labelled `CORE-nn`; the demo-tool tests are labelle
 - **Rebalancing suggestions** (UC-10 3a) are computed in RedistributionController from
   BR-HUB-01 flags, not by a separate class.
 - **Simulation recommendations** (BR-SIM-01) are derived in SimulationController from the
-  scenario measures: transfers from surplus Hubs, charging plans for low-battery vehicles
-  or failed points, and alternative-Hub advice.
+  scenario measures: transfers from surplus Hubs, charging plans for low-battery vehicles,
+  failed points (C) or a charging surge (D), and alternative-Hub advice. Transfers follow the
+  shared outflow rule in `src/domain/operations/OutflowPlan.ts`.
 - **DemoClock and SimulatedDataSource** are demo infrastructure, not design classes.
 - **UC-06 E1** (photo upload fails) is not simulated; photos are placeholders.
 

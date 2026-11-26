@@ -34,10 +34,15 @@ export interface ScheduleBlock {
   sessionId: string; pointId: string; start: number; end: number; committed: boolean; status: string; vehicleId: string;
   soc: number | null; targetSoc: number; priority: number | null; emergency: boolean; originalStart: number | null; latestStart: number | null; moved: boolean; locked: boolean;
 }
+/** Points kept free of planned sessions during a window (UC-14 apply of a what-if charging plan). */
+export interface KeepFree { hubId: string; points: string[]; window: TimeWindow; ref: string; reason: string }
+/** One slot of the Hub load: the total and what makes it up (each block draws its point's rated power). */
+export interface LoadSlot { t: number; proposed: number; current: number; parts: Array<{ pointId: string; kw: number; vehicleId: string }> }
 export interface ScheduleProposal {
   hubId: string; horizon: TimeWindow; hours: number; baseVersion: number; generatedAt: number; blocks: ScheduleBlock[]; current: ScheduleBlock[];
+  keepFree: KeepFree[];
   unserved: Array<{ sessionId: string; vehicleId: string; priority: number | null; reason: string }>; alerts: string[]; rejected: { sessionId: string; message: string } | null;
-  kpis: { serviced: number; servicedWas: number; avgWait: number; avgWaitWas: number; peakKw: number; peakKwWas: number; limitKw: number; unserved: number; unservedWas: number; load: Array<{ t: number; proposed: number; current: number }> };
+  kpis: { serviced: number; servicedWas: number; avgWait: number; avgWaitWas: number; peakKw: number; peakKwWas: number; limitKw: number; unserved: number; unservedWas: number; load: LoadSlot[] };
 }
 
 const vnd = (n: number) => `${n.toLocaleString("en-US")} VND`;
@@ -46,6 +51,8 @@ export class ChargingController implements StatusListener {
   private readonly drafts = new Map<string, { req: ChargingRequest; proposal: Proposal | null; alts: Proposal["alternatives"]; durationMs: number; fee: number }>();
   private readonly holdTimers = new Map<string, Timer>();
   private readonly graceTimers = new Map<string, Timer>();
+  /** Windows in which a Hub's points are kept free, per Hub. Every later schedule respects them until they end. */
+  private readonly keepFree = new Map<string, KeepFree[]>();
 
   constructor(protected readonly payment: PaymentController) {}
 
@@ -256,12 +263,39 @@ export class ChargingController implements StatusListener {
 
   /** Hub peak electrical capacity: MVP rule of 76% of the installed point power (UC-11 2a). */
   peakKw(hubId: string): number {
-    return Math.round([...db.points.values()].filter((p) => p.hubId === hubId).reduce((s, p) => s + p.kw, 0) * 0.76);
+    return Math.round(this.installedKw(hubId) * 0.76);
   }
 
-  private horizonFor(hours: number): TimeWindow {
+  /** The rated power of every point at the Hub, in service or not (the grid connection is sized on it). */
+  installedKw(hubId: string): number {
+    return [...db.points.values()].filter((p) => p.hubId === hubId).reduce((s, p) => s + p.kw, 0);
+  }
+
+  /** The keep-free windows still ahead for a Hub. */
+  keepFreeFor(hubId: string): KeepFree[] {
+    const now = clock().now();
+    const list = (this.keepFree.get(hubId) ?? []).filter((k) => k.window.end > now);
+    this.keepFree.set(hubId, list);
+    return list;
+  }
+
+  /** Keep points free in a window from now on (replaces an earlier entry with the same ref). */
+  addKeepFree(k: KeepFree): void {
+    this.keepFree.set(k.hubId, [...this.keepFreeFor(k.hubId).filter((x) => x.ref !== k.ref), k]);
+  }
+
+  removeKeepFree(hubId: string, ref: string): void {
+    this.keepFree.set(hubId, this.keepFreeFor(hubId).filter((x) => x.ref !== ref));
+  }
+
+  private keptFree(keep: KeepFree[], pointId: string, start: number, end: number): KeepFree | null {
+    return keep.find((k) => k.points.includes(pointId) && k.window.start < end && k.window.end > start) ?? null;
+  }
+
+  private horizonFor(hours: number, from?: number): TimeWindow {
     const step = config().value("SCHEDULE_TIMESLOT");
-    const start = Math.floor(clock().now() / step) * step;
+    const now = Math.floor(clock().now() / step) * step;
+    const start = from !== undefined && Number.isFinite(from) && from > now ? Math.floor(from / step) * step : now;
     return { start, end: start + hours * HOUR };
   }
 
@@ -287,10 +321,10 @@ export class ChargingController implements StatusListener {
   }
 
   /** openSchedule() : Schedule — UC-11 step 2: the committed timeline and the Charging Queue. */
-  openSchedule(hubId: string, hours = 4) {
+  openSchedule(hubId: string, hours = 4, from?: number) {
     const hub = db.hubs.get(hubId);
     if (!hub) throw new UserError(`Unknown Hub ${hubId}`, 404);
-    const horizon = this.horizonFor(hours);
+    const horizon = this.horizonFor(hours, from);
     const queue = ChargingSession.getChargingQueue().filter((s) => s.hubId === hubId);
     this.computePriority(queue);
     return {
@@ -299,6 +333,8 @@ export class ChargingController implements StatusListener {
       blocks: this.currentBlocks(hubId, horizon),
       queue: ChargingSession.getChargingQueue().filter((s) => s.hubId === hubId).map((s) => this.queueRow(s)),
       version: ChargingPoint.getActiveSchedule(hubId).version,
+      installedKw: this.installedKw(hubId), keepFree: this.keepFreeFor(hubId),
+      load: this.loadSlots(this.currentBlocks(hubId, horizon), horizon),
       proposal: this.openProposal(hubId),
       policy: this.getChargingPolicy(hubId),
     };
@@ -365,22 +401,24 @@ export class ChargingController implements StatusListener {
   }
 
   /** generateSchedule(hub : Hub, horizon : Horizon) : ScheduleProposal — UC-11 step 7. A draft only. */
-  generateSchedule(hubId: string, hours = 4): ScheduleProposal {
+  generateSchedule(hubId: string, hours = 4, opts: { extraKeepFree?: KeepFree[]; dryRun?: boolean } = {}): ScheduleProposal {
     const hub = db.hubs.get(hubId);
     if (!hub) throw new UserError(`Unknown Hub ${hubId}`, 404);
     if (hub.isStale()) throw new UserError(`${hubId} is Disconnected; its points cannot be scheduled (E5).`, 409, "E5");
     const horizon = this.horizonFor(hours);
+    const keep = [...this.keepFreeFor(hubId), ...(opts.extraKeepFree ?? [])];
     const queue = ChargingSession.getChargingQueue().filter((s) => s.hubId === hubId);
     const current = this.currentBlocks(hubId, horizon);
     const shared = [...db.allocations.values()].filter((a): a is ChargingSession => a instanceof ChargingSession && a.hubId === hubId && !a.isCommittedReservation() && a.status === "Scheduled");
     const requests = [...queue, ...shared];
     this.computePriority(requests);
-    const p: ScheduleProposal = { hubId, horizon, hours, baseVersion: ChargingPoint.getActiveSchedule(hubId).version, generatedAt: clock().now(), blocks: [], unserved: [], current, alerts: [], rejected: null, kpis: null as unknown as ScheduleProposal["kpis"] };
+    const p: ScheduleProposal = { hubId, horizon, hours, baseVersion: ChargingPoint.getActiveSchedule(hubId).version, generatedAt: clock().now(), blocks: [], unserved: [], current, keepFree: keep, alerts: [], rejected: null, kpis: null as unknown as ScheduleProposal["kpis"] };
     const usable = this.hubPoints(hubId).filter((pt) => pt.status !== "Out of Service" && pt.status !== "Disconnected");
     // 1. Fixed: what is charging now, and committed student reservations (moved only if their point is down).
     for (const b of current) {
       const s = db.allocations.get(b.sessionId) as ChargingSession;
-      if (b.locked || (b.committed && usable.some((x) => x.id === b.pointId))) { p.blocks.push({ ...b, moved: false }); continue; }
+      // A session already charging stays where it is, even on a point kept free (it can't be moved).
+      if (b.locked || (b.committed && usable.some((x) => x.id === b.pointId) && !this.keptFree(keep, b.pointId, b.start, b.end))) { p.blocks.push({ ...b, moved: false }); continue; }
       if (!b.committed) continue; // shared Scheduled sessions are re-planned below
       const spot = this.findSpot(p, usable, b.end - b.start, b.originalStart ?? b.start, b.latestStart ?? b.start, hubId);
       if (spot) { p.blocks.push(this.blockOf(s, spot.pointId, spot.start, spot.start + (b.end - b.start))); p.alerts.push(`${s.id} moved to ${spot.pointId} ${fmtHM(spot.start)} (within CHARGING_SHIFT_TOLERANCE).`); }
@@ -396,9 +434,12 @@ export class ChargingController implements StatusListener {
       if (spot) p.blocks.push(this.blockOf(s, spot.pointId, spot.start, spot.start + dur));
       else p.unserved.push({ sessionId: s.id, vehicleId: s.vehicleRef, priority: s.priority, reason: "No slot within the horizon and the peak capacity (E1)." });
     }
-    this.markUnserved(p);
     p.kpis = this.kpis(p);
+    for (const k of keep) p.alerts.push(`${k.points.join(", ")} kept free ${fmtHM(k.window.start)}–${fmtHM(k.window.end)} (${k.reason}).`);
     if (p.unserved.length) p.alerts.push(`${p.unserved.length} request(s) cannot be served in the horizon (E1).`);
+    // A dry run (what-if) changes nothing: no stored proposal, no "unserved" marks, no audit line.
+    if (opts.dryRun) return p;
+    this.markUnserved(p);
     this.proposals.set(hubId, p);
     audit("OP-014", "UC-11 schedule generated", hubId);
     return p;
@@ -408,13 +449,14 @@ export class ChargingController implements StatusListener {
   private findSpot(p: ScheduleProposal, points: ChargingPoint[], dur: number, from: number, to: number, hubId: string): { pointId: string; start: number } | null {
     const step = config().value("SCHEDULE_TIMESLOT");
     for (let t = Math.ceil(from / step) * step; t <= to; t += step) {
-      for (const pt of points) if (this.fits(p, pt.id, t, t + dur) && this.underPeak(p, pt.kw, t, t + dur, hubId)) return { pointId: pt.id, start: t };
+      for (const pt of points) if (this.fits(p, pt.id, t, t + dur) && !this.peakViolation(p.blocks, pt.kw, t, t + dur, hubId)) return { pointId: pt.id, start: t };
     }
     return null;
   }
 
-  private fits(p: ScheduleProposal, pointId: string, start: number, end: number, ignore?: string): boolean {
+  private fits(p: ScheduleProposal, pointId: string, start: number, end: number, ignore?: string, honourKeepFree = true): boolean {
     if (p.blocks.some((b) => b.sessionId !== ignore && b.pointId === pointId && b.start < end && b.end > start)) return false;
+    if (honourKeepFree && this.keptFree(p.keepFree ?? [], pointId, start, end)) return false;
     const pt = db.points.get(pointId)!;
     // Held slots of students still paying are respected (UC-05 step 10).
     return !pt.bookings.some((b) => b.state === "Held" && b.ref !== ignore && b.start < end && b.end > start);
@@ -424,10 +466,55 @@ export class ChargingController implements StatusListener {
     return blocks.filter((b) => b.start <= t && b.end > t).reduce((s, b) => s + (db.points.get(b.pointId)?.kw ?? 0), 0);
   }
 
-  private underPeak(p: { blocks: ScheduleBlock[] }, kw: number, start: number, end: number, hubId: string): boolean {
+  /**
+   * The first slot in [start, end) where adding `kw` would take the Hub over its peak, with what is
+   * already drawn there, or null. The load of a slot is the rated power of every point that has a
+   * block in it; the block being moved must already be left out of `blocks` (no double count).
+   */
+  private peakViolation(blocks: ScheduleBlock[], kw: number, start: number, end: number, hubId: string): { t: number; load: number; parts: LoadSlot["parts"] } | null {
     const step = config().value("SCHEDULE_TIMESLOT");
-    for (let t = start; t < end; t += step) if (this.loadAt(p.blocks, t) + kw > this.peakKw(hubId)) return false;
-    return true;
+    const limit = this.peakKw(hubId);
+    for (let t = start; t < end; t += step) {
+      const load = this.loadAt(blocks, t);
+      if (load + kw > limit) return { t, load, parts: this.partsAt(blocks, t) };
+    }
+    return null;
+  }
+
+  private partsAt(blocks: ScheduleBlock[], t: number): LoadSlot["parts"] {
+    return blocks.filter((b) => b.start <= t && b.end > t).sort((a, b) => a.pointId.localeCompare(b.pointId))
+      .map((b) => ({ pointId: b.pointId, kw: db.points.get(b.pointId)?.kw ?? 0, vehicleId: b.vehicleId }));
+  }
+
+  private loadSlots(blocks: ScheduleBlock[], horizon: TimeWindow, current: ScheduleBlock[] = blocks): LoadSlot[] {
+    const step = config().value("SCHEDULE_TIMESLOT");
+    const out: LoadSlot[] = [];
+    for (let t = horizon.start; t < horizon.end; t += step) out.push({ t, proposed: this.loadAt(blocks, t), current: this.loadAt(current, t), parts: this.partsAt(blocks, t) });
+    return out;
+  }
+
+  /**
+   * What-if only (UC-13 scenario D): place extra charging requests into the free point-slots a plan
+   * leaves, in arrival order, earliest start first, under the peak. Points kept free are usable here:
+   * they are kept free for exactly these requests. Nothing is stored.
+   */
+  placeExtra(p: ScheduleProposal, requests: Array<{ id: string; arrive: number; durationMs: number }>, latestStart: number): Array<{ id: string; pointId: string | null; start: number | null; waitMs: number | null }> {
+    const step = config().value("SCHEDULE_TIMESLOT");
+    const usable = this.hubPoints(p.hubId).filter((pt) => pt.status !== "Out of Service" && pt.status !== "Disconnected");
+    const blocks = [...p.blocks];
+    const probe: ScheduleProposal = { ...p, blocks };
+    const out: Array<{ id: string; pointId: string | null; start: number | null; waitMs: number | null }> = [];
+    for (const r of [...requests].sort((a, b) => a.arrive - b.arrive)) {
+      let hit: { pointId: string; start: number } | null = null;
+      for (let t = Math.ceil(r.arrive / step) * step; t <= latestStart && !hit; t += step) {
+        for (const pt of usable) if (this.fits(probe, pt.id, t, t + r.durationMs, undefined, false) && !this.peakViolation(blocks, pt.kw, t, t + r.durationMs, p.hubId)) { hit = { pointId: pt.id, start: t }; break; }
+      }
+      if (hit) {
+        blocks.push({ sessionId: r.id, pointId: hit.pointId, start: hit.start, end: hit.start + r.durationMs, committed: true, status: "Scheduled", vehicleId: r.id, soc: null, targetSoc: 80, priority: null, emergency: false, originalStart: null, latestStart: null, moved: false, locked: false });
+        out.push({ id: r.id, pointId: hit.pointId, start: hit.start, waitMs: hit.start - r.arrive });
+      } else out.push({ id: r.id, pointId: null, start: null, waitMs: null });
+    }
+    return out;
   }
 
   /** - markUnserved(requests) : void — UC-11 E1: kept visible as an explicit shortfall. */
@@ -445,8 +532,7 @@ export class ChargingController implements StatusListener {
     };
     const now = measure(p.current), next = measure(p.blocks);
     const queueNow = ChargingSession.getChargingQueue().filter((s) => s.hubId === p.hubId && !p.current.some((b) => b.sessionId === s.id)).length;
-    const load: Array<{ t: number; proposed: number; current: number }> = [];
-    for (let t = p.horizon.start; t < p.horizon.end; t += step) load.push({ t, proposed: this.loadAt(p.blocks, t), current: this.loadAt(p.current, t) });
+    const load = this.loadSlots(p.blocks, p.horizon, p.current);
     return { serviced: next.serviced, servicedWas: now.serviced, avgWait: next.avgWaitMin, avgWaitWas: now.avgWaitMin, peakKw: next.peakKw, peakKwWas: now.peakKw, limitKw: this.peakKw(p.hubId), unserved: p.unserved.length, unservedWas: queueNow, load };
   }
 
@@ -481,8 +567,15 @@ export class ChargingController implements StatusListener {
       if (start > b.latestStart!) return `Cannot move ${b.sessionId} more than ${config().value("CHARGING_SHIFT_TOLERANCE") / MINUTE} min later (BR-CHG-02).`;
     }
     if (start < p.horizon.start) return "Outside the horizon.";
+    const kept = this.keptFree(p.keepFree ?? [], pointId, start, end);
+    if (kept) return `${pointId} is kept free ${fmtHM(kept.window.start)}–${fmtHM(kept.window.end)} (${kept.reason}).`;
     if (!this.fits(p, pointId, start, end, b.sessionId)) return `${pointId} is taken at ${fmtHM(start)}.`;
-    if (!this.underPeak({ blocks: p.blocks.filter((x) => x.sessionId !== b.sessionId) }, pt.kw, start, end, p.hubId)) return `The Hub would exceed its ${this.peakKw(p.hubId)} kW peak.`;
+    // The moved block is left out first, so its old position is not counted twice.
+    const over = this.peakViolation(p.blocks.filter((x) => x.sessionId !== b.sessionId), pt.kw, start, end, p.hubId);
+    if (over) {
+      const already = over.parts.length ? `${over.load} kW already planned (${over.parts.map((x) => `${x.pointId} ${x.kw}`).join(" + ")})` : "0 kW already planned";
+      return `At ${fmtHM(over.t)} the Hub would draw ${over.load + pt.kw} kW: ${already} + ${pt.kw} kW for ${pointId}. The limit is ${this.peakKw(p.hubId)} kW (76% of the ${this.installedKw(p.hubId)} kW installed).`;
+    }
     return null;
   }
 

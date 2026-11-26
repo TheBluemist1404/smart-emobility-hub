@@ -92,7 +92,7 @@ describe("UC-11 smart charging", () => {
 describe("UC-13 what-if simulation", () => {
   const period = () => ({ start: now() + min(30), end: now() + min(30) + 2 * HOUR });
 
-  it("TC-UC13-02 scenario B: overflow = returns − (free docks + pickups); vehicles move out, the Hub keeps 10%", () => {
+  it("TC-UC13-02 scenario B: overflow = returns − (free docks + pickups); vehicles move out, the Hub keeps its pickups plus 10%", () => {
     ctl.simulation.startSimulation("H03");
     ctl.simulation.defineScenario("B return wave", ["H03"], period(), [{ name: "extraReturns", value: 100 }]);
     const s = ctl.simulation.run();
@@ -104,7 +104,10 @@ describe("UC-13 what-if simulation", () => {
     expect(moves.length).toBeGreaterThan(0);
     expect(moves.every((r) => r.params.fromHub === "H03" && r.params.toHub !== "H03")).toBe(true);
     const moved = moves.reduce((n, r) => n + (r.params.quantity ?? 0), 0);
-    expect(h.available - moved).toBeGreaterThanOrEqual(Math.ceil(0.1 * h.docksInService));
+    // The wave brings vehicles back, so the Hub may send out more than it holds now, but never so many
+    // that it falls short of its own pickups plus HUB_SHORTAGE_RATIO of its docks.
+    expect(s.after[0].shortage).toBe(0);
+    expect(h.available + 100 - moved - m.demand).toBeGreaterThanOrEqual(Math.ceil(0.1 * h.docksInService));
     expect(s.after[0].overflow).toBe(Math.max(0, m.overflow - moved));
   });
 

@@ -38,7 +38,7 @@ export function createControllers(): Controllers {
   const charging = new ChargingController(payment);
   const redistribution = new RedistributionController();
   const incident = new IncidentController(reservation, rental, charging, redistribution);
-  const simulation = new SimulationController();
+  const simulation = new SimulationController(charging);
   // ReservationController is not a StatusListener in the design; the parking sensor event
   // reaches it through this small adapter (UC-04 step 14).
   const parkingSensor: StatusListener = { onIoTEvent: (e: IoTEvent) => { if (e.type === "parkingSensor") reservation.parkingSensor(e.spaceId, e.occupied, e.at); } };

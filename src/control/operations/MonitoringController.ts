@@ -6,6 +6,7 @@ import { config } from "../../platform/config/ConfigurationRegistry";
 import { clock } from "../../platform/clock/DemoClock";
 import { Hub, type HubSnapshot } from "../../domain/network/Hub";
 import { Incident } from "../../domain/operations/Incident";
+import { kmBetween, safeRoom } from "../../domain/operations/OutflowPlan";
 import { OperatorConsole } from "../../api/push";
 import type { IoTEvent, StatusListener } from "../../gateway/iot/StatusListener";
 import type { HubCategory, HubStatus } from "../../domain/types";
@@ -35,8 +36,9 @@ export class MonitoringController implements StatusListener {
     if (!h) throw new Error(`Unknown Hub ${hubId}`);
     const d = h.getDetails();
     const nearby = [...db.hubs.values()].filter((x) => x.id !== hubId && !x.isStale())
-      .map((x) => ({ hubId: x.id, name: x.name, netFreeDocks: x.netFreeDocks(), status: x.status, available: x.snapshot().available, km: Math.round(Math.hypot(x.x - h.x, x.y - h.y) * 0.04 * 10) / 10 }))
-      .sort((a, b) => b.netFreeDocks - a.netFreeDocks).slice(0, 3);
+      .map((x) => { const sn = x.snapshot(); return { hubId: x.id, name: x.name, netFreeDocks: x.netFreeDocks(), safeRoom: safeRoom(sn, config().value("HUB_BUSY")), status: x.status, available: sn.available, km: kmBetween(x, h) }; })
+      // Nearest first, the same order the redistribution plan fills them in (OutflowPlan).
+      .filter((x) => x.netFreeDocks > 0).sort((a, b) => a.km - b.km).slice(0, 4);
     return { ...d, nearby, acknowledged: this.acknowledged.get(hubId) ?? null, history: this.history(h) };
   }
 

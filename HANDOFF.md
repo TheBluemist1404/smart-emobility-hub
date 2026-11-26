@@ -8,7 +8,7 @@ Pushed to GitHub. A new session only needs this file, the README and the docs be
 ```powershell
 npm install
 npm run dev     # one port, 5173: /stage, /student, /operator (?tools=0 hides Demo tools)
-npm test        # 82 Vitest tests, named by TC ID (CORE-nn platform, DEMO-nn demo tools)
+npm test        # 94 Vitest tests, named by TC ID (CORE-nn platform, DEMO-nn demo tools)
 npm run typecheck
 ```
 
@@ -266,3 +266,74 @@ or in `/stage`; no dead buttons on any screen; no JS exceptions in the console.
   "Report IR-… from student …").
 - A vehicle that broke down in transit is still counted at its source Hub in O01 (not docked).
 - Browser consoles log the API's 4xx validation answers as failed requests; they are expected.
+
+## Teammate feedback round (2026-11-26)
+
+A teammate tested the public URL and sent 13 problems. Each was reproduced in the real UI
+(preview "mvp" at 1440 and 1280 px and inside `/stage`), fixed at the root, and checked again.
+
+### Found and fixed
+
+- **Second rental showed no scan screen.** Already fixed by 039aafa (deployed after the test).
+  Three rent -> return -> rent rounds open the scan screen from the ticket, the Find a Hub
+  banner and the Trip tab, with no Reset.
+- **Redistribution was only 1-to-1.** New `src/domain/operations/OutflowPlan.ts` holds the one
+  rule: a Hub above the 70 % safe ceiling (HUB_BUSY) sends its excess to the nearest Hub first,
+  fills it only up to 70 % (docks promised to open orders count as filled), then the next
+  nearest, until the excess is placed. Used by the O02 suggestions (one row per leg, "leg x of
+  n"), the Hub panel on O01 ("Redistribution plan" with a Create order button per leg and
+  "room for N before 70 %" per nearby Hub) and the UC-13 recommendations. Two overloaded Hubs
+  share a destination's room instead of both counting it.
+- **New order kept a stale validation** ("31 >= 1" after switching to H02 and 5). Old answers
+  are dropped; Confirm stays disabled until the check for the current form arrives and passes.
+  The server re-validates on commit, as before.
+- **Scenario A moved vehicles into H02 (97 %) and took them from H04 (short).** Transfers now
+  go only into Hubs with room below 70 %, and never from a Hub flagged Vehicle Shortage. A full
+  Hub gets the advisory "No transfer into H02: it is at 97 %".
+- **What-if form did not match the result; 500 % stayed "Valid".** The form is filled from the
+  scenario that produced the result; inputs are validated as you type and Run is disabled
+  while invalid. Opening the simulator from another Hub discards an older result for a
+  different Hub.
+- **Scenario B: H02 overflow 24, no H02 recommendation.** B now plans outflow from each
+  overflowing Hub (transfers, nearest first) and advises redirecting returning students
+  ("Send 20 returning students from H02 to H05 ...").
+- **Scenario C was unclear and Apply did not match.** The result shows, per Hub, the normal
+  plan vs the plan with the failure (served, unserved, wait, peak kW) and every session on a
+  failing point: moved, shifted, stops early, unserved, or cancelled with a refund. Apply now
+  stores a **keep-free window** in ChargingController (points stay In Service, no session is
+  planned on them in the window, every later schedule honours it until it ends) and commits
+  exactly the simulated plan. O03 shows the window as a hatched band with a banner. A run for a
+  later window says so on the result and opens O03 at that window.
+- **Missing "surge in charging demand" scenario.** New scenario **D - Charging demand surge**
+  (1-60 extra requests, 60 min each, spread over the period). It picks the set of points to
+  keep free that serves the most surge requests, shows surge served/wait before and after and
+  what it costs the shared fleet, and applies through the same keep-free window.
+- **Smart charging rejected a move "over 55 kW".** The check was right; the message was not
+  clear. Each session draws its point's rated power (7 or 22 kW AC); the limit is
+  round(0.76 x installed kW) = 55 kW at H02 (72 kW installed). The moved block is left out
+  first (no double count), sessions already charging count, Out of Service points have none.
+  The message now names the slot, what is planned there (CP-... 7 + ...), the point's kW and
+  the limit; the load chart shows kW per slot with a hover list of the sessions.
+- **Student hub cards ignored the vehicle filter.** With a type or battery filter the count is
+  of matching vehicles only, labelled "E-bikes available" / "E-motorbikes available".
+- **Star button did nothing.** It toggles a favourite (per browser, `localStorage`
+  `seh.favHubs`); favourites are listed first on S01 and marked with a star.
+- **H06 Parking/Charging tabs looked live and bookable.** They show "Last update ... - counts
+  may have changed" and Reserve parking / Schedule charging are disabled (UC-01 E1).
+- **S05/S06 errors appeared far below the button.** They now appear just above it and scroll
+  into view.
+- **Incident description sat outside the card.** It has its own "Description" card that wraps
+  long, short and Vietnamese text.
+- **O01 Hubs table cut LAST UPDATE at 1440/1280.** Flags wrap; the last column fits.
+- **O03 "now" label covered a time label; short blocks were clipped.** The header label under
+  the now line is hidden; blocks narrower than 13 % of the horizon drop the lock icon and keep
+  the full text in a tooltip (with kW).
+- **Operator icon rail scrolled away in `/stage`.** `.console.live` had `overflow: hidden`,
+  which made it the scroll container for the sticky sidebar and topbar. It is now
+  `overflow: clip`.
+
+Tests: `tests/teammate-feedback.test.ts` (12 tests: filtered count, order refusal, outflow
+plan, multi-leg suggestions, scenarios A/B/C/D, the power formula and its message). Four older
+simulation tests were updated for the new rules. Total 94.
+
+The reply to the teammate is in `notes/reply-viet.md`.

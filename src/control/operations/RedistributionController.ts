@@ -6,6 +6,7 @@ import { clock, fmtHM, fmtTime, MINUTE } from "../../platform/clock/DemoClock";
 import { Hub } from "../../domain/network/Hub";
 import { Vehicle } from "../../domain/network/Vehicle";
 import { Dock } from "../../domain/network/Dock";
+import { excessOver, planOutflow, safeRoom, type DestinationState } from "../../domain/operations/OutflowPlan";
 import { RedistributionOrder } from "../../domain/operations/RedistributionOrder";
 import { VehicleTransfer } from "../../domain/operations/VehicleTransfer";
 import { Incident } from "../../domain/operations/Incident";
@@ -20,7 +21,11 @@ export interface Shortfall {
   ok: boolean; eligible: number; netFreeDocks: number; candidates: Array<{ id: string; soc: number; status: string; eligible: boolean; why?: string }>;
   checks: Array<{ label: string; ok: boolean; detail: string }>; alternatives: Array<{ hubId: string; name: string; value: number; role: "source" | "destination" }>; message: string | null;
 }
-export interface Suggestion { fromHub: string; toHub: string; model: string; quantity: number; reason: string; detail: string }
+export interface Suggestion {
+  fromHub: string; toHub: string; model: string; quantity: number; reason: string; detail: string;
+  /** Set for an overload plan: one source split over several destinations (nearest first). */
+  plan?: { sourceHub: string; excess: number; leg: number; legs: number; placed: number; left: number; km: number; room: number; shared: number; ceilingPct: number; note: string | null };
+}
 
 const OPERATOR = "OP-014";
 
@@ -45,29 +50,65 @@ export class RedistributionController implements StatusListener {
     };
   }
 
-  /** BR-HUB-01 driven suggestions: overloaded Hubs push to the freest Hub, shortage Hubs pull from the fullest. */
   /** The pre-filled order for UC-09 5a "Create Redistribution Order" on one Hub, from the same rules. */
   orderSeedFor(hubId: string): Suggestion | null {
-    return this.suggestions(Infinity).find((s) => s.fromHub === hubId || s.toHub === hubId) ?? null;
+    return this.orderPlanFor(hubId)[0] ?? null;
   }
 
-  private suggestions(limit = 3): Suggestion[] {
+  /** Every suggestion that moves vehicles out of or into one Hub (the whole multi-destination plan). */
+  orderPlanFor(hubId: string): Suggestion[] {
+    return this.suggestions(Infinity).filter((s) => s.fromHub === hubId || s.toHub === hubId);
+  }
+
+  /**
+   * BR-HUB-01 driven suggestions. An overloaded (or at-risk) Hub sends its excess over the safe
+   * ceiling (HUB_BUSY) to several nearby Hubs, nearest first, each filled up to that ceiling
+   * (planOutflow). A Hub short of vehicles pulls from the Hub with the most eligible vehicles.
+   */
+  private suggestions(limit = 8): Suggestion[] {
     const live = Hub.getLatestStatus().filter((h) => !h.stale);
     const out: Suggestion[] = [];
     const busy = (id: string) => [...db.orders.values()].some((o) => o.isOpen() && (o.fromHub === id || o.toHub === id) && o.status !== "Draft");
-    for (const h of live.filter((x) => x.status === "Overloaded" || x.status === "Risk of Overload")) {
-      const dest = live.filter((x) => x.hubId !== h.hubId && !["Overloaded", "Risk of Overload"].includes(x.status)).map((x) => ({ x, free: db.hubs.get(x.hubId)!.netFreeDocks() })).sort((a, b) => b.free - a.free)[0];
-      if (!dest || dest.free <= 0) continue;
-      const q = Math.min(dest.free, Math.max(1, Math.ceil(h.occupiedDocks - 0.8 * h.docksInService)), Vehicle.countEligible(db.hubs.get(h.hubId)!, "e-bike"));
-      if (q <= 0) continue;
-      out.push({ fromHub: h.hubId, toHub: dest.x.hubId, model: "e-bike", quantity: q, reason: h.status, detail: `${h.hubId} at ${h.occupancy}%; ${dest.x.hubId} has ${dest.free} net free docks` });
+    const ceilingPct = config().value("HUB_BUSY");
+    const dests: DestinationState[] = live.map((x) => ({ hubId: x.hubId, x: x.x, y: x.y, docksInService: x.docksInService, occupiedDocks: x.occupiedDocks, vacantDocks: x.vacantDocks, allocatedDocks: x.allocatedDocks }));
+    const used = new Map<string, number>();
+    // The fullest Hub plans first.
+    for (const h of live.filter((x) => x.status === "Overloaded" || x.status === "Risk of Overload").sort((a, b) => (b.occupancy ?? 0) - (a.occupancy ?? 0))) {
+      const hub = db.hubs.get(h.hubId)!;
+      // Vehicles already assigned to leave (not departed yet) still sit in their docks.
+      const leaving = [...db.orders.values()].filter((o) => o.isOpen() && o.fromHub === h.hubId).reduce((n, o) => n + o.transfers.filter((t) => t.status === "Assigned").length, 0);
+      const excess = Math.max(0, excessOver(h, ceilingPct) - leaving);
+      if (excess <= 0) continue;
+      const byModel = (["e-bike", "e-motorbike"] as const).map((m) => ({ m, n: Vehicle.countEligible(hub, m) }));
+      const eligible = byModel.reduce((a, b) => a + b.n, 0);
+      // Room is shared between plans: what one overloaded Hub's plan takes, the next one can't use.
+      const usedBefore = new Map(used);
+      const plan = planOutflow(h, Math.min(excess, eligible), dests.filter((d) => d.hubId !== h.hubId), ceilingPct, (d) => Math.max(0, safeRoom(d, ceilingPct) - (used.get(d.hubId) ?? 0)));
+      for (const l of plan.legs) used.set(l.toHub, (used.get(l.toHub) ?? 0) + l.quantity);
+      const left = excess - plan.placed;
+      const why = left <= 0 ? null : eligible < excess
+        ? `${left} more can't move now: only ${eligible} eligible vehicle${eligible === 1 ? "" : "s"} at ${h.hubId} (the rest are reserved, charging below REDISTRIBUTION_MIN_SOC or waiting for charge).`
+        : `${left} more can't move now: no other Hub has room below ${ceilingPct}%.`;
+      // Split each leg by model, e-bikes first.
+      const stock = byModel.map((x) => ({ ...x }));
+      const legs: Array<{ toHub: string; model: string; quantity: number; km: number; room: number; shared: number }> = [];
+      for (const l of plan.legs) {
+        let q = l.quantity;
+        for (const st of stock) { const take = Math.min(q, st.n); if (take > 0) { legs.push({ toHub: l.toHub, model: st.m, quantity: take, km: l.km, room: l.room, shared: usedBefore.get(l.toHub) ?? 0 }); st.n -= take; q -= take; } }
+      }
+      legs.forEach((l, i) => out.push({
+        fromHub: h.hubId, toHub: l.toHub, model: l.model, quantity: l.quantity, reason: h.status,
+        detail: `${h.hubId} at ${h.occupancy}% · ${excess} over the ${ceilingPct}% ceiling · leg ${i + 1} of ${legs.length}: ${l.toHub} (${l.km} km) can take ${l.room} before reaching ${ceilingPct}%${l.shared ? ` (${l.shared} more of its room is planned for a fuller Hub)` : ""}`,
+        plan: { sourceHub: h.hubId, excess, leg: i + 1, legs: legs.length, placed: plan.placed, left, km: l.km, room: l.room, shared: l.shared, ceilingPct, note: why },
+      }));
     }
-    for (const h of live.filter((x) => x.flags.includes("Vehicle Shortage") && x.status !== "Overloaded")) {
+    for (const h of live.filter((x) => x.flags.includes("Vehicle Shortage") && x.status !== "Overloaded" && x.status !== "Risk of Overload")) {
       if (busy(h.hubId)) continue;
-      const src = live.filter((x) => x.hubId !== h.hubId).map((x) => ({ x, n: Vehicle.countEligible(db.hubs.get(x.hubId)!, "e-bike") })).sort((a, b) => b.n - a.n)[0];
+      const src = live.filter((x) => x.hubId !== h.hubId && !x.flags.includes("Vehicle Shortage")).map((x) => ({ x, n: Vehicle.countEligible(db.hubs.get(x.hubId)!, "e-bike") })).sort((a, b) => b.n - a.n)[0];
       if (!src || src.n < 2) continue;
       const need = Math.max(1, Math.ceil(config().value("HUB_SHORTAGE_RATIO") / 100 * h.docksInService) - h.available + 1);
-      out.push({ fromHub: src.x.hubId, toHub: h.hubId, model: "e-bike", quantity: Math.min(need, src.n, db.hubs.get(h.hubId)!.netFreeDocks()), reason: "Vehicle Shortage", detail: `${h.hubId} has ${h.available} Available, below ${config().value("HUB_SHORTAGE_RATIO")}% of ${h.docksInService} docks` });
+      const room = Math.max(0, safeRoom(h, ceilingPct) - (used.get(h.hubId) ?? 0));
+      out.push({ fromHub: src.x.hubId, toHub: h.hubId, model: "e-bike", quantity: Math.min(need, src.n, room), reason: "Vehicle Shortage", detail: `${h.hubId} has ${h.available} Available, below ${config().value("HUB_SHORTAGE_RATIO")}% of ${h.docksInService} docks` });
     }
     return out.filter((s) => s.quantity > 0).slice(0, limit);
   }
@@ -88,8 +129,8 @@ export class RedistributionController implements StatusListener {
     const netFree = dst.netFreeDocks();
     const q = Math.max(0, Math.floor(d.quantity || 0));
     checks.push({ label: "Source and destination differ", ok: src.id !== dst.id, detail: src.id === dst.id ? "Same Hub" : "OK" });
-    checks.push({ label: "Eligible vehicles at source", ok: eligible >= q, detail: `${eligible} ≥ ${q}` });
-    checks.push({ label: "Destination net free docks", ok: netFree >= q, detail: `${netFree} ≥ ${q}` });
+    checks.push({ label: "Eligible vehicles at source", ok: eligible >= q, detail: `${eligible} eligible · ${q} needed` });
+    checks.push({ label: "Destination net free docks", ok: netFree >= q, detail: `${netFree} free · ${q} needed` });
     const picked = d.vehicleIds ?? [];
     const bad = picked.filter((id) => !db.vehicles.get(id)?.isEligibleForOrder());
     checks.push({ label: "No vehicle reserved or in a trip", ok: bad.length === 0, detail: bad.length ? bad.join(", ") : "OK" });

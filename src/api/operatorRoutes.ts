@@ -21,7 +21,7 @@ export function operatorRoutes(): Router {
     const q = req.query as Record<string, string>;
     res.json({ ...o, hubs: ctl.monitoring.filter({ category: q.category as never, status: q.status as never, vehicleType: q.vehicleType, sort: q.sort as never }) });
   });
-  r.get("/hub/:id", (req, res, next) => { try { res.json({ ...ctl.monitoring.getHubDetails(req.params.id), orderSeed: ctl.redistribution.orderSeedFor(req.params.id) }); } catch (e) { next(e); } });
+  r.get("/hub/:id", (req, res, next) => { try { res.json({ ...ctl.monitoring.getHubDetails(req.params.id), orderSeed: ctl.redistribution.orderSeedFor(req.params.id), orderPlan: ctl.redistribution.orderPlanFor(req.params.id) }); } catch (e) { next(e); } });
   r.get("/search", (req, res) => res.json(searchOperator(String(req.query.q ?? ""))));
   r.get("/alerts", (_req, res) => res.json(db.alerts.slice().reverse().slice(0, 40)));
   r.post("/alerts/ack", wrap((req) => ctl.monitoring.acknowledge(String(req.body.id), OPERATOR)));
@@ -34,7 +34,7 @@ export function operatorRoutes(): Router {
   r.post("/orders/:id/cancel", wrap((req) => ctl.redistribution.cancelOrder(req.params.id, String(req.body.reason ?? ""), OPERATOR)));
 
   // ---- UC-11 smart charging -----------------------------------------------------------
-  r.get("/charging/:hubId", (req, res) => res.json(ctl.charging.openSchedule(req.params.hubId, Number(req.query.hours ?? 4))));
+  r.get("/charging/:hubId", (req, res) => res.json(ctl.charging.openSchedule(req.params.hubId, Math.min(36, Math.max(1, Number(req.query.hours ?? 4) || 4)), req.query.from ? Number(req.query.from) : undefined)));
   r.post("/charging/:hubId/generate", wrap((req) => ctl.charging.generateSchedule(req.params.hubId, Number(req.body.hours ?? 4))));
   r.post("/charging/:hubId/emergency", wrap((req) => ctl.charging.setEmergency(req.params.hubId, String(req.body.sessionId), String(req.body.reason ?? ""), OPERATOR)));
   r.post("/charging/:hubId/move", wrap((req) => ctl.charging.moveBlock(req.params.hubId, String(req.body.sessionId), String(req.body.pointId), Number(req.body.start))));

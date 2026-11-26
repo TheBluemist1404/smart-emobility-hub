@@ -16,7 +16,7 @@ export class Recommendation {
     public readonly title: string,
     public readonly detail: string,
     /** transfer: source, destination, quantity, model. charging plan: hub, point IDs excluded. alternative Hub: hubs. */
-    public readonly params: { fromHub?: string; toHub?: string; quantity?: number; model?: string; hubId?: string; points?: string[]; hubs?: string[] },
+    public readonly params: { fromHub?: string; toHub?: string; quantity?: number; model?: string; hubId?: string; points?: string[]; hubs?: string[]; window?: { start: number; end: number }; purpose?: "failure" | "surge" },
   ) {}
 
   /** Only UC-10 or UC-11 actions can be applied; alternative Hubs stay advisory (UC-13 step 9). */
@@ -40,6 +40,8 @@ export class Recommendation {
     }
     const hub = live.hubs.find((h) => h.hubId === this.params.hubId);
     if (!hub || hub.stale) { this.validity = "invalid"; this.validityNote = "The Hub is not reporting."; }
+    else if (this.params.window && this.params.window.end <= live.takenAt) { this.validity = "invalid"; this.validityNote = "The simulated window has already ended."; }
+    else if (this.params.window && (this.params.points ?? []).some((p) => !live.points.some((x) => x.id === p && x.hubId === hub.hubId))) { this.validity = "invalid"; this.validityNote = "A point of this plan no longer exists at the Hub."; }
     else { this.validity = "valid"; this.validityNote = `${hub.freeChargers} charging points free now at ${hub.hubId}.`; }
     return this.validity;
   }

@@ -6,18 +6,24 @@ import type { OpGo } from "./OperatorConsole";
 
 interface Block { sessionId: string; pointId: string; start: number; end: number; committed: boolean; status: string; vehicleId: string; soc: number | null; targetSoc: number; priority: number | null; emergency: boolean; originalStart: number | null; latestStart: number | null; moved: boolean; locked: boolean }
 interface Proposal { hubId: string; horizon: { start: number; end: number }; hours: number; generatedAt: number; blocks: Block[]; current: Block[]; unserved: Array<{ sessionId: string; vehicleId: string; priority: number | null; reason: string }>; alerts: string[]; rejected: { sessionId: string; message: string } | null;
-  kpis: { serviced: number; servicedWas: number; avgWait: number; avgWaitWas: number; peakKw: number; peakKwWas: number; limitKw: number; unserved: number; unservedWas: number; load: Array<{ t: number; proposed: number; current: number }> } }
+  keepFree: KeepFree[];
+  kpis: { serviced: number; servicedWas: number; avgWait: number; avgWaitWas: number; peakKw: number; peakKwWas: number; limitKw: number; unserved: number; unservedWas: number; load: LoadSlot[] } }
+interface KeepFree { hubId: string; points: string[]; window: { start: number; end: number }; ref: string; reason: string }
+interface LoadSlot { t: number; proposed: number; current: number; parts: Array<{ pointId: string; kw: number; vehicleId: string }> }
 interface Sched { hubId: string; name: string; stale: boolean; horizon: { start: number; end: number }; slotMs: number; peakKw: number; points: Array<{ id: string; power: string; kw: number; status: string; incidentId: string | null; updatedAt: number }>; blocks: Block[];
   queue: Array<{ sessionId: string; vehicleId: string; soc: number | null; priority: number | null; waitedMs: number; emergency: string | null; unserved: boolean; status: string | null; hubFlag: boolean }>; version: number; proposal: Proposal | null;
+  installedKw: number; keepFree: KeepFree[]; load: LoadSlot[];
   policy: { params: Array<{ name: string; value: number; unit: string; min: number; max: number; meaning: string }>; peakKw: number | null } }
 
 const HUBS: Array<[string, string]> = [["H01", "KTX Khu A"], ["H02", "KTX Khu B"], ["H03", "Ga Metro ĐHQG"], ["H04", "ĐH Bách khoa (Dĩ An)"], ["H05", "Nhà Văn hóa SV"], ["H06", "ĐH KHTN"], ["H07", "Thư viện Trung tâm"]];
 const pointTone = (s: string) => ({ Available: "ok", "In Use": "info", "Out of Service": "danger", Disconnected: "neutral" } as Record<string, string>)[s] ?? "neutral";
 
-export function O03Charging({ go, now, hubId: hub0 }: { go: OpGo; now: number; hubId: string }) {
+export function O03Charging({ go, now, hubId: hub0, from: from0, hours: hours0 }: { go: OpGo; now: number; hubId: string; from?: number; hours?: number }) {
   const [hubId, setHub] = useState(hub0);
-  const [hours, setHours] = useState(4);
-  const { data: s } = useLive<Sched>(`/operator/charging/${hubId}?hours=${hours}`);
+  const [hours, setHours] = useState(hours0 ?? 4);
+  // Opened from a what-if result for a later window: show that window instead of "from now".
+  const [from, setFrom] = useState<number | undefined>(from0 && from0 > now + 30 * 60_000 ? from0 : undefined);
+  const { data: s } = useLive<Sched>(`/operator/charging/${hubId}?hours=${hours}${from ? `&from=${from}` : ""}`);
   const [err, setErr] = useState<string | null>(null);
   const [msg, setMsg] = useState<string | null>(null);
   const [drag, setDrag] = useState<string | null>(null);
@@ -29,12 +35,14 @@ export function O03Charging({ go, now, hubId: hub0 }: { go: OpGo; now: number; h
   const apply = () => call(`/operator/charging/${hubId}/apply`).then((r) => { const x = r as { applied: number; shifted: string[]; cancelled: string[]; version: number }; setMsg(`Applied version ${x.version}: ${x.applied} sessions scheduled${x.shifted.length ? `, ${x.shifted.join(", ")} moved (student notified)` : ""}${x.cancelled.length ? `, ${x.cancelled.join(", ")} cancelled and refunded` : ""}.`); }).catch(() => {});
 
   if (!s) return <div className="c-body"><span className="spinner" /></div>;
-  const hz = p?.horizon ?? s.horizon;
+  const hz = p && !from ? p.horizon : s.horizon;
   const span = hz.end - hz.start;
   const slots = Math.round(span / s.slotMs);
   const pct = (t: number) => `${Math.max(0, Math.min(100, ((t - hz.start) / span) * 100))}%`;
-  const blocks = p ? p.blocks : s.blocks;
+  const blocks = p && !from ? p.blocks : s.blocks;
+  const keep = s.keepFree.filter((x) => x.window.end > hz.start && x.window.start < hz.end);
   const k = p?.kpis;
+  const load = k && !from ? k.load : s.load;
   const delta = (a: number, b: number, unit = "", better: "up" | "down" = "up") => { const d = a - b; if (!d) return <span className="subtle">no change</span>; const good = better === "up" ? d > 0 : d < 0; return <span className={good ? "delta-up" : "delta-down"}>{d > 0 ? "+" : "−"}{Math.abs(d)}{unit}</span>; };
 
   const onDrop = (pointId: string, e: React.DragEvent<HTMLDivElement>) => {
@@ -55,19 +63,21 @@ export function O03Charging({ go, now, hubId: hub0 }: { go: OpGo; now: number; h
           <p className="row" style={{ gap: 10 }}><span>{p ? <>Proposal generated <span className="mono">{hms(p.generatedAt)}</span> · not applied</> : <>Committed schedule · version <span className="mono">{s.version}</span></>}</span><span className="tag param">SCHEDULE_TIMESLOT = {s.slotMs / 60000} min</span></p></div>
         <div className="row" style={{ gap: 8, alignItems: "flex-end" }}>
           <label className="filter"><span>Hub</span><select className="input sm" style={{ width: 200 }} value={hubId} onChange={(e) => { setHub(e.target.value); setMsg(null); setErr(null); }}>{HUBS.map(([h, n]) => <option key={h} value={h}>{h} · {n}</option>)}</select></label>
-          <label className="filter"><span>Horizon</span><select className="input sm" style={{ width: 150 }} value={hours} onChange={(e) => setHours(Number(e.target.value))}>{[2, 4, 6].map((h) => <option key={h} value={h}>Next {h} hours</option>)}</select></label>
+          <label className="filter"><span>Horizon</span><select className="input sm" style={{ width: 150 }} value={hours} onChange={(e) => setHours(Number(e.target.value))}>{[...new Set([2, 4, 6, hours])].sort((a, b) => a - b).map((h) => <option key={h} value={h}>{from ? `${h} hours` : `Next ${h} hours`}</option>)}</select></label>
           <button className="btn ghost" onClick={() => setPolicy(!policy)}><Icon name="sliders-horizontal" />Policy</button>
           <button className="btn secondary" disabled={s.stale} onClick={gen}><Icon name="sparkles" />Generate Schedule</button>
         </div>
       </div>
 
+      {from && <div className="banner info"><span className="ic"><Icon name="calendar-clock" /></span><b>Showing {hm(s.horizon.start)}–{hm(s.horizon.end)}, the window of the applied what-if plan.</b><p>This is the committed schedule for that window. <a className="clickable" onClick={() => setFrom(undefined)}>Back to now</a></p></div>}
+      {keep.map((x) => <div key={x.ref} className="banner sim compact" style={{ background: "var(--sim-bg)", borderColor: "var(--sim)" }}><span className="ic" style={{ color: "var(--sim)" }}><Icon name="flask-conical" /></span><b>{x.points.join(", ")} kept free {hm(x.window.start)}–{hm(x.window.end)}</b><p>{x.reason} (UC-14). These points stay In Service; no session is planned on them in that window, and every new schedule keeps it so until it ends.</p></div>)}
       {s.stale && <div className="banner neutral"><span className="ic"><Icon name="wifi-off" /></span><b>{hubId} is Disconnected (E5).</b><p>Its charging points cannot be scheduled until the Hub reports again.</p></div>}
       {policy && <Policy s={s} onClose={() => setPolicy(false)} />}
 
       <div className="grid" style={{ gridTemplateColumns: "repeat(4,1fr)" }}>
         <div className="kpi"><div className="l"><span className="ic"><Icon name="battery-charging" /></span>Vehicles serviced</div><div className="v">{k ? k.serviced : blocks.length} {k && <small>was {k.servicedWas}</small>}</div><div className="d">{k ? <>{delta(k.serviced, k.servicedWas)} in the horizon</> : "in the horizon"}</div></div>
         <div className="kpi"><div className="l"><span className="ic"><Icon name="hourglass" /></span>Average wait</div><div className="v">{k ? k.avgWait : "–"} <small>min{k ? ` · was ${k.avgWaitWas}` : ""}</small></div><div className="d">{k ? delta(k.avgWait, k.avgWaitWas, " min", "down") : "generate to compare"}</div></div>
-        <div className="kpi"><div className="l"><span className="ic"><Icon name="gauge" /></span>Peak load</div><div className="v">{k ? k.peakKw : "–"} <small>kW{k ? ` · was ${k.peakKwWas}` : ""}</small></div><div className="d">under the {s.peakKw} kW limit</div></div>
+        <div className="kpi"><div className="l"><span className="ic"><Icon name="gauge" /></span>Peak load</div><div className="v">{k && !from ? k.peakKw : Math.max(0, ...s.load.map((l) => l.proposed))} <small>kW{k && !from ? ` · was ${k.peakKwWas}` : ""}</small></div><div className="d" title={`Limit = 76% × ${s.installedKw} kW installed`}>under the {s.peakKw} kW limit</div></div>
         <div className="kpi"><div className="l"><span className="ic" style={{ background: "var(--warn-bg)", color: "var(--warn)" }}><Icon name="circle-off" /></span>Unserved requests</div><div className="v">{k ? k.unserved : s.queue.length} {k && <small>was {k.unservedWas}</small>}</div><div className="d">{p?.unserved[0] ? `${p.unserved[0].vehicleId}${p.unserved[0].priority !== null ? ` · P ${p.unserved[0].priority.toFixed(2)}` : ""} (E1)` : k ? "all served" : "waiting in the queue"}</div></div>
       </div>
 
@@ -80,22 +90,25 @@ export function O03Charging({ go, now, hubId: hub0 }: { go: OpGo; now: number; h
               <span className="row" style={{ gap: 6 }}><i style={{ width: 14, height: 14, borderRadius: 4, background: "var(--warn-bg)", border: "1.5px dashed var(--warn)" }} />Moved (7b)</span></div></div>
           <div className="tl" style={{ padding: "0 0 4px", gridTemplateColumns: `150px repeat(${slots}, minmax(0, 1fr))` }}>
             <div className="hd" style={{ border: 0 }} />
-            {Array.from({ length: slots }, (_, i) => { const t = hz.start + i * s.slotMs; return <div key={i} className={`hd${new Date(t).getUTCMinutes() === 0 ? " hour" : ""}`}>{i % Math.max(1, Math.round(slots / 8)) === 0 ? hm(t) : ""}</div>; })}
+            {Array.from({ length: slots }, (_, i) => { const t = hz.start + i * s.slotMs; const underNow = Math.abs(t - now) < (span / slots) * 0.9 * Math.max(1, slots / 16); return <div key={i} className={`hd${new Date(t).getUTCMinutes() === 0 ? " hour" : ""}`}>{i % Math.max(1, Math.round(slots / 8)) === 0 && !underNow ? hm(t) : ""}</div>; })}
             {s.points.map((pt, pi) => {
               const down = pt.status === "Out of Service" || pt.status === "Disconnected";
               return [
                 <div key={`l${pt.id}`} className="lane"><b>{pt.id}</b><span className={`chip ${pointTone(pt.status)}`}>{pt.status}</span></div>,
                 <div key={`t${pt.id}`} className={`track${down ? " out" : ""}`} style={{ gridColumn: `span ${slots}`, ...(down ? {} : { backgroundImage: `repeating-linear-gradient(90deg, var(--line) 0 1px, transparent 1px calc(100% / ${slots}))` }) }} onDragOver={(e) => e.preventDefault()} onDrop={(e) => onDrop(pt.id, e)}>
-                  <span className="now" style={{ left: pct(now) }}>{pi === 0 && <span className="lbl">{hm(now)}</span>}</span>
+                  {now >= hz.start && now <= hz.end && <span className="now" style={{ left: pct(now) }}>{pi === 0 && <span className="lbl">{hm(now)}</span>}</span>}
+                  {keep.filter((x) => x.points.includes(pt.id)).map((x) => <div key={x.ref} className="keepfree" style={{ left: pct(x.window.start), width: `calc(${pct(x.window.end)} - ${pct(x.window.start)})` }} title={`${pt.id} kept free ${hm(x.window.start)}–${hm(x.window.end)} · ${x.reason}`}><span>Kept free · what-if</span></div>)}
                   {down && <div className="blk" style={{ left: "2%", width: "70%", color: "var(--danger)", justifyContent: "center" }}><span className="row" style={{ gap: 6 }}><Icon name="plug" className="ic-sm" />{pt.status}{pt.incidentId ? ` · ${pt.incidentId}` : ""}{pt.status === "Out of Service" ? " (E3)" : " (E5)"} · no sessions planned</span></div>}
                   {blocks.filter((b) => b.pointId === pt.id).map((b) => {
                     const rejected = p?.rejected?.sessionId === b.sessionId;
                     const cls = b.committed ? "student" : b.moved ? "moved" : "shared";
+                    const narrow = (b.end - b.start) / span < 0.13;
+                    const tip = `${b.committed ? `${b.sessionId} · student, paid` : `${b.vehicleId} · shared${b.priority !== null ? ` · P ${b.priority.toFixed(2)}` : ""}`} · ${pt.id} ${hm(b.start)}–${hm(b.end)} · ${pt.kw} kW${b.locked ? " · charging now" : p && !from ? " · drag to another point or time" : ""}`;
                     return (
-                      <div key={b.sessionId} className={`blk ${cls}`} draggable={!!p && !b.locked} title={b.locked ? "Charging now" : p ? "Drag to another point or time" : ""}
+                      <div key={b.sessionId} className={`blk ${cls}${narrow ? " narrow" : ""}`} draggable={!!p && !from && !b.locked} title={tip}
                         onDragStart={(e) => { setDrag(b.sessionId); const r = (e.currentTarget.parentElement as HTMLDivElement).getBoundingClientRect(); e.dataTransfer.setData("text/offset", String(((e.clientX - e.currentTarget.getBoundingClientRect().left) / r.width) * span)); }}
                         style={{ left: pct(b.start), width: `calc(${pct(b.end)} - ${pct(b.start)} - 3px)`, ...(rejected ? { boxShadow: "0 0 0 2px var(--danger)" } : {}), ...(b.emergency ? { outline: "2px solid var(--danger)" } : {}), cursor: p && !b.locked ? "grab" : "default" }}>
-                        {b.committed ? <span className="row" style={{ gap: 5 }}><Icon name="lock" className="ic-sm" />{b.sessionId}<span className="opt"> · committed</span></span> : <span>{b.vehicleId}{b.locked ? " · charging" : b.priority !== null ? ` · P ${b.priority.toFixed(2)}` : ""}</span>}
+                        {b.committed ? <span className="row" style={{ gap: 5 }}>{!narrow && <Icon name="lock" className="ic-sm" />}{b.sessionId}<span className="opt"> · committed</span></span> : <span>{b.vehicleId}<span className="opt">{b.locked ? " · charging" : b.priority !== null ? ` · P ${b.priority.toFixed(2)}` : ""}</span></span>}
                         <small>{b.committed ? <>{hm(b.start)}–{hm(b.end)}<span className="opt"> · {rejected ? "move rejected" : `shift ≤ +${((b.latestStart ?? 0) - (b.originalStart ?? 0)) / 60000} min`}</span></> : b.moved ? `moved (7b) · ${hm(b.start)}` : `${b.soc ?? "?"}% → ${b.targetSoc}%`}</small>
                       </div>
                     );
@@ -104,18 +117,18 @@ export function O03Charging({ go, now, hubId: hub0 }: { go: OpGo; now: number; h
               ];
             })}
           </div>
-          {k && (
+          {load.length > 0 && (
             <div className="card-body" style={{ paddingTop: 14, borderTop: "1px solid var(--line)" }}>
-              <div className="row between" style={{ marginBottom: 8 }}><span className="eyebrow">Hub load per slot · proposed vs current plan</span><span className="small subtle">Limit {k.limitKw} kW</span></div>
+              <div className="row between" style={{ marginBottom: 8, flexWrap: "wrap", gap: 8 }}><span className="eyebrow">Hub load per slot{k && !from ? " · proposed vs current plan" : " · committed plan"}</span><span className="small subtle">Each session draws its point's rated power (7 or 22 kW). Limit {s.peakKw} kW = 76% × {s.installedKw} kW installed. Hover a bar for its sessions.</span></div>
               <div style={{ display: "grid", gridTemplateColumns: "150px 1fr", alignItems: "end" }}>
-                <div className="stack tight small"><span className="row" style={{ gap: 6 }}><i style={{ width: 12, height: 12, borderRadius: 3, background: "var(--brand-500)" }} />Proposed</span><span className="row" style={{ gap: 6 }}><i style={{ width: 12, height: 12, borderRadius: 3, border: "1.5px solid var(--ink-300)" }} />Current plan</span></div>
-                <div style={{ position: "relative", height: 80 }}>
-                  {(() => { const top = Math.max(k.limitKw * 1.1, ...k.load.map((l) => Math.max(l.proposed, l.current)), 1); return (
-                    <>
-                      <div style={{ position: "absolute", left: 0, right: 0, bottom: `${(k.limitKw / top) * 100}%`, borderTop: "1.5px dashed var(--danger)" }} />
-                      <div style={{ display: "grid", gridTemplateColumns: `repeat(${k.load.length},1fr)`, gap: 4, height: 80, alignItems: "end" }}>{k.load.map((l) => <i key={l.t} style={{ height: `${(l.proposed / top) * 100}%`, background: "var(--brand-500)", borderRadius: "4px 4px 1px 1px" }} />)}</div>
-                      <div style={{ display: "grid", gridTemplateColumns: `repeat(${k.load.length},1fr)`, gap: 4, height: 80, alignItems: "end", position: "absolute", inset: 0, pointerEvents: "none" }}>{k.load.map((l) => <i key={l.t} style={{ height: `${(l.current / top) * 100}%`, border: l.current ? "1.5px solid var(--ink-300)" : undefined, borderBottom: 0, borderRadius: "4px 4px 0 0" }} />)}</div>
-                    </>); })()}
+                <div className="stack tight small"><span className="row" style={{ gap: 6 }}><i style={{ width: 12, height: 12, borderRadius: 3, background: "var(--brand-500)" }} />{k && !from ? "Proposed" : "Planned"}</span>{k && !from && <span className="row" style={{ gap: 6 }}><i style={{ width: 12, height: 12, borderRadius: 3, border: "1.5px solid var(--ink-300)" }} />Current plan</span>}<span className="row" style={{ gap: 6 }}><i style={{ width: 12, borderTop: "1.5px dashed var(--danger)" }} />Limit {s.peakKw} kW</span></div>
+                <div style={{ position: "relative", height: 96, paddingTop: 16 }}>
+                  {(() => { const top = Math.max(s.peakKw * 1.1, ...load.map((l) => Math.max(l.proposed, l.current)), 1); const tip = (l: LoadSlot) => `${hm(l.t)}: ${l.proposed} kW of ${s.peakKw} kW${l.parts.length ? ` = ${l.parts.map((x) => `${x.pointId} ${x.kw} kW (${x.vehicleId})`).join(" + ")}` : " (no session)"}${k && !from ? ` · current plan ${l.current} kW` : ""}`; return (
+                    <div style={{ position: "relative", height: 80 }}>
+                      <div style={{ position: "absolute", left: 0, right: 0, bottom: `${(s.peakKw / top) * 100}%`, borderTop: "1.5px dashed var(--danger)" }} />
+                      <div className="load-bars" style={{ gridTemplateColumns: `repeat(${load.length},1fr)` }}>{load.map((l) => <i key={l.t} title={tip(l)} style={{ height: `${(l.proposed / top) * 100}%` }}>{l.proposed > 0 && <b>{l.proposed}</b>}</i>)}</div>
+                      {k && !from && <div style={{ display: "grid", gridTemplateColumns: `repeat(${load.length},1fr)`, gap: 4, height: 80, alignItems: "end", position: "absolute", inset: 0, pointerEvents: "none" }}>{load.map((l) => <i key={l.t} style={{ height: `${(l.current / top) * 100}%`, border: l.current ? "1.5px solid var(--ink-300)" : undefined, borderBottom: 0, borderRadius: "4px 4px 0 0" }} />)}</div>}
+                    </div>); })()}
                 </div>
               </div>
             </div>

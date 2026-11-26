@@ -7,6 +7,20 @@ import type { Go, Home, HubDetail, RosterHub } from "./types";
 
 const CAT_ICON: Record<string, string> = { Dormitory: "building-2", Metro: "train-front", School: "graduation-cap", Service: "landmark" };
 const vehIcon = (type: string) => (type === "electric bicycle" || type === "e-bike" ? "bike" : "motorbike");
+/** Favourite Hubs, kept per browser (localStorage); S01 lists them first. */
+const FAV_KEY = "seh.favHubs";
+function readFavs(): string[] {
+  try { const v = JSON.parse(localStorage.getItem(FAV_KEY) ?? "[]"); return Array.isArray(v) ? v.filter((x) => typeof x === "string") : []; } catch { return []; }
+}
+function useFavs(): [string[], (hubId: string) => void] {
+  const [favs, setFavs] = useState<string[]>(readFavs);
+  const toggle = (hubId: string) => {
+    const next = favs.includes(hubId) ? favs.filter((x) => x !== hubId) : [...favs, hubId];
+    setFavs(next);
+    try { localStorage.setItem(FAV_KEY, JSON.stringify(next)); } catch { /* storage blocked: kept for this page only */ }
+  };
+  return [favs, toggle];
+}
 const socClass = (soc: number) => (soc < 20 ? " low" : soc < 70 ? " mid" : "");
 
 export function Soc({ v, dark }: { v: number; dark?: boolean }) {
@@ -27,7 +41,10 @@ export function S01HubSearch({ go, now, home }: { go: Go; now: number; home: Hom
   const qs = new URLSearchParams({ nearMe: nearMe ? "1" : "0", ...(text ? { text } : {}), ...(type ? { type } : {}) }).toString();
   const { data } = useLive<{ hubs: RosterHub[]; empty: boolean }>(`/student/search?${qs}`);
   const hubs = data?.hubs ?? [];
-  const sorted = nearMe ? [...hubs].sort((a, b) => (a.distanceKm ?? 0) - (b.distanceKm ?? 0)) : hubs;
+  const [favs] = useFavs();
+  const fav = (id: string) => Number(favs.includes(id));
+  const sorted = [...hubs].sort((a, b) => fav(b.hubId) - fav(a.hubId) || (nearMe ? (a.distanceKm ?? 0) - (b.distanceKm ?? 0) : 0));
+  const availLabel = type === "electric bicycle" ? "E-bikes available" : type === "electric motorcycle" ? "E-motorbikes available" : "Vehicles available";
   const first = sorted[0];
   const vr = home?.reservation;
 
@@ -88,10 +105,11 @@ export function S01HubSearch({ go, now, home }: { go: Go; now: number; home: Hom
               <span className="hub-code lg">{h.hubId}</span>
               <div className="grow"><div className="name">{h.name}</div>
                 <div className="where">{h.distanceKm !== null ? <><Icon name="navigation" className="ic-sm" />{h.distanceKm} km · {Math.max(1, Math.round(h.distanceKm * 13))} min walk</> : <><Icon name={CAT_ICON[h.category] ?? "map-pin"} className="ic-sm" />{h.category}</>}</div></div>
+              {favs.includes(h.hubId) && <Icon name="star" className="ic-sm" style={{ color: "var(--warn, #E8A400)", fill: "currentColor" }} aria-label="Favourite" />}
               {h.stale ? <span className="chip stale">Possibly out of date</span> : <Icon name="chevron-right" style={{ color: "var(--ink-400)" }} />}
             </div>
             <div className="stats">
-              <div><div className="v"><Icon name="bike" />{h.available}</div><div className="l">Vehicles available</div></div>
+              <div><div className="v"><Icon name="bike" />{h.available}</div><div className="l">{availLabel}</div></div>
               <div><div className="v"><Icon name="square-parking" />{h.freeParking}</div><div className="l">Free parking</div></div>
               <div><div className="v"><Icon name="plug-zap" />{h.freeChargers}</div><div className="l">Free chargers</div></div>
             </div>
@@ -110,6 +128,7 @@ export function S01HubSearch({ go, now, home }: { go: Go; now: number; home: Hom
 
 export function S02HubDetail({ go, now, hubId, tab: tab0, home }: { go: Go; now: number; hubId: string; tab?: "vehicles" | "parking" | "charging"; home: Home | null }) {
   const [tab, setTab] = useState(tab0 ?? "vehicles");
+  const [favs, toggleFav] = useFavs();
   const { data: h } = useLive<HubDetail>(`/student/hub/${hubId}`);
   if (!h) return <div className="content"><span className="spinner" /></div>;
   const firstAvail = h.vehicles.find((v) => v.reservable)?.vehicleId;
@@ -121,11 +140,13 @@ export function S02HubDetail({ go, now, hubId, tab: tab0, home }: { go: Go; now:
     </div>
   );
   const blocked = !!home?.blocked;
+  const isFav = favs.includes(h.hubId);
+  const fresh = <Fresh t={h.updatedAt} now={now} stale={h.stale} />;
   const mine = home?.reservation?.vehicleId;
   return (
     <>
       <div className="m-hero" style={{ paddingBottom: 20 }}>
-        <div className="row between"><span className="icon-btn on-dark clickable" onClick={() => go({ s: "S01" })}><Icon name="chevron-left" /></span><span className="icon-btn on-dark"><Icon name="star" /></span></div>
+        <div className="row between"><span className="icon-btn on-dark clickable" onClick={() => go({ s: "S01" })}><Icon name="chevron-left" /></span><span className={`icon-btn on-dark clickable${isFav ? " on" : ""}`} role="button" aria-pressed={isFav} aria-label={isFav ? "Remove from favourites" : "Add to favourites"} title={isFav ? "Favourite · listed first on Find a Hub" : "Add to favourites"} onClick={() => toggleFav(h.hubId)}><Icon name="star" style={isFav ? { color: "#FFD233", fill: "#FFD233" } : undefined} /></span></div>
         <div className="row" style={{ marginTop: 14, gap: 12 }}><span className="hub-code lg">{h.hubId}</span>
           {h.stale ? <span className="chip stale">Possibly out of date · {hms(h.updatedAt)}</span> : <span className="fresh" style={{ color: "var(--ink-300)" }}>Updated <span className="mono" style={{ color: "var(--ink-200)" }}>{hms(h.updatedAt)}</span> · {ago(now, h.updatedAt)}</span>}</div>
         <h1 style={{ marginTop: 8 }}>{h.name}</h1>
@@ -138,11 +159,11 @@ export function S02HubDetail({ go, now, hubId, tab: tab0, home }: { go: Go; now:
       </div>
       <div className="content">
         {tabs}
-        {h.stale && <div className="banner stale compact"><span className="ic"><Icon name="wifi-off" /></span><b>{h.hubId} has sent no data since {hms(h.updatedAt)}.</b><p>Its vehicles show as "Disconnected" and can't be reserved until it reports again (UC-01 E1).</p></div>}
+        {h.stale && <div className="banner stale compact"><span className="ic"><Icon name="wifi-off" /></span><b>{h.hubId} has sent no data since {hms(h.updatedAt)}.</b><p>{tab === "vehicles" ? "Its vehicles show as \"Disconnected\" and can't be reserved" : tab === "parking" ? "Parking and charging counts may be wrong, so they can't be booked" : "Charging point states may be wrong, so charging can't be booked"} until it reports again (UC-01 E1).</p></div>}
         {blocked && tab === "vehicles" && <div className="banner danger compact"><span className="ic"><Icon name="ban" /></span><b>Reservations are blocked.</b><p>Pay the outstanding fare first (BR-PAY-04).</p></div>}
         {tab === "vehicles" && (
           <>
-            <div className="row between"><span className="small strong">Shared vehicles</span><span className="fresh">Updated <span className="mono">{hms(h.updatedAt)}</span></span></div>
+            <div className="row between"><span className="small strong">Shared vehicles</span>{fresh}</div>
             <div className="card" style={{ overflow: "hidden" }}>
               {h.vehicles.map((v) => (
                 <div key={v.vehicleId} className={`veh${v.reservable ? "" : " unavail"}`}>
@@ -158,7 +179,7 @@ export function S02HubDetail({ go, now, hubId, tab: tab0, home }: { go: Go; now:
         )}
         {tab === "parking" && (
           <section className="card">
-            <div className="card-head"><span className="h4"><Icon name="square-parking" />Parking · private EV</span><span className="fresh">Updated <span className="mono">{hms(h.updatedAt)}</span></span></div>
+            <div className="card-head"><span className="h4"><Icon name="square-parking" />Parking · private EV</span>{fresh}</div>
             <div className="card-body stack">
               {h.parking.map((p) => (
                 <div className="stack tight" key={p.type}>
@@ -166,13 +187,13 @@ export function S02HubDetail({ go, now, hubId, tab: tab0, home }: { go: Go; now:
                   <div className="meter" style={{ ["--v" as string]: `${Math.round((p.free / Math.max(1, p.total)) * 100)}%` }}><i /></div>
                 </div>
               ))}
-              <button className="btn primary block" onClick={() => go({ s: "S05", hubId: h.hubId })}><Icon name="calendar-plus" />Reserve parking</button>
+              <button className="btn primary block" disabled={h.stale} title={h.stale ? "No live data from this Hub (UC-01 E1)" : undefined} onClick={() => go({ s: "S05", hubId: h.hubId })}><Icon name="calendar-plus" />Reserve parking</button>
             </div>
           </section>
         )}
         {(tab === "parking" || tab === "charging") && (
           <section className="card">
-            <div className="card-head"><span className="h4"><Icon name="plug-zap" />Charging points</span><span className="fresh">Updated <span className="mono">{hms(h.updatedAt)}</span></span></div>
+            <div className="card-head"><span className="h4"><Icon name="plug-zap" />Charging points</span>{fresh}</div>
             <div className="list">
               {h.points.map((p) => (
                 <div key={p.pointId} className={`li${p.status === "Out of Service" ? " dim" : ""}`}>
@@ -182,7 +203,7 @@ export function S02HubDetail({ go, now, hubId, tab: tab0, home }: { go: Go; now:
                 </div>
               ))}
             </div>
-            <div className="card-body" style={{ paddingTop: 4 }}><button className={`btn ${tab === "charging" ? "primary" : "secondary"} block`} onClick={() => go({ s: "S06", hubId: h.hubId })}><Icon name="calendar-clock" />Schedule charging</button></div>
+            <div className="card-body" style={{ paddingTop: 4 }}><button className={`btn ${tab === "charging" ? "primary" : "secondary"} block`} disabled={h.stale} title={h.stale ? "No live data from this Hub (UC-01 E1)" : undefined} onClick={() => go({ s: "S06", hubId: h.hubId })}><Icon name="calendar-clock" />Schedule charging</button></div>
           </section>
         )}
       </div>

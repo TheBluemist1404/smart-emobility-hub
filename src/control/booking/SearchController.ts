@@ -27,8 +27,14 @@ export class SearchController {
     const hubs = Hub.findMatchingHubs(criteria).map((h) => {
       this.markStale(h);
       const s = h.snapshot();
+      // With a vehicle-type or battery filter the card counts only the vehicles that match it.
+      const filtered = (criteria.type && criteria.type !== "any") || criteria.minSoc;
+      const available = filtered
+        ? [...db.vehicles.values()].filter((v) => v.hubId === h.id && v.usage !== "In Use" && v.status === "Available"
+          && (!criteria.type || criteria.type === "any" || v.type === criteria.type) && v.soc >= (criteria.minSoc ?? 0)).length
+        : s.available;
       return {
-        hubId: h.id, name: h.name, category: h.category, openHours: h.openHours, available: s.available, freeParking: s.freeParking, freeChargers: s.freeChargers,
+        hubId: h.id, name: h.name, category: h.category, openHours: h.openHours, available, freeParking: s.freeParking, freeChargers: s.freeChargers,
         updatedAt: h.lastUpdateTime, stale: s.stale, distanceKm: criteria.nearMe ? h.distanceKm() : null, status: s.status, x: h.x, y: h.y,
       };
     });

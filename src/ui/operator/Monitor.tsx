@@ -13,8 +13,9 @@ export interface HubSnap {
 interface Overview { updatedAt: number; hubs: HubSnap[]; reporting: number; kpis: Record<string, number> }
 interface HubDetail extends Omit<HubSnap, "vehicles"> {
   docks: Array<{ id: string; label: string; status: string }>; vehicles: Array<{ id: string; status: string; soc: number }>; points: Array<{ id: string; status: string }>;
-  nearby: Array<{ hubId: string; name: string; netFreeDocks: number; status: string; km: number }>; acknowledged: string | null; history: number[];
+  nearby: Array<{ hubId: string; name: string; netFreeDocks: number; safeRoom: number; status: string; km: number }>; acknowledged: string | null; history: number[];
   orderSeed: { fromHub: string; toHub: string; quantity: number; model: string } | null;
+  orderPlan: Array<{ fromHub: string; toHub: string; quantity: number; model: string; detail: string; plan?: { excess: number; leg: number; legs: number; placed: number; left: number; km: number; room: number; shared: number; ceilingPct: number; note: string | null } }>;
 }
 interface Alert { id: string; time: number; hubId?: string; kind: string; message: string; acknowledgedBy?: string }
 
@@ -96,8 +97,8 @@ export function O01Monitor({ go, now, hubId }: { go: OpGo; now: number; hubId?: 
         </section>
         <section className="card span-8 r-stack" style={{ overflow: "hidden" }}>
           <div className="card-head"><span className="h4"><Icon name="table-2" />Hubs</span><span className="tag"><Icon name="arrow-down-wide-narrow" className="ic-sm" />{f.sort === "usage" ? "Usage, high first" : "Hub code"}</span></div>
-          <table className="table">
-            <thead><tr><th>Hub</th><th>Dock occupancy (R)</th><th className="r" title="Vehicles with status Available">Ready{f.vehicleType !== "all" ? ` · ${f.vehicleType}` : ""}</th><th>Status · flags</th><th className="r">Last update</th></tr></thead>
+          <table className="table hub-table">
+            <thead><tr><th>Hub</th><th>Dock occupancy (R)</th><th className="r" title="Vehicles with status Available">Ready{f.vehicleType !== "all" ? ` · ${f.vehicleType}` : ""}</th><th>Status · flags</th><th className="r upd">Last update</th></tr></thead>
             <tbody>
               {hubs.map((h) => (
                 <tr key={h.hubId} className={`clickable${h.hubId === pick ? " sel" : ""}${h.stale ? " dim" : ""}`} onClick={() => setSel(h.hubId)}>
@@ -135,6 +136,7 @@ function HubPanel({ d, now, go, alert }: { d: HubDetail; now: number; go: OpGo; 
   const vstat = ["Available", "Reserved", "Waiting for Charge", "Charging", "In Redistribution", "Under Maintenance", "Disconnected"];
   const hot = d.status === "Overloaded" || d.status === "Risk of Overload" || d.flags.length > 0;
   const tone = statusTone(d.status);
+  const plan = (d.orderPlan ?? []).filter((l) => l.fromHub === d.hubId && l.plan);
   const seed = d.orderSeed ? { fromHub: d.orderSeed.fromHub, toHub: d.orderSeed.toHub, quantity: d.orderSeed.quantity } : d.status === "Overloaded" || d.status === "Risk of Overload"
     ? { fromHub: d.hubId, toHub: d.nearby[0]?.hubId ?? "", quantity: Math.max(1, Math.min(d.nearby[0]?.netFreeDocks ?? 1, Math.ceil(d.occupiedDocks - 0.8 * d.docksInService))) }
     : { fromHub: d.nearby.find((n) => n.hubId !== d.hubId)?.hubId ?? "", toHub: d.hubId, quantity: Math.max(1, Math.ceil(d.docksInService * 0.1) - d.available + 1) };
@@ -159,11 +161,26 @@ function HubPanel({ d, now, go, alert }: { d: HubDetail; now: number; go: OpGo; 
           <div className="card-body stack">
             <div className={`banner ${tone === "danger" ? "danger" : "warn"} compact`}><span className="ic"><Icon name="gauge" /></span><b>R = {d.occupancy}% ({d.occupiedDocks} of {d.docksInService} docks){d.flags.length ? ` · ${d.flags.join(" · ")}` : ""}</b>
               <p>{d.flags.includes("Vehicle Shortage") ? `Only ${d.available} vehicle${d.available === 1 ? "" : "s"} Available, below HUB_SHORTAGE_RATIO 10% × ${d.docksInService} docks = ${Math.ceil(d.docksInService * 0.1)}.` : `Thresholds: Busy 70%, Risk 85%, Overloaded 95% (BR-HUB-01).`}</p></div>
-            <span className="eyebrow">Nearby Hubs with free capacity</span>
+            <span className="eyebrow">Nearby Hubs with free capacity · nearest first</span>
             <div className="card" style={{ boxShadow: "none", overflow: "hidden" }}><div className="list">
-              {d.nearby.map((n) => <div key={n.hubId} className="li"><span className="hub-code">{n.hubId}</span><div className="grow"><div className="t">{n.name}</div><div className="s">{n.km} km · {n.netFreeDocks} net free docks</div></div><span className={`chip ${statusTone(n.status)}`}>{n.status}</span></div>)}
+              {d.nearby.map((n) => <div key={n.hubId} className="li"><span className="hub-code">{n.hubId}</span><div className="grow"><div className="t">{n.name}</div><div className="s">{n.km} km · {n.netFreeDocks} net free docks · room for {n.safeRoom} before 70%</div></div><span className={`chip ${statusTone(n.status)}`}>{n.status}</span></div>)}
             </div></div>
-            <button className="btn primary block" onClick={() => go({ nav: "orders", order: { ...seed, model: d.orderSeed?.model ?? "e-bike", from: "O01" } })}><Icon name="truck" />Create Redistribution Order</button>
+            {plan.length > 0 && plan[0].plan && (
+              <>
+                <span className="eyebrow">Redistribution plan · {plan[0].plan.excess} over the {plan[0].plan.ceilingPct}% ceiling</span>
+                <div className="card" style={{ boxShadow: "none", overflow: "hidden" }}><div className="list">
+                  {plan.map((l, i) => (
+                    <div key={`${l.toHub}-${l.model}`} className="li">
+                      <span className="mono small strong" style={{ width: 22 }}>{i + 1}.</span>
+                      <div className="grow"><div className="t">{l.quantity} {l.model}{l.quantity === 1 ? "" : "s"} → {l.toHub}</div><div className="s">{l.plan!.km} km · room {l.plan!.room} before {l.plan!.ceilingPct}%{l.plan!.shared ? ` (${l.plan!.shared} more kept for a fuller Hub's plan)` : ""}</div></div>
+                      <button className="btn secondary xs" onClick={() => go({ nav: "orders", order: { fromHub: l.fromHub, toHub: l.toHub, quantity: l.quantity, model: l.model, from: "O01" } })}>Create order</button>
+                    </div>
+                  ))}
+                </div></div>
+                <span className="hint"><Icon name="info" />{plan[0].plan.placed} of {plan[0].plan.excess} placed, nearest Hub first, each kept at or below {plan[0].plan.ceilingPct}%.{plan[0].plan.note ? ` ${plan[0].plan.note}` : ""}</span>
+              </>
+            )}
+            <button className="btn primary block" onClick={() => go({ nav: "orders", order: { ...seed, model: d.orderSeed?.model ?? "e-bike", from: "O01" } })}><Icon name="truck" />{plan.length > 1 ? "Create order for leg 1" : "Create Redistribution Order"}</button>
             <button className="btn secondary block" onClick={() => go({ nav: "sim", hubId: d.hubId })}><Icon name="flask-conical" />Run What-if Simulation</button>
             {d.acknowledged ? <span className="hint"><Icon name="check" />Acknowledged; you will be warned again only if the severity changes.</span>
               : <button className="btn ghost block" onClick={() => api("/operator/alerts/ack", { id: alert?.id ?? d.hubId })}><Icon name="check" />Acknowledge</button>}

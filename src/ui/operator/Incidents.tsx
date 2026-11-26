@@ -132,9 +132,12 @@ function Panel({ id, go, now }: { id: string; go: OpGo; now: number }) {
             {d.live && <dl className="kv" style={{ marginTop: 8 }}><dt>Battery</dt><dd>{d.live.soc}%</dd><dt>Location</dt><dd>{d.live.location}</dd><dt>Model</dt><dd>{d.live.model}</dd></dl>}
             {d.unconfirmed && <div className="banner warn compact" style={{ marginTop: 8 }}><span className="ic"><Icon name="wifi-off" /></span><b>Status cannot be confirmed (E1).</b><p>No fresh data; act on site information.</p></div>}
           </div>
-          <p className="small">{d.description}</p>
+          <div className="card pad" style={{ boxShadow: "none" }}>
+            <span className="eyebrow">Description</span>
+            <p className="small" style={{ marginTop: 6, whiteSpace: "pre-wrap", overflowWrap: "anywhere" }}>{d.description?.trim() || <span className="subtle">No description given.</span>}</p>
+          </div>
           {d.reports.length > 0 && <><span className="eyebrow">Linked reports (5a)</span>
-            {d.reports.map((x) => <div key={x.id} className="card pad" style={{ boxShadow: "none" }}><div className="row between"><b className="mono small">{x.id}</b><span className="xs subtle">{hm(x.time)} · {x.studentId}{x.photos ? ` · ${x.photos} photo${x.photos > 1 ? "s" : ""}` : ""}</span></div><p className="small muted">"{x.text}"</p></div>)}</>}
+            {d.reports.map((x) => <div key={x.id} className="card pad" style={{ boxShadow: "none" }}><div className="row between"><b className="mono small">{x.id}</b><span className="xs subtle">{hm(x.time)} · {x.studentId}{x.photos ? ` · ${x.photos} photo${x.photos > 1 ? "s" : ""}` : ""}</span></div><p className="small muted" style={{ overflowWrap: "anywhere", whiteSpace: "pre-wrap" }}>"{x.text}"</p></div>)}</>}
           {d.affectedDetail.length > 0 && <><span className="eyebrow">Allocations on this resource</span>
             {d.affectedDetail.map((a) => <div key={a.id} className="row between small"><span><b className="mono">{a.id}</b> · {a.detail} · {a.studentId}</span><span className="chip info">{a.status}</span></div>)}</>}
           {(d.orders.length > 0 || d.reschedules.length > 0 || d.awaiting.length > 0) && <div className="stack tight small">

@@ -5,7 +5,26 @@ import type { NetworkSnapshot } from "../network/Hub";
 import type { ScenarioType, TimeWindow } from "../types";
 import type { Recommendation } from "./Recommendation";
 
-export interface ScenarioInput { name: "extraDemand" | "extraDemandPct" | "extraReturns" | "failedPoints"; value: number | string[] }
+export interface ScenarioInput { name: "extraDemand" | "extraDemandPct" | "extraReturns" | "failedPoints" | "extraChargingRequests"; value: number | string[] }
+
+/** One charging session in a what-if plan: where it was planned, and where the scenario puts it. */
+export interface ChargingMove {
+  sessionId: string; vehicleId: string; committed: boolean;
+  from: { pointId: string; start: number; end: number } | null;
+  to: { pointId: string; start: number; end: number } | null;
+  outcome: "moved" | "shifted" | "stops early" | "unserved" | "cancelled, fee refunded";
+}
+
+/** Scenarios C and D: the charging plan of one Hub, normal vs. with the scenario. */
+export interface ChargingDetail {
+  hubId: string; window: { start: number; end: number }; points: string[]; installedKw: number; limitKw: number;
+  normal: { served: number; unserved: number; waitMin: number; peakKw: number };
+  scenario: { served: number; unserved: number; waitMin: number; peakKw: number };
+  moves: ChargingMove[];
+  /** Scenario D only: the extra requests, without and with the recommended plan. */
+  surge?: { requests: number; durationMin: number; servedBefore: number; servedAfter: number; waitBefore: number; waitAfter: number; keep: string[];
+    sharedUnservedBefore: number; sharedUnservedAfter: number; placedAfter: Array<{ id: string; arrive: number; pointId: string | null; start: number | null }> };
+}
 
 export interface Measure {
   hubId: string; demand: number; supply: number; shortage: number; overflow: number; demandMetPct: number;
@@ -16,6 +35,8 @@ export class SimulationScenario {
   measures: Measure[] = [];
   recommendations: Recommendation[] = [];
   after: Measure[] = [];
+  /** Scenarios C and D: the per-Hub charging plans behind the measures. */
+  charging: ChargingDetail[] = [];
   readonly createdAt: number;
 
   constructor(

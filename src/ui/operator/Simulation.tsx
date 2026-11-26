@@ -1,27 +1,53 @@
 // O05 What-if simulation (UC-13) and O06 Apply recommendations (UC-14). Everything inside the
 // violet frame is simulated; only "Confirm and apply" changes live state, through UC-10/UC-11.
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Icon } from "../shared/Icon";
 import { ApiError, api, hm, hms } from "../shared/live";
 import type { OpGo } from "./OperatorConsole";
 
-type SType = "A demand surge" | "B return wave" | "C charging-point failure";
+type SType = "A demand surge" | "B return wave" | "C charging-point failure" | "D charging demand surge";
+interface Seg { pointId: string; start: number; end: number }
+interface ChargingDetail {
+  hubId: string; window: { start: number; end: number }; points: string[]; installedKw: number; limitKw: number;
+  normal: { served: number; unserved: number; waitMin: number; peakKw: number }; scenario: { served: number; unserved: number; waitMin: number; peakKw: number };
+  moves: Array<{ sessionId: string; vehicleId: string; committed: boolean; from: Seg | null; to: Seg | null; outcome: string }>;
+  surge?: { requests: number; durationMin: number; servedBefore: number; servedAfter: number; waitBefore: number; waitAfter: number; keep: string[]; sharedUnservedBefore: number; sharedUnservedAfter: number; placedAfter: Array<{ id: string; arrive: number; pointId: string | null; start: number | null }> };
+}
 interface Measure { hubId: string; demand: number; supply: number; shortage: number; overflow: number; demandMetPct: number; avgWaitMin: number; unservedCharging: number; sessionsToMove: number; freeDocks: number }
 interface Rec { id: string; kind: string; title: string; detail: string; actionable: boolean; params: Record<string, unknown> }
 interface Review { id: string; title: string; kind: string; useCase: string; check: string; change: string; note: string }
-interface Outcome { id: string; title: string; outcome: string; reference: string | null; note: string }
+interface Outcome { id: string; title: string; outcome: string; reference: string | null; note: string; schedule?: { hubId: string; from: number; hours: number } }
 interface SimState {
   baseline: { takenAt: number; hubs: Array<{ hubId: string; name: string; stale: boolean }>; points: Array<{ id: string; hubId: string; status: string }> };
   scenarios: Array<{ type: SType; title: string; hint: string }>; openedFrom: string | null; run: number;
   history: Array<{ run: number; type: string; hubs: string[]; at: number; demandMet: [number, number] }>;
-  scenario: { id: string; type: SType; hubs: string[]; period: { start: number; end: number } } | null;
-  measures: Measure[]; after: Measure[]; recommendations: Rec[];
+  scenario: { id: string; type: SType; hubs: string[]; period: { start: number; end: number }; inputs: Array<{ name: string; value: unknown }> } | null;
+  measures: Measure[]; after: Measure[]; recommendations: Rec[]; charging: ChargingDetail[]; now: number;
   totals: { demandMet: number; demandMetAfter: number; avgWait: number; avgWaitAfter: number; short: string[]; shortAfter: string[]; overflow: string[]; overflowAfter: string[]; unservedCharging: number; unservedChargingAfter: number } | null;
   review: Review[] | null; result: Outcome[] | null; drift?: { movedHubs: string[]; minutes: number }; liveAt?: number;
 }
 
 const H7 = 7 * 3600_000, DAY = 24 * 3600_000;
-const ICON: Record<SType, string> = { "A demand surge": "trending-up", "B return wave": "corner-down-left", "C charging-point failure": "plug" };
+const ICON: Record<SType, string> = { "A demand surge": "trending-up", "B return wave": "corner-down-left", "C charging-point failure": "plug", "D charging demand surge": "battery-charging" };
+const isCharging = (t: SType) => t === "C charging-point failure" || t === "D charging demand surge";
+
+/** The same rules the server checks (UC-13 E2), run on every keystroke so "Valid" is never stale. */
+function checkInputs(type: SType, hubs: string[], from: string, to: string, pct: string, returns: string, points: string[], extra: string, hubPoints: number): { field: string; message: string } | null {
+  if (!hubs.length) return { field: "hubs", message: "Choose at least one Hub." };
+  if (!/^\d\d:\d\d$/.test(from) || !/^\d\d:\d\d$/.test(to)) return { field: "period", message: "Enter a start and an end time." };
+  const mins = (x: string) => Number(x.slice(0, 2)) * 60 + Number(x.slice(3));
+  if (mins(to) <= mins(from)) return { field: "period", message: "The end must be after the start." };
+  if (mins(to) - mins(from) > 12 * 60) return { field: "period", message: "The period can be at most 12 h." };
+  const num = (x: string) => (x.trim() === "" ? NaN : Number(x));
+  if (type === "A demand surge") { const v = num(pct); if (!Number.isFinite(v) || v < -90 || v > 300) return { field: "extraDemandPct", message: "Pickup demand must be between −90% and +300%." }; }
+  if (type === "B return wave") { const v = num(returns); if (!Number.isInteger(v) || v < 1 || v > 300) return { field: "extraReturns", message: "Extra returns must be a whole number from 1 to 300." }; }
+  if (type === "C charging-point failure" && !points.length) return { field: "failedPoints", message: "Choose at least one charging point." };
+  if (type === "D charging demand surge") {
+    if (!hubPoints) return { field: "hubs", message: "The chosen Hubs have no charging points." };
+    const v = num(extra); if (!Number.isInteger(v) || v < 1 || v > 60) return { field: "extraChargingRequests", message: "Extra charging requests must be a whole number from 1 to 60." };
+  }
+  return null;
+}
 const toMs = (now: number, hhmm: string) => { const [h, m] = hhmm.split(":").map(Number); return Math.floor((now + H7) / DAY) * DAY - H7 + (h * 60 + m) * 60_000; };
 const nextHalf = (now: number) => hm(Math.ceil(now / 1_800_000) * 1_800_000);
 const addH = (hhmm: string, h: number) => { const [a, b] = hhmm.split(":").map(Number); const t = (a * 60 + b + h * 60) % 1440; return `${String(Math.floor(t / 60)).padStart(2, "0")}:${String(t % 60).padStart(2, "0")}`; };
@@ -36,6 +62,8 @@ export function O05Simulation({ go, now, hubId }: { go: OpGo; now: number; hubId
   const [pct, setPct] = useState("60");
   const [returns, setReturns] = useState("25");
   const [points, setPoints] = useState<string[]>([]);
+  const [extra, setExtra] = useState("12");
+  const synced = useRef<string | null>(null);
   const [sel, setSel] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [showHist, setShowHist] = useState(false);
@@ -49,12 +77,25 @@ export function O05Simulation({ go, now, hubId }: { go: OpGo; now: number; hubId
   };
   useEffect(() => { void call("start", { hubId }); }, [hubId]);
   useEffect(() => { if (st?.scenario) setSel(st.recommendations.filter((r) => r.actionable).map((r) => r.id)); }, [st?.scenario?.id, st?.run]);
+  // The form always shows the inputs of the result on the right (another operator's run included).
+  useEffect(() => {
+    const sc = st?.scenario;
+    if (!sc || synced.current === `${sc.id}-${st?.run}`) return;
+    synced.current = `${sc.id}-${st?.run}`;
+    setType(sc.type); setHubs(sc.hubs); setFrom(hm(sc.period.start)); setTo(hm(sc.period.end));
+    const v = (n: string) => sc.inputs.find((i) => i.name === n)?.value;
+    if (v("extraDemandPct") !== undefined) setPct(String(v("extraDemandPct")));
+    if (v("extraReturns") !== undefined) setReturns(String(v("extraReturns")));
+    if (v("extraChargingRequests") !== undefined) setExtra(String(v("extraChargingRequests")));
+    if (Array.isArray(v("failedPoints"))) setPoints(v("failedPoints") as string[]);
+  }, [st?.scenario?.id, st?.run]);
 
   const runIt = async () => {
     // A blank field is sent as null, so the server reports it (E2) instead of running it as 0.
     const num = (x: string) => (x.trim() === "" ? null : Number(x));
     const inputs = type === "A demand surge" ? [{ name: "extraDemandPct", value: num(pct) }]
-      : type === "B return wave" ? [{ name: "extraReturns", value: num(returns) }] : [{ name: "failedPoints", value: points }];
+      : type === "B return wave" ? [{ name: "extraReturns", value: num(returns) }]
+      : type === "D charging demand surge" ? [{ name: "extraChargingRequests", value: num(extra) }] : [{ name: "failedPoints", value: points.filter((p) => hubs.some((h) => p.startsWith(`CP-${h}-`))) }];
     setBusy(true);
     try {
       if (!st?.scenario) await api("/operator/sim/start", {});
@@ -71,8 +112,11 @@ export function O05Simulation({ go, now, hubId }: { go: OpGo; now: number; hubId
   const s = st.scenario && st.measures.length ? st : null;
   const t = s?.totals;
   const hubName = (id: string) => st.baseline.hubs.find((h) => h.hubId === id)?.name ?? id;
-  const fieldErr = (f: string) => (err?.field === f ? <span className="hint" style={{ color: "var(--danger)" }}><Icon name="circle-alert" />{err.message}</span> : null);
   const hubPoints = st.baseline.points.filter((p) => hubs.includes(p.hubId));
+  const local = checkInputs(type, hubs, from, to, pct, returns, points.filter((p) => hubPoints.some((x) => x.id === p)), extra, hubPoints.length);
+  // A live local error wins; a server error stays only until the inputs change.
+  const shown = local ?? (err?.field ? err : null);
+  const fieldErr = (f: string) => (shown?.field === f ? <span className="hint" style={{ color: "var(--danger)" }}><Icon name="circle-alert" />{shown.message}</span> : null);
   const selected = sel.filter((id) => s?.recommendations.find((r) => r.id === id)?.actionable);
 
   return (
@@ -94,11 +138,11 @@ export function O05Simulation({ go, now, hubId }: { go: OpGo; now: number; hubId
         <div className="inner">
           <div className="grid g-12">
             <section className="card span-4 r-stack-md">
-              <div className="card-head"><span className="h4"><Icon name="sliders-horizontal" />Scenario</span>{err?.field ? <span className="chip danger">Invalid</span> : <span className="chip ok">Valid</span>}</div>
+              <div className="card-head"><span className="h4"><Icon name="sliders-horizontal" />Scenario</span>{shown ? <span className="chip danger">Invalid</span> : <span className="chip ok">Valid</span>}</div>
               <div className="card-body stack">
                 <div className="stack tight">
                   {st.scenarios.map((x) => (
-                    <div key={x.type} className={`choice clickable${type === x.type ? " on" : ""}`} onClick={() => { setType(x.type); setErr(null); }}>
+                    <div key={x.type} className={`choice clickable${type === x.type ? " on" : ""}`} onClick={() => { setType(x.type); setErr(null); if (x.type === "C charging-point failure" && !points.length) setPoints([]); }}>
                       <span className="radio" /><div className="grow"><b>{x.title}</b><div className="small muted">{x.hint}</div></div><Icon name={ICON[x.type]} />
                     </div>
                   ))}
@@ -108,41 +152,41 @@ export function O05Simulation({ go, now, hubId }: { go: OpGo; now: number; hubId
                     {st.baseline.hubs.map((h) => (
                       <button key={h.hubId} disabled={h.stale} title={h.stale ? "Disconnected in the baseline (E1)" : h.name}
                         className={`chip clickable ${hubs.includes(h.hubId) ? "sim" : "neutral"}`} style={{ opacity: h.stale ? 0.45 : 1, border: 0, cursor: h.stale ? "not-allowed" : "pointer" }}
-                        onClick={() => setHubs(hubs.includes(h.hubId) ? hubs.filter((x) => x !== h.hubId) : [...hubs, h.hubId].sort())}>{h.hubId}</button>
+                        onClick={() => { setHubs(hubs.includes(h.hubId) ? hubs.filter((x) => x !== h.hubId) : [...hubs, h.hubId].sort()); setErr(null); }}>{h.hubId}</button>
                     ))}
                   </div>{fieldErr("hubs")}
                 </div>
                 <div className="two">
-                  <div className="field"><label>From</label><input className="input sm" type="time" value={from} onChange={(e) => setFrom(e.target.value)} /></div>
-                  <div className="field"><label>To</label><input className="input sm" type="time" value={to} onChange={(e) => setTo(e.target.value)} /></div>
+                  <div className="field"><label>From</label><input className="input sm" type="time" value={from} onChange={(e) => { setFrom(e.target.value); setErr(null); }} /></div>
+                  <div className="field"><label>To</label><input className="input sm" type="time" value={to} onChange={(e) => { setTo(e.target.value); setErr(null); }} /></div>
                 </div>{fieldErr("period")}
-                {type === "A demand surge" && <div className="field"><label>Pickup demand vs. baseline (%)</label><input className="input sm" type="number" value={pct} onChange={(e) => setPct(e.target.value)} /><span className="hint"><Icon name="info" />Allowed −90% to +300%.</span>{fieldErr("extraDemandPct")}</div>}
-                {type === "B return wave" && <div className="field"><label>Extra returns in the period</label><input className="input sm" type="number" value={returns} onChange={(e) => setReturns(e.target.value)} /><span className="hint"><Icon name="info" />Whole number from 1 to 300, spread over the chosen Hubs.</span>{fieldErr("extraReturns")}</div>}
+                {type === "A demand surge" && <div className="field"><label>Pickup demand vs. baseline (%)</label><input className={`input sm${shown?.field === "extraDemandPct" ? " error" : ""}`} type="number" value={pct} onChange={(e) => { setPct(e.target.value); setErr(null); }} /><span className="hint"><Icon name="info" />Allowed −90% to +300%.</span>{fieldErr("extraDemandPct")}</div>}
+                {type === "B return wave" && <div className="field"><label>Extra returns in the period</label><input className={`input sm${shown?.field === "extraReturns" ? " error" : ""}`} type="number" value={returns} onChange={(e) => { setReturns(e.target.value); setErr(null); }} /><span className="hint"><Icon name="info" />Whole number from 1 to 300, spread over the chosen Hubs.</span>{fieldErr("extraReturns")}</div>}
+                {type === "D charging demand surge" && <div className="field"><label>Extra charging requests in the period</label><input className={`input sm${shown?.field === "extraChargingRequests" ? " error" : ""}`} type="number" value={extra} onChange={(e) => { setExtra(e.target.value); setErr(null); }} /><span className="hint"><Icon name="info" />Whole number from 1 to 60, spread evenly over the period and the chosen Hubs. Each needs 1 h on a point.</span>{fieldErr("extraChargingRequests")}</div>}
                 {type === "C charging-point failure" && (
                   <div className="field"><label>Points that fail</label>
                     <div className="row" style={{ flexWrap: "wrap", gap: 6 }}>
                       {hubPoints.length === 0 && <span className="small muted">The chosen Hubs have no charging points.</span>}
-                      {hubPoints.map((p) => <button key={p.id} className={`chip clickable mono ${points.includes(p.id) ? "sim" : "neutral"}`} style={{ border: 0 }} onClick={() => setPoints(points.includes(p.id) ? points.filter((x) => x !== p.id) : [...points, p.id])}>{p.id}</button>)}
+                      {hubPoints.map((p) => <button key={p.id} className={`chip clickable mono ${points.includes(p.id) ? "sim" : "neutral"}`} style={{ border: 0 }} title={p.status} onClick={() => { setPoints(points.includes(p.id) ? points.filter((x) => x !== p.id) : [...points, p.id]); setErr(null); }}>{p.id}</button>)}
                     </div>{fieldErr("failedPoints")}
                   </div>
                 )}
               </div>
               <div className="row" style={{ padding: "12px 18px", borderTop: "1px solid var(--line)" }}>
-                <button className={`btn ${s ? "secondary" : "primary"} grow`} disabled={busy} onClick={runIt}><Icon name={s ? "rotate-ccw" : "play"} />{s ? "Rerun (10a)" : "Run simulation"}</button>
+                <button className={`btn ${s ? "secondary" : "primary"} grow`} disabled={busy || !!local} title={local ? local.message : undefined} onClick={runIt}><Icon name={s ? "rotate-ccw" : "play"} />{s ? "Rerun (10a)" : "Run simulation"}</button>
               </div>
             </section>
 
             <div className="span-8 stack loose r-stack-md">
               {!s && <div className="card pad-lg"><p className="muted">Choose a scenario and run it. The simulation uses the baseline copy only.</p></div>}
-              {s && t && (
+              {s && t && isCharging(s.scenario!.type) && <ChargingResult st={s} t={t} />}
+              {s && t && !isCharging(s.scenario!.type) && (
                 <>
                   <div className="grid" style={{ gridTemplateColumns: "repeat(4,1fr)", gap: 14 }}>
                     <Kpi icon="users" label="Demand met" v={`${t.demandMet}%`} after={`→ ${t.demandMetAfter}%`} d={<span className="sim-tag">simulated</span>} />
                     <Kpi icon="hourglass" label="Average wait" v={`${t.avgWait}`} after={`min → ${t.avgWaitAfter}`} d={<span className="sim-tag">simulated</span>} />
                     <Kpi icon="circle-minus" label="Hubs short" v={`${t.short.length}`} after={`→ ${t.shortAfter.length}`} d={t.short.length ? `${t.short.join(", ")} below S/D` : "none"} />
-                    {s.scenario!.type === "C charging-point failure"
-                      ? <Kpi icon="plug-zap" label="Unserved charging" v={`${t.unservedCharging}`} after={`→ ${t.unservedChargingAfter}`} d="requests in the period" />
-                      : <Kpi icon="layout-grid" label="Dock overflow" v={`${t.overflow.length}`} after={`→ ${t.overflowAfter.length}`} d={t.overflow.length ? `${t.overflow.join(", ")} above capacity` : "none"} />}
+                    {<Kpi icon="layout-grid" label="Dock overflow" v={`${t.overflow.length}`} after={`→ ${t.overflowAfter.length}`} d={t.overflow.length ? `${t.overflow.join(", ")} above capacity` : "none"} />}
                   </div>
                   <section className="card">
                     <div className="card-head"><span className="h4"><Icon name="chart-column" />Measures per Hub · {hm(s.scenario!.period.start)}–{hm(s.scenario!.period.end)}</span>
@@ -173,6 +217,11 @@ export function O05Simulation({ go, now, hubId }: { go: OpGo; now: number; hubId
             </div>
           </div>
 
+          {s && s.charging.length > 0 && s.charging.map((c) => <ChargingPlanCard key={c.hubId} c={c} type={s.scenario!.type} />)}
+          {s && s.scenario!.period.start > st.now + 15 * 60_000 && (
+            <div className="banner info"><span className="ic"><Icon name="calendar-clock" /></span><b>This run is for a later window: {hm(s.scenario!.period.start)}–{hm(s.scenario!.period.end)} (now {hm(st.now)}).</b>
+              <p>Applying changes only what happens in that window: {isCharging(s.scenario!.type) ? "the chosen points take no session in it, and sessions before it stay as they are" : `transfers are due before ${hm(s.scenario!.period.start)}`}. Smart charging shows it under "Open charging schedule" on the result.</p></div>
+          )}
           {s && (
             <>
               <section className="card">
@@ -270,10 +319,72 @@ function Result({ st, go, now, onDone }: { st: SimState; go: OpGo; now: number; 
             <span className={`chip ${tone[o.outcome]}`}>{o.outcome}</span><b style={{ fontSize: 15 }}>{o.title}</b>
             {o.reference && <div className="mono" style={{ fontSize: 20 }}>{o.reference}</div>}
             <span className="small muted">{o.note}</span>
+            {o.schedule && o.outcome !== "Not Applied" && <button className="btn secondary sm" onClick={() => go({ nav: "charging", hubId: o.schedule!.hubId, from: o.schedule!.from, hours: o.schedule!.hours })}><Icon name="calendar-range" />Open charging schedule · {o.schedule.hubId}</button>}
           </div>
         ))}
         {st.result!.length === 0 && <div className="card pad-lg"><p className="muted">Nothing was applied.</p></div>}
       </div>
     </div>
+  );
+}
+
+function ChargingResult({ st, t }: { st: SimState; t: NonNullable<SimState["totals"]> }) {
+  const c = st.scenario!.type === "C charging-point failure";
+  const moves = st.charging.reduce((n, x) => n + x.moves.filter((m) => m.outcome === "moved" || m.outcome === "shifted").length, 0);
+  return (
+    <>
+      <div className="grid" style={{ gridTemplateColumns: "repeat(4,1fr)", gap: 14 }}>
+        <Kpi icon="battery-charging" label={c ? "Charging requests met" : "Surge requests met"} v={`${t.demandMet}%`} after={`→ ${t.demandMetAfter}%`} d={<span className="sim-tag">simulated</span>} />
+        <Kpi icon="hourglass" label={c ? "Average charging wait" : "Surge average wait"} v={`${t.avgWait}`} after={`min → ${t.avgWaitAfter}`} d={c ? "normal plan → with the failure" : "before → with the plan"} />
+        <Kpi icon="plug-zap" label="Unserved charging" v={`${t.unservedCharging}`} after={`→ ${t.unservedChargingAfter}`} d={c ? "no re-plan → re-planned" : "surge requests"} />
+        <Kpi icon="move" label={c ? "Sessions moved" : "Points kept free"} v={c ? `${moves}` : `${st.charging.reduce((n, x) => n + x.points.length, 0)}`} after="" d={c ? "to another point or time" : "in the window, for the surge"} />
+      </div>
+    </>
+  );
+}
+
+const OUT_TONE: Record<string, string> = { moved: "info", shifted: "neutral", "stops early": "warn", unserved: "warn", "cancelled, fee refunded": "danger" };
+
+function ChargingPlanCard({ c, type }: { c: ChargingDetail; type: SType }) {
+  const fail = type === "C charging-point failure";
+  const w = `${hm(c.window.start)}–${hm(c.window.end)}`;
+  const row = (label: string, a: number | string, b: number | string, unit = "") => <tr><td>{label}</td><td className="r num">{a}{unit}</td><td className="r num"><b className="simval">{b}{unit}</b></td></tr>;
+  return (
+    <section className="card">
+      <div className="card-head"><span className="h4"><Icon name="calendar-range" />{c.hubId} charging plan · {w}</span>
+        <span className="small subtle">{fail ? <>Failing: <b className="mono">{c.points.join(", ")}</b></> : c.points.length ? <>Kept free for the surge: <b className="mono">{c.points.join(", ")}</b></> : "No point needs to be kept free"} · limit {c.limitKw} kW <span className="sim-tag">simulated</span></span></div>
+      <div className="card-body grid" style={{ gridTemplateColumns: "minmax(220px, 1fr) 2fr", gap: 18, alignItems: "start" }}>
+        <table className="table">
+          <thead><tr><th /><th className="r">{fail ? "Normal" : "Today's plan"}</th><th className="r">{fail ? "With failure" : "With the plan"}</th></tr></thead>
+          <tbody>
+            {c.surge && row("Surge requests served", `${c.surge.servedBefore}/${c.surge.requests}`, `${c.surge.servedAfter}/${c.surge.requests}`)}
+            {c.surge && row("Surge average wait", c.surge.waitBefore, c.surge.waitAfter, " min")}
+            {row(fail ? "Sessions served" : "Shared sessions served", c.normal.served, c.scenario.served)}
+            {row(fail ? "Requests unserved" : "Shared vehicles unserved", c.normal.unserved, c.scenario.unserved)}
+            {row("Average wait (queue)", c.normal.waitMin, c.scenario.waitMin, " min")}
+            {row("Peak load", c.normal.peakKw, c.scenario.peakKw, " kW")}
+          </tbody>
+        </table>
+        <div className="stack tight">
+          <span className="eyebrow">{fail ? "Sessions on the failing points, and what the re-plan does with them" : "Shared sessions the plan moves out of the kept points"}</span>
+          {c.moves.length === 0 && <span className="small muted">No session is affected.</span>}
+          {c.moves.length > 0 && (
+            <table className="table">
+              <thead><tr><th>Session</th><th>Planned</th><th>In the scenario</th><th>Outcome</th></tr></thead>
+              <tbody>{c.moves.map((m) => (
+                <tr key={m.sessionId}>
+                  <td><b className="mono small">{m.vehicleId}</b><div className="xs subtle">{m.sessionId}{m.committed ? " · student, paid" : " · shared"}</div></td>
+                  <td className="mono small">{m.from ? `${m.from.pointId} ${hm(m.from.start)}–${hm(m.from.end)}` : "—"}</td>
+                  <td className="mono small">{m.to ? `${m.to.pointId} ${hm(m.to.start)}–${hm(m.to.end)}` : "—"}</td>
+                  <td><span className={`chip ${OUT_TONE[m.outcome] ?? "neutral"}`}>{m.outcome}</span></td>
+                </tr>))}</tbody>
+            </table>
+          )}
+          <span className="hint"><Icon name="info" />{fail
+            ? `"moved": was on a failing point in ${w}. "shifted": moved to make room. "stops early": already charging, so it would stop when the point fails. Apply keeps ${c.points.join(", ")} free in ${w} (they stay In Service) and commits this plan; Smart charging then shows it.`
+            : `Each surge request needs ${c.surge?.durationMin ?? 60} min on a point and arrives spread over ${w}. Apply keeps ${c.points.join(", ") || "no point"} free in ${w} for students' bookings; shared vehicles charge outside it. A session already charging on a kept point finishes as planned.`}</span>
+        </div>
+      </div>
+    </section>
   );
 }

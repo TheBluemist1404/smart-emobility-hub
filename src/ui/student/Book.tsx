@@ -1,6 +1,6 @@
 // S05 Reserve parking (UC-04) and S06 Schedule charging (UC-05), plus the live screens of a
 // parking reservation (PR) and a charging session (CS): paying, confirmed, failed, ended.
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Icon } from "../shared/Icon";
 import { api, dayLabel, hm, mmss, useLive, vnd } from "../shared/live";
 import { BankMeter, PaymentFailed } from "./Reserve";
@@ -124,10 +124,10 @@ export function S05Parking({ go, home, now, hubId: hub0 }: { go: Go; home: Home;
           <div className="field"><label>Arrival</label><input className="input" type="datetime-local" value={arr} onChange={(e) => setArr(e.target.value)} /></div>
           <div className="field"><label>Departure</label><input className={`input${local ? " error" : ""}`} type="datetime-local" value={dep} onChange={(e) => setDep(e.target.value)} /></div>
         </div>
-        {(local || err) && <span className="err" style={{ marginTop: -6 }}><Icon name="circle-alert" />{local ?? err}</span>}
+        {local && <span className="err" style={{ marginTop: -6 }}><Icon name="circle-alert" />{local}</span>}
         <span className="hint"><Icon name="info" />Up to {(st?.maxDurationMs ?? 0) / 3_600_000} h (PARKING_MAX_DURATION), within the next {(st?.horizonMs ?? 0) / 3_600_000} h (BOOKING_HORIZON).</span>
       </div>
-      <div className="actionbar"><button className="btn primary block lg" disabled={!!local || !veh} onClick={find}>Find a space</button></div>
+      <div className="actionbar"><ActionError err={err} /><button className="btn primary block lg" disabled={!!local || !veh} onClick={find}>Find a space</button></div>
     </>
   );
 }
@@ -232,9 +232,8 @@ export function S06Charging({ go, home, now, hubId: hub0 }: { go: Go; home: Home
         </div>
         <div className="field"><label>Needed by <span className="opt">Optional</span></label><input className="input" type="datetime-local" value={needed} onChange={(e) => setNeeded(e.target.value)} />
           <span className="hint"><Icon name="shield-check" />If set, any later change keeps your session ending by this time.</span></div>
-        {err && <span className="err"><Icon name="circle-alert" />{err}</span>}
       </div>
-      <div className="actionbar"><button className="btn primary block lg" disabled={!veh} onClick={find}>Find a slot</button></div>
+      <div className="actionbar"><ActionError err={err} /><button className="btn primary block lg" disabled={!veh} onClick={find}>Find a slot</button></div>
     </>
   );
 }
@@ -327,4 +326,13 @@ export function CSScreen({ go, id, now }: { go: Go; id: string; now: number }) {
       <div className="actionbar"><button className="btn primary block lg" onClick={() => go({ s: "bookings" })}><Icon name="ticket" />View in Bookings</button></div>
     </>
   );
+}
+
+/** An error from the "Find a space / slot" button, shown right above it in the sticky action bar
+ * (the form can be longer than the screen, so an inline error there would sit out of view). */
+function ActionError({ err }: { err: string | null }) {
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => { if (err) ref.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }); }, [err]);
+  if (!err) return null;
+  return <div ref={ref} role="alert" className="banner danger compact" style={{ margin: 0 }}><span className="ic"><Icon name="circle-alert" /></span><b>{err}</b></div>;
 }

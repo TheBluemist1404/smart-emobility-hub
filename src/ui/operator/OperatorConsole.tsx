@@ -13,7 +13,7 @@ import { O04Incidents } from "./Incidents";
 import { O05Simulation } from "./Simulation";
 import { AlertBell, HeaderSearch, type Alert } from "./TopBar";
 
-export interface OpRoute { nav: Nav; hubId?: string; order?: OrderSeed; orderId?: string; incidentId?: string; draftFor?: string }
+export interface OpRoute { nav: Nav; hubId?: string; order?: OrderSeed; orderId?: string; incidentId?: string; draftFor?: string; from?: number; hours?: number }
 export type OpGo = (r: OpRoute) => void;
 interface Toast { id: number; message: string }
 
@@ -48,7 +48,7 @@ export function OperatorConsole() {
   switch (route.nav) {
     case "monitor": body = <O01Monitor go={go} now={now} hubId={route.hubId} />; break;
     case "orders": body = <O02Orders go={go} now={now} seed={route.order} orderId={route.orderId} />; break;
-    case "charging": body = <O03Charging go={go} now={now} hubId={route.hubId ?? "H01"} />; break;
+    case "charging": body = <O03Charging key={`${route.hubId}-${route.from ?? ""}`} go={go} now={now} hubId={route.hubId ?? "H01"} from={route.from} hours={route.hours} />; break;
     case "incidents": body = <O04Incidents go={go} now={now} incidentId={route.incidentId} draftFor={route.draftFor} />; break;
     default: body = <O05Simulation go={go} now={now} hubId={route.hubId} />;
   }

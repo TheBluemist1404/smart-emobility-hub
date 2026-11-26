@@ -116,6 +116,35 @@ show "Payment Failed" with the hold released (UC-02 E2).
    "Not Applied" with the reason.
 5. Open **Redistribution orders**: the new orders are there with source "simulation".
 
+Multi-Hub plan: on O01 open **H02** or **H03**. The warning card lists nearby Hubs nearest
+first with "room for N before 70 %" and a **Redistribution plan**: one leg per destination,
+each with its own **Create order**. O02 shows the same legs as "leg x of n".
+
+### Scenario C - charging-point failure (how to read it)
+
+1. Scenario **C**, Hub **H02**, period e.g. 15:00-17:00, tick **CP-H02-02** and **CP-H02-06**.
+   **Run simulation**.
+2. The card "H02 charging plan" compares the **normal** plan with the plan **with the failure**
+   (sessions served, requests unserved, average wait, peak kW against the 55 kW limit).
+3. The table lists every session that was on a failing point in the window and what the
+   re-plan does with it: **moved** (to another point), **shifted** (moved to make room),
+   **stops early** (already charging when the point fails), **unserved**, or **cancelled, fee
+   refunded** (a paid session that cannot be kept within 15 min).
+4. If the period starts later than now, a banner says so: Apply only changes that window;
+   sessions before it stay as they are.
+5. Tick the charging plan, **Apply 1 selected...**, **Confirm and apply**. The result says how
+   many sessions are in the committed plan and has **Open charging schedule - H02**.
+6. O03 opens at that window: the failing points have a hatched "Kept free - what-if" band and
+   the sessions sit exactly where the simulation put them. Press Generate Schedule again: the
+   window is still honoured until it ends.
+
+### Scenario D - charging demand surge
+
+Scenario **D**, Hub H02, the same period, **8** extra requests. The result shows surge requests
+served and their wait before -> after keeping points free, and what that costs the shared
+fleet. Apply works like C (points kept free for students' bookings in the window; a session
+already charging on a kept point finishes).
+
 ## Close
 
-Press **Reset demo**. Run `npm test` to show the 82 tests, labelled with their TC IDs, pass.
+Press **Reset demo**. Run `npm test` to show the 94 tests, labelled with their TC IDs, pass.

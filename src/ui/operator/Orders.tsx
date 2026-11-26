@@ -1,5 +1,5 @@
 // O02 Redistribution orders (UC-10 steps 2, 4-10, 2a, 2b, 2c, 8a, E1-E5).
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Icon } from "../shared/Icon";
 import { ApiError, api, hm, hms, useLive } from "../shared/live";
 import type { OpGo } from "./OperatorConsole";
@@ -7,7 +7,7 @@ import type { OpGo } from "./OperatorConsole";
 export interface OrderSeed { fromHub: string; toHub: string; quantity: number; model: string; from?: string; draftId?: string; incidentId?: string }
 interface Transfer { vehicleId: string; status: string; destHubId: string; destDock: string | null; destDockId: string | null; dockStatus: string | null; redirectedTo: string | null; soc: number | null; vehicleStatus: string | null }
 interface Order { id: string; fromHub: string; toHub: string; model: string; quantity: number; deadline: number; status: string; overdue: boolean; team: string | null; source: string; createdAt: number; cancelReason: string | null; arrived: number; transfers: Transfer[]; history: Array<{ time: number; status: string; note?: string }> }
-interface Suggestion { fromHub: string; toHub: string; model: string; quantity: number; reason: string; detail: string }
+interface Suggestion { fromHub: string; toHub: string; model: string; quantity: number; reason: string; detail: string; plan?: { leg: number; legs: number; excess: number; placed: number; left: number; note: string | null } }
 interface Shortfall { ok: boolean; eligible: number; netFreeDocks: number; candidates: Array<{ id: string; soc: number; status: string; eligible: boolean; why?: string }>; checks: Array<{ label: string; ok: boolean; detail: string }>; alternatives: Array<{ hubId: string; name: string; value: number; role: string }>; message: string | null }
 
 const HUBS = ["H01", "H02", "H03", "H04", "H05", "H06", "H07"];
@@ -41,7 +41,8 @@ export function O02Orders({ go, now, seed, orderId }: { go: OpGo; now: number; s
             {data!.suggestions.map((s, i) => (
               <div key={i} className="li"><span className="hub-code">{s.fromHub}</span><Icon name="arrow-right" className="ic-sm" /><span className="hub-code">{s.toHub}</span>
                 <span className={`chip ${s.reason === "Overloaded" ? "danger" : "warn"}`}>{s.reason}</span>
-                <div className="grow"><div className="t">Move {s.quantity} {s.model}s</div><div className="s">{s.detail}</div></div>
+                <div className="grow"><div className="t">Move {s.quantity} {s.model}{s.quantity === 1 ? "" : "s"}{s.plan && s.plan.legs > 1 ? ` · leg ${s.plan.leg} of ${s.plan.legs}` : ""}</div><div className="s">{s.detail}</div>
+                  {s.plan && s.plan.leg === s.plan.legs && <div className="xs subtle">Plan for {s.fromHub}: {s.plan.placed} of {s.plan.excess} placed over {s.plan.legs} Hub{s.plan.legs === 1 ? "" : "s"}, nearest first.{s.plan.note ? ` ${s.plan.note}` : ""}</div>}</div>
                 <button className="btn secondary sm" onClick={() => setDraft({ fromHub: s.fromHub, toHub: s.toHub, quantity: s.quantity, model: s.model, from: "suggestion" })}>Use suggestion</button></div>
             ))}
           </div>
@@ -113,17 +114,24 @@ function Transfers({ o, now }: { o: Order; now: number }) {
 function NewOrder({ seed, now, go, onClose, onDone }: { seed: OrderSeed; now: number; go: OpGo; onClose: () => void; onDone: (id: string) => void }) {
   const [d, setD] = useState({ fromHub: seed.fromHub, toHub: seed.toHub, model: seed.model || "e-bike", quantity: seed.quantity || 1, deadlineMin: 60, team: "Team A" });
   const [picked, setPicked] = useState<string[] | null>(null);
-  const [v, setV] = useState<Shortfall | null>(null);
+  const [vr, setV] = useState<{ key: string; v: Shortfall } | null>(null);
+  const seq = useRef(0);
   const [err, setErr] = useState<string | null>(null);
   useEffect(() => { setD((x) => ({ ...x, fromHub: seed.fromHub, toHub: seed.toHub, quantity: seed.quantity || 1, model: seed.model || "e-bike" })); setPicked(null); }, [seed]);
   const deadline = Math.ceil((now + d.deadlineMin * 60_000) / 300_000) * 300_000;
   const body = { fromHub: d.fromHub, toHub: d.toHub, model: d.model, quantity: d.quantity, deadline, team: d.team, vehicleIds: picked ?? undefined, draftId: seed.draftId };
   const key = JSON.stringify({ ...body, deadline: 0 });
+  // Every input change asks the server again. Only the answer for the current inputs counts: an
+  // older answer arriving late is dropped, and until the new one arrives the order can't be confirmed.
   useEffect(() => {
+    const n = ++seq.current;
     if (!d.fromHub || !d.toHub) { setV(null); return; }
-    api<Shortfall>("/operator/orders/validate", body).then((r) => { setV(r); setErr(null); }).catch((e: Error) => setErr(e.message));
+    api<Shortfall>("/operator/orders/validate", body).then((r) => { if (n === seq.current) { setV({ key, v: r }); setErr(null); } }).catch((e: Error) => { if (n === seq.current) { setV(null); setErr(e.message); } });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [key]);
+  const v = vr?.v ?? null;
+  const fresh = !!vr && vr.key === key;
+  const qtyOk = Number.isInteger(d.quantity) && d.quantity >= 1;
   const chosen = picked ?? (v?.candidates.filter((c) => c.eligible).slice(0, d.quantity).map((c) => c.id) ?? []);
   const submit = (choice: "draft" | "commit") => api<{ id: string }>("/operator/orders", { draft: { ...body, vehicleIds: chosen }, choice })
     .then((r) => { if (seed.incidentId) api(`/operator/incidents/${seed.incidentId}/corrective`, { note: `Redistribution order ${r.id} ${d.fromHub} → ${d.toHub}`, orderId: r.id }); onDone(r.id); })
@@ -152,8 +160,8 @@ function NewOrder({ seed, now, go, onClose, onDone }: { seed: OrderSeed; now: nu
               {v.candidates.length === 0 && <div className="li subtle small">No candidate vehicles at {d.fromHub}.</div>}
             </div></div>
             <span className="hint"><Icon name="info" />Charging vehicles qualify only at SoC ≥ 80% (REDISTRIBUTION_MIN_SOC).</span>
-            <span className="eyebrow">Checks before confirming</span>
-            <div className="stack tight">{v.checks.map((c) => <div key={c.label} className="row between small"><span className="row" style={{ gap: 6 }}><Icon name={c.ok ? "circle-check" : "circle-x"} className="ic-sm" style={{ color: c.ok ? "var(--ok)" : "var(--danger)" }} />{c.label}</span><span className="mono">{c.detail}</span></div>)}</div>
+            <span className="eyebrow row" style={{ gap: 6 }}>Checks before confirming{!fresh && <span className="spinner" style={{ width: 12, height: 12 }} aria-label="Checking" />}</span>
+            <div className="stack tight" style={fresh ? undefined : { opacity: 0.45 }}>{v.checks.map((c) => <div key={c.label} className="row between small"><span className="row" style={{ gap: 6 }}><Icon name={c.ok ? "circle-check" : "circle-x"} className="ic-sm" style={{ color: c.ok ? "var(--ok)" : "var(--danger)" }} />{c.label}</span><span className="mono">{c.detail}</span></div>)}</div>
             {v.message && <div className="banner danger compact"><span className="ic"><Icon name="circle-alert" /></span><b>{v.message}</b>
               {v.alternatives.length > 0 && <p>Try {v.alternatives.map((a) => `${a.hubId} (${a.value} ${a.role === "source" ? "eligible" : "free docks"})`).join(", ")}.</p>}
               {v.alternatives.length > 0 && <div className="actions">{v.alternatives.map((a) => <button key={a.hubId} className="btn secondary sm" onClick={() => setD({ ...d, [a.role === "source" ? "fromHub" : "toHub"]: a.hubId })}>Use {a.hubId} as {a.role}</button>)}</div>}</div>}
@@ -163,7 +171,7 @@ function NewOrder({ seed, now, go, onClose, onDone }: { seed: OrderSeed; now: nu
         <div className="row" style={{ gap: 8, justifyContent: "flex-end" }}>
           <button className="btn ghost" onClick={onClose}>Cancel</button>
           <button className="btn secondary" disabled={!d.fromHub || !d.toHub} onClick={() => submit("draft")}>Save as Draft</button>
-          <button className="btn primary" disabled={!v?.ok || chosen.length !== d.quantity} onClick={() => submit("commit")}><Icon name="check" />Confirm Order</button>
+          <button className="btn primary" disabled={!fresh || !qtyOk || !v?.ok || chosen.length !== d.quantity} title={!fresh ? "Checking…" : undefined} onClick={() => submit("commit")}><Icon name="check" />Confirm Order</button>
         </div>
         {seed.incidentId && <span className="hint"><Icon name="siren" />The order is recorded under {seed.incidentId} (UC-12 8a). <a className="clickable" onClick={() => go({ nav: "incidents", incidentId: seed.incidentId })}>Back to the incident</a></span>}
       </div>

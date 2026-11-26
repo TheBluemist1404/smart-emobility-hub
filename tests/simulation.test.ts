@@ -9,9 +9,10 @@ const period = () => ({ start: now() + min(30), end: now() + min(30) + 2 * HOUR 
 function snapshotLive() {
   return JSON.stringify({ v: [...db.vehicles.values()].map((v) => [v.id, v.status, v.hubId]), d: [...db.docks.values()].map((d) => [d.id, d.status]), o: db.orders.size });
 }
-function runA(pct = 200) {
-  ctl.simulation.startSimulation("H02");
-  ctl.simulation.defineScenario("A demand surge", ["H02"], period(), [{ name: "extraDemandPct", value: pct }]);
+// H05 (46 %) has room below the 70 % ceiling, so a shortage there can be covered by transfers.
+function runA(pct = 200, hub = "H05") {
+  ctl.simulation.startSimulation(hub);
+  ctl.simulation.defineScenario("A demand surge", [hub], period(), [{ name: "extraDemandPct", value: pct }]);
   return ctl.simulation.run();
 }
 
@@ -19,7 +20,7 @@ describe("UC-13 what-if simulation", () => {
   it("TC-UC13-01 scenario A: measures and recommendations, live state untouched", () => {
     const before = snapshotLive();
     const s = runA();
-    expect(s.measures[0].hubId).toBe("H02");
+    expect(s.measures[0].hubId).toBe("H05");
     expect(s.measures[0].shortage).toBeGreaterThan(0);
     expect(s.recommendations.some((r) => r.kind === "transfer")).toBe(true);
     expect(s.recommendations.filter((r) => r.kind === "alternative Hub").every((r) => !r.actionable)).toBe(true);
@@ -37,13 +38,18 @@ describe("UC-13 what-if simulation", () => {
     catch (e) { expect((e as { code: string }).code).toBe("E2:extraDemandPct"); }
   });
 
-  it("TC-UC13-03 scenario C proposes a charging plan for the failed points", () => {
+  it("TC-UC13-03 scenario C proposes a charging plan without the failed points", () => {
     ctl.simulation.startSimulation("H01");
     const pts = [...db.points.values()].filter((p) => p.hubId === "H01").slice(0, 3).map((p) => p.id);
     ctl.simulation.defineScenario("C charging-point failure", ["H01"], period(), [{ name: "failedPoints", value: pts }]);
     const s = ctl.simulation.run();
-    expect(s.measures[0].sessionsToMove).toBe(3);
-    expect(s.recommendations.some((r) => r.kind === "charging plan")).toBe(true);
+    const plan = s.recommendations.find((r) => r.kind === "charging plan")!;
+    expect(plan.params.points).toEqual(pts);
+    expect(plan.params.window).toEqual(period());
+    // Every session the normal plan had on a failed point in the window is listed with where it goes.
+    const c = s.charging[0];
+    expect(s.measures[0].sessionsToMove).toBe(c.moves.filter((m) => m.from && pts.includes(m.from.pointId) && m.from.start < period().end && m.from.end > period().start).length);
+    for (const m of c.moves.filter((x) => x.to)) expect(pts.includes(m.to!.pointId) && m.to!.start < period().end && m.to!.end > period().start).toBe(false);
   });
 
   it("TC-UC13-09 discard releases the result; nothing was applied", () => {
@@ -66,7 +72,7 @@ describe("UC-14 apply recommendations", () => {
     expect(out.outcome).toBe("Applied");
     const o = db.orders.get(out.reference!)!;
     expect(o.status).toBe("Assigned");
-    expect(o.toHub).toBe("H02");
+    expect(o.toHub).toBe("H05");
   });
 
   it("TC-UC14-06 cancel goes back to the result and applies nothing", () => {
